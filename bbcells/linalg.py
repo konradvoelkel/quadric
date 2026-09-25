@@ -179,3 +179,66 @@ def smith_invariants(matrix):
         invariants.append(abs(a[t][t]))
         t += 1
     return invariants
+
+
+def null_space(matrix, ncols=None):
+    """a basis of {x : A x = 0} over Q (list of Fraction vectors)
+    >>> null_space([[1, 1, 0], [0, 0, 1]])
+    [[Fraction(-1, 1), Fraction(1, 1), Fraction(0, 1)]]
+    """
+    ncols = len(matrix[0]) if matrix else (ncols or 0)
+    a = [[Fraction(x) for x in row] for row in matrix]
+    pivots, r = [], 0
+    for col in range(ncols):
+        pivot = next((i for i in range(r, len(a)) if a[i][col] != 0), None)
+        if pivot is None:
+            continue
+        a[r], a[pivot] = a[pivot], a[r]
+        p = a[r][col]
+        a[r] = [x / p for x in a[r]]
+        for i in range(len(a)):
+            if i != r and a[i][col] != 0:
+                factor = a[i][col]
+                a[i] = [x - factor * y for x, y in zip(a[i], a[r])]
+        pivots.append(col)
+        r += 1
+    free = [c for c in range(ncols) if c not in pivots]
+    basis = []
+    for f in free:
+        v = [Fraction(0)] * ncols
+        v[f] = Fraction(1)
+        for row, pc in zip(a, pivots):
+            v[pc] = -row[f]
+        basis.append(v)
+    return basis
+
+
+def solve(matrix, rhs):
+    """one solution x of A x = b over Q, or None
+    >>> solve([[1, 1], [1, -1]], [2, 0])
+    [Fraction(1, 1), Fraction(1, 1)]
+    >>> solve([[1, 1], [2, 2]], [1, 3]) is None
+    True
+    """
+    ncols = len(matrix[0]) if matrix else 0
+    a = [[Fraction(x) for x in row] + [Fraction(b)] for row, b in zip(matrix, rhs)]
+    pivots, r = [], 0
+    for col in range(ncols):
+        pivot = next((i for i in range(r, len(a)) if a[i][col] != 0), None)
+        if pivot is None:
+            continue
+        a[r], a[pivot] = a[pivot], a[r]
+        p = a[r][col]
+        a[r] = [x / p for x in a[r]]
+        for i in range(len(a)):
+            if i != r and a[i][col] != 0:
+                factor = a[i][col]
+                a[i] = [x - factor * y for x, y in zip(a[i], a[r])]
+        pivots.append(col)
+        r += 1
+    if any(all(x == 0 for x in row[:-1]) and row[-1] != 0 for row in a):
+        return None
+    x = [Fraction(0)] * ncols
+    for row, pc in zip(a, pivots):
+        x[pc] = row[-1]
+    return x

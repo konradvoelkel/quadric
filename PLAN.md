@@ -248,12 +248,15 @@ prints usage.
   On $dP_6$ with $\lambda = (1,3)$ an invariant curve joins two 1-cells, so
   that BB decomposition is not a stratification. The order is still acyclic,
   and `gkm.is_graded` reports which case applies.)*
-- [ ] **S3.3 $H_T^*(X;\mathbb{Q})$ as a GKM ring** (M). Tuples of polynomials
+- [x] **S3.3 $H_T^*(X;\mathbb{Q})$ as a GKM ring** (M). Tuples of polynomials
   with divisibility along edges; a module basis from the BB order (the
   equivariant Schubert classes are the unique flow-up classes). Poincaré
   series check $P_X(t)/(1-t^2)^r$. **Done when:** $H_T^*(\mathbb{P}^n)$ and
   $H_T^*(\mathrm{Gr}(2,4))$ reproduce the known ring structure after
-  setting the equivariant parameters to $0$.
+  setting the equivariant parameters to $0$. *(Implemented in `equivariant.py`
+  with Atiyah–Bott localization; degrees of Grassmannians, quadrics and
+  $\mathbb{P}^n$ and Pieri on $\mathrm{Gr}(2,4)$ are tested. Flow-up classes of
+  high codimension in large rank are expensive: they are computed on demand.)*
 - [x] **S3.4 `operations.blowup`** (M). Implements 1.6. Needs `Z` as its own
   `FixedPointData` and an embedding map of fixed points; the embedding is
   checked by multiset inclusion $\mathrm{wt}_Z(p) \subset \mathrm{wt}_X(p)$.
