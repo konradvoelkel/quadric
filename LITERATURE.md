@@ -122,9 +122,16 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   so its incidence is 0, not $+2$ (Kocherlakota's rule agrees:
   $\sigma(I)-\sigma(J) = 3e_{25}$); and the identity $m = N_I(a,b)+1$ used
   to rederive Kocherlakota's theorem holds for complete flags only.
-- ✓ L. Rabelo, L. A. B. San Martin, *Cellular homology of real flag
-  manifolds*, Indag. Math. 30 (2019), 745–772 (from the bibliography of
-  arXiv:1910.11149). Signs for general real flag manifolds; PLAN S5.4. Real Bruhat cell
+- ✓a L. Rabelo, L. A. B. San Martin, *Cellular homology of real flag
+  manifolds*, Indag. Math. 30 (2019), 745–772; arXiv:1810.00934. Signs for
+  general real flag manifolds, $c(w,w') = (-1)^i\deg(\Phi_{w'}^{-1}\circ\Psi_{w'})(1+(-1)^\kappa)$.
+  Implemented for the classical types in `realcells.rabelo_san_martin`: the
+  degree is computed as a change of tangent frame at the Tits-lift point in
+  exact matrix realizations (`liealgebra.py`).
+- ✓a J. Lambert, L. Rabelo, *A correspondence between boundary coefficients
+  of real flag manifolds and height of roots*, J. Lie Theory 32 (2022),
+  431–446; arXiv:2009.05114. $\kappa$ as a height of a root; in type A,
+  $\kappa = j - i$ for $w = w'(i,j)$. Real Bruhat cell
   incidences are $0$ or $\pm 2$; the model for the matrices $E_d$ in SPEC §3.5.
 - ✓a L. Casian, Y. Kodama, *On the cohomology of real Grassmann manifolds*,
   arXiv:1309.5520. Explicit incidence graphs via checkered Young diagrams.

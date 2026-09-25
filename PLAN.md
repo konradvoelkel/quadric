@@ -302,7 +302,7 @@ prints usage.
   $E_d \in W(\mathbb{Z})$ from GKM data plus orientation signs, testing it
   against S5.1 on all type A cases with $n \le 5$. Write up the results in
   `docs/H1.md`, whether positive or negative. This step never blocks M6.
-- [ ] **S5.4 Other types** (later). Rabelo–San Martin (Indag. Math. 30 (2019),
+- [x] **S5.4 Other types** (later). Rabelo–San Martin (Indag. Math. 30 (2019),
   745–772) give signs for general real flag manifolds; not on arXiv, so
   obtain a copy first.
 

@@ -80,8 +80,8 @@ class TestGolden(unittest.TestCase):
         code, out, err = run_cli("real", "A3")
         self.assertEqual(code, 0, err)
         self.assertIn("H^3 = Z^2 + Z/2 + Z/2", out)
-        code, out, err = run_cli("real", "G2")
-        self.assertIn("unsigned", out)
+        code, out, err = run_cli("real", "C3")
+        self.assertIn("H^9 = Z", out)
 
     def test_cli_errors_are_reported(self):
         code, out, err = run_cli("toric", "--named", "P2", "--cocharacter", "1,1")

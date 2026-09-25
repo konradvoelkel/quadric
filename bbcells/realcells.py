@@ -67,7 +67,9 @@ class RealCellComplex(object):
         return [[self.incidences.get((x, y), 0) for x in cols] for y in rows]
 
     def square_zero(self):
-        """whether delta o delta = 0 (a strong check of the signs)"""
+        """whether delta o delta = 0, resp. d o d = 0 (a strong check of the signs)"""
+        if self.convention == "cellular":
+            return _square_zero_cellular(self.incidences, self.dims)
         for c in range(0, self.dim - 1):
             a, b = self.coboundary_matrix(c + 1), self.coboundary_matrix(c)
             for i in range(len(a)):
@@ -76,12 +78,30 @@ class RealCellComplex(object):
                         return False
         return True
 
+    def cellular_homology(self):
+        """H_d from the boundary C_d -> C_{d-1} with coefficients [x, y]"""
+        cells_of = {d: sorted((p for p, e in self.dims.items() if e == d), key=str)
+                    for d in range(self.dim + 1)}
+        ranks, torsion = {}, {}
+        for d in range(0, self.dim + 2):
+            if 1 <= d <= self.dim:
+                matrix = [[self.incidences.get((x, y), 0) for x in cells_of[d]]
+                          for y in cells_of[d - 1]]
+            else:
+                matrix = []
+            invariants = smith_invariants(matrix) if matrix and matrix[0] else []
+            ranks[d] = len(invariants)
+            torsion[d] = [x for x in invariants if x > 1]
+        return [(len(cells_of[d]) - ranks[d] - ranks[d + 1], torsion[d + 1])
+                for d in range(self.dim + 1)]
+
     def cohomology(self):
         """[(free rank, [torsion orders]) for c = 0..dim] of H^c(X(R); Z)"""
         if not self.signed:
             raise ValueError("integral cohomology needs signed incidences")
-        if self.convention != "cooriented":
-            raise ValueError("cohomology is implemented for the cooriented convention")
+        if self.convention == "cellular":
+            h = self.cellular_homology()
+            return [(h[c][0], h[c - 1][1] if c > 0 else []) for c in range(len(h))]
         ranks, torsion = {}, {}
         for c in range(-1, self.dim + 1):
             matrix = self.coboundary_matrix(c) if 0 <= c < self.dim else []
@@ -93,6 +113,8 @@ class RealCellComplex(object):
 
     def homology(self):
         """H_d: free part of H^d, torsion of H^{d+1} (universal coefficients)"""
+        if self.signed and self.convention == "cellular":
+            return self.cellular_homology()
         h = self.cohomology()
         return [(h[d][0], h[d + 1][1] if d + 1 < len(h) else []) for d in range(len(h))]
 
@@ -141,20 +163,29 @@ def kocherlakota_incidences(cartan_type, crossed=None):
 
 
 def real_flag_variety(cartan_type, crossed=None):
-    """the real cell complex of G/P; signed (type A) or unsigned (other types)
+    """the real cell complex of G/P with signs where available:
+    type A: Matszangosz (cooriented complex); types B, C, D: Rabelo-San Martin
+    (cellular complex, orientations from the classical matrix realizations);
+    exceptional types: signs from d o d = 0 when this determines the
+    homology, otherwise Kocherlakota's unsigned incidences
     >>> X = real_flag_variety("A2", {1})            # RP^2
     >>> X.cohomology()                              # Z, 0, Z/2
     [(1, []), (0, []), (0, [2])]
     >>> X.homology()                                # Z, Z/2, 0
     [(1, []), (0, [2]), (0, [])]
     """
-    letter = cartan_type.strip().upper()[0]
+    letter = RootSystem(cartan_type).letter
     if letter == "A":
         return type_a_signed(cartan_type, crossed)
-    data, unsigned = kocherlakota_incidences(cartan_type, crossed)
-    dims = {p: data.annotation(p)["length"] for p in data.points}
-    return RealCellComplex(data.name + "(R)", dims, unsigned, signed=False,
-                           convention="cellular")
+    if letter in "BCD":
+        return rabelo_san_martin(cartan_type, crossed)
+    try:
+        return cellular_real_flag_variety(cartan_type, crossed)
+    except ValueError:
+        data, unsigned = kocherlakota_incidences(cartan_type, crossed)
+        dims = {p: data.annotation(p)["length"] for p in data.points}
+        return RealCellComplex(data.name + "(R)", dims, unsigned, signed=False,
+                               convention="cellular")
 
 
 # -- Matszangosz, type A, signed ---------------------------------------------
@@ -367,3 +398,211 @@ def cellular_rational_betti(dims, signed):
         rows = [[signed.get((x, y), 0) for x in cells_of[d]] for y in cells_of[d - 1]]
         ranks[d] = matrix_rank(rows) if rows and rows[0] else 0
     return [len(cells_of[d]) - ranks.get(d, 0) - ranks.get(d + 1, 0) for d in range(top + 1)]
+
+
+# -- signs from d o d = 0 (PLAN.md S5.4) --------------------------------------
+
+def _f2_solve(equations, nvars):
+    """solve A e = b over F_2; equations: list of (bitmask, bit). Returns
+    (particular solution as bitmask, list of null space basis bitmasks) or None"""
+    pivots = []          # (pivot bit, row mask, rhs)
+    for mask, rhs in equations:
+        for bit, row, value in pivots:
+            if mask >> bit & 1:
+                mask ^= row
+                rhs ^= value
+        if mask == 0:
+            if rhs:
+                return None
+            continue
+        bit = mask.bit_length() - 1
+        # reduce existing pivot rows
+        new_pivots = []
+        for b2, row, value in pivots:
+            if row >> bit & 1:
+                row ^= mask
+                value ^= rhs
+            new_pivots.append((b2, row, value))
+        pivots = new_pivots + [(bit, mask, rhs)]
+    solution = 0
+    pivot_bits = {bit for bit, _, _ in pivots}
+    for bit, row, value in pivots:
+        if value:
+            solution |= 1 << bit
+    null = []
+    for free in range(nvars):
+        if free in pivot_bits:
+            continue
+        vector = 1 << free
+        for bit, row, value in pivots:
+            if row >> free & 1:
+                vector |= 1 << bit
+        null.append(vector)
+    return solution, null
+
+
+def _f2_rank(vectors):
+    basis = []
+    for v in vectors:
+        for b in basis:
+            v = min(v, v ^ b)
+        if v:
+            basis.append(v)
+    return len(basis)
+
+
+def signs_from_square_zero(dims, magnitudes):
+    """sign the nonzero incidences {(x, y): 2} of a cellular complex (dim x =
+    dim y + 1) so that the boundary squares to zero. Pairs (x, z) two apart
+    with exactly two nonzero paths give linear equations over F_2 for the
+    sign exponents. Returns (signed incidences, unique_up_to_reorientation).
+    Raises ValueError if the conditions are inconsistent or not linear
+    (more than two paths)."""
+    edges = sorted(k for k, v in magnitudes.items() if v)
+    index = {e: i for i, e in enumerate(edges)}
+    down = {}
+    for x, y in edges:
+        down.setdefault(x, []).append(y)
+    equations = []
+    for x, ys in down.items():
+        paths = {}
+        for y in ys:
+            for z in down.get(y, []):
+                paths.setdefault(z, []).append(y)
+        for z, middle in paths.items():
+            if len(middle) == 1:
+                raise ValueError("boundary cannot square to zero: one path %r -> %r -> %r"
+                                 % (x, middle[0], z))
+            if len(middle) > 2:
+                raise ValueError("more than two paths from %r to %r: nonlinear sign "
+                                 "conditions" % (x, z))
+            y1, y2 = middle
+            mask = (1 << index[(x, y1)]) ^ (1 << index[(y1, z)]) ^ \
+                   (1 << index[(x, y2)]) ^ (1 << index[(y2, z)])
+            equations.append((mask, 1))
+    result = _f2_solve(equations, len(edges))
+    if result is None:
+        raise ValueError("no sign assignment makes the boundary square to zero")
+    solution, null = result
+    # reorienting a cell flips the signs of all incidences at it
+    cells = sorted({c for e in edges for c in e}, key=str)
+    gauge = []
+    for c in cells:
+        v = 0
+        for e, i in index.items():
+            if c in e:
+                v |= 1 << i
+        gauge.append(v)
+    unique = _f2_rank(null) == _f2_rank(gauge) and _f2_rank(null + gauge) == _f2_rank(gauge)
+    signed = {e: (-2 if solution >> i & 1 else 2) for e, i in index.items()}
+    return signed, unique
+
+
+def sign_choices(dims, magnitudes):
+    """all sign assignments with d o d = 0, one per class modulo
+    reorientation of cells: a list of 2^k signed incidence dicts"""
+    edges = sorted(k for k, v in magnitudes.items() if v)
+    index = {e: i for i, e in enumerate(edges)}
+    signed, unique = signs_from_square_zero(dims, magnitudes)
+    base = 0
+    for e, i in index.items():
+        if signed[e] < 0:
+            base |= 1 << i
+    # recompute the null space and the gauge to find the extra directions
+    down = {}
+    for x, y in edges:
+        down.setdefault(x, []).append(y)
+    equations = []
+    for x, ys in down.items():
+        paths = {}
+        for y in ys:
+            for z in down.get(y, []):
+                paths.setdefault(z, []).append(y)
+        for z, (y1, y2) in paths.items():
+            equations.append(((1 << index[(x, y1)]) ^ (1 << index[(y1, z)]) ^
+                              (1 << index[(x, y2)]) ^ (1 << index[(y2, z)]), 1))
+    _, null = _f2_solve(equations, len(edges))
+    cells = sorted({c for e in edges for c in e}, key=str)
+    span = []
+    for c in cells:
+        v = 0
+        for e, i in index.items():
+            if c in e:
+                v |= 1 << i
+        span.append(v)
+    extra = []
+    for v in null:
+        if _f2_rank(span + [v]) > _f2_rank(span):
+            span.append(v)
+            extra.append(v)
+    choices = []
+    for k in range(2 ** len(extra)):
+        mask = base
+        for j, v in enumerate(extra):
+            if k >> j & 1:
+                mask ^= v
+        choices.append({e: (-2 if mask >> i & 1 else 2) for e, i in index.items()})
+    return choices
+
+
+def cellular_real_flag_variety(cartan_type, crossed=None, max_choices=256):
+    """the cellular chain complex of G/P(R) for any type: Kocherlakota's
+    magnitudes, with signs from d o d = 0. When d o d = 0 leaves k free signs
+    beyond reorienting cells, all 2^k choices are tried; the result is
+    returned only if their integral homology agrees (then it is the homology
+    of G/P(R), since the true signs are among the choices)."""
+    data, magnitudes = kocherlakota_incidences(cartan_type, crossed)
+    dims = {p: data.annotation(p)["length"] for p in data.points}
+    choices = sign_choices(dims, magnitudes)
+    if len(choices) > max_choices:
+        raise ValueError("%d sign choices, more than %d" % (len(choices), max_choices))
+    complexes = [RealCellComplex(data.name + "(R)", dims, signed, signed=True,
+                                 convention="cellular") for signed in choices]
+    homologies = {tuple((f, tuple(t)) for f, t in X.cellular_homology()) for X in complexes}
+    if len(homologies) != 1:
+        raise ValueError("the %d sign choices allowed by d o d = 0 give different homology"
+                         % len(choices))
+    return complexes[0]
+
+
+# -- Rabelo-San Martin signs for classical types (PLAN.md S5.4) --------------
+
+def rabelo_san_martin(cartan_type, crossed=None):
+    """the cellular chain complex of G/P(R) for classical G with signs from
+    arXiv:1810.00934 (Theorem `teoforcw1`): for w = r_1 ... r_n (our fixed
+    reduced words) and w' = r_1 ... ^r_i ... r_n,
+        c(w, w') = (-1)^i deg(Phi_{w'}^{-1} o Psi_{w'}) (1 + (-1)^kappa),
+    where Psi_{w'} is the parametrization by the deleted word. The degree is
+    the orientation of the deleted word's tangent frame at the common point
+    n_{w'} b_0 relative to the frame of w's fixed word (Tits lifts satisfy the
+    braid relations, and the composite is a diffeomorphism of the open cube)."""
+    from bbcells.liealgebra import ClassicalRealization
+    R = RootSystem(cartan_type)
+    if R.letter not in "ABCD":
+        raise ValueError("the matrix realization covers the classical types only")
+    realization = ClassicalRealization(R.letter, R.rank)
+    data, magnitudes = kocherlakota_incidences(cartan_type, crossed)
+    word = {p: tuple(i - 1 for i in data.annotation(p)["word"]) for p in data.points}
+    mu = {p: data.annotation(p)["weight"] for p in data.points}
+    dims = {p: len(word[p]) for p in data.points}
+    signed = {}
+    for (x, y), magnitude in magnitudes.items():
+        if not magnitude:
+            continue
+        wx = word[x]
+        start = mu[data.points[0]]
+        candidates = []
+        for i in range(len(wx)):
+            deleted = wx[:i] + wx[i + 1:]
+            image = start
+            for letter in reversed(deleted):
+                image = R.reflect_weight(letter, image)
+            if image == mu[y]:
+                candidates.append(i)
+        if len(candidates) != 1:
+            raise AssertionError("expected a unique deletion index, got %r" % candidates)
+        i = candidates[0]
+        deleted = wx[:i] + wx[i + 1:]
+        degree = realization.relative_orientation(deleted, word[y])
+        signed[(x, y)] = (-1) ** (i + 1) * degree * magnitude
+    return RealCellComplex(data.name + "(R)", dims, signed, signed=True, convention="cellular")

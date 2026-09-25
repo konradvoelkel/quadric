@@ -87,16 +87,90 @@ class TestTypeA(unittest.TestCase):
                          {("s1", "e"): 2, ("s2.s1", "s1"): 0})
 
 
+def compact_poincare(letter, n):
+    """rational Poincare polynomial of the maximal compact subgroup K of the
+    split real form: (G/B)(R) = K/M with M finite acting trivially on
+    rational cohomology, so P((G/B)(R)) = P(K)"""
+    def so(m):
+        p = IntPoly((1,))
+        for i in range(1, m // 2 + (m % 2)):
+            if m % 2 == 1 or i < m // 2:
+                p = p * (IntPoly.monomial(4 * i - 1) + 1)
+        if m % 2 == 0 and m >= 2:
+            p = p * (IntPoly.monomial(m - 1) + 1)
+        return p
+
+    def u(m):
+        p = IntPoly((1,))
+        for i in range(1, m + 1):
+            p = p * (IntPoly.monomial(2 * i - 1) + 1)
+        return p
+
+    return {"A": lambda: so(n + 1), "B": lambda: so(n) * so(n + 1), "C": lambda: u(n),
+            "D": lambda: so(n) * so(n)}[letter]()
+
+
 class TestOtherTypes(unittest.TestCase):
 
-    def test_unsigned_incidences(self):
-        for name, crossed in (("B2", None), ("C3", {1}), ("G2", None), ("D4", {1}),
-                              ("B3", {3}), ("F4", {4})):
+    def test_full_flags_against_the_maximal_compact_subgroup(self):
+        """P((G/B)(R); Q) = P(K) for SO(n+1), SO(n) x SO(n+1), U(n), SO(n) x SO(n)"""
+        for name in ("A1", "A2", "A3", "B2", "B3", "C2", "C3", "D3"):
+            letter, n = name[0], int(name[1:])
+            X = realcells.real_flag_variety(name)
+            self.assertTrue(X.signed and X.square_zero(), name)
+            self.assertEqual(IntPoly.from_counts(X.rational_betti()), compact_poincare(letter, n),
+                             name)
+
+    def test_rabelo_san_martin_agrees_with_matszangosz_in_type_a(self):
+        for n in range(1, 4):
+            for crossed in parabolics(n):
+                cellular = realcells.rabelo_san_martin("A%d" % n, crossed)
+                self.assertTrue(cellular.square_zero())
+                self.assertEqual(cellular.cohomology(),
+                                 realcells.type_a_signed("A%d" % n, crossed).cohomology(),
+                                 (n, crossed))
+
+    def test_signs_from_square_zero_agree_with_rabelo_san_martin(self):
+        """where d o d = 0 determines the homology, it matches"""
+        for name, crossed in (("B2", None), ("B3", None), ("B3", {1}), ("C3", {2})):
+            a = realcells.cellular_real_flag_variety(name, crossed)
+            b = realcells.rabelo_san_martin(name, crossed)
+            self.assertEqual(a.cellular_homology(), b.cellular_homology(), (name, crossed))
+
+    def test_square_zero_does_not_always_determine_the_signs(self):
+        with self.assertRaisesRegex(ValueError, "different homology"):
+            realcells.cellular_real_flag_variety("C3")
+
+    def test_exceptional_partial_flags(self):
+        """signs from d o d = 0; the Euler characteristic must equal the
+        signature of chi^{A^1} from the BB cells (an independent count)"""
+        for name, crossed in (("G2", {1}), ("G2", {2}), ("F4", {1}), ("F4", {4}), ("E6", {1})):
             X = realcells.real_flag_variety(name, crossed)
-            self.assertFalse(X.signed)
-            self.assertTrue(set(X.incidences.values()) <= {0, 2})
-            with self.assertRaises(ValueError):
-                X.cohomology()
+            self.assertTrue(X.signed, (name, crossed))
+            chi = sum((-1) ** c * free for c, (free, _) in enumerate(X.cohomology()))
+            signature = bb_cells(flag.flag_variety(name, crossed)).invariants() \
+                .real_euler_characteristic
+            self.assertEqual(chi, signature, (name, crossed))
+        # G2/P1 = Q_5, whose real points are (S^2 x S^3)/+-1: Q in degrees 0 and 3
+        self.assertEqual(realcells.real_flag_variety("G2", {1}).rational_betti(),
+                         [1, 0, 0, 1, 0, 0])
+
+    def test_g2(self):
+        """G2/B(R) = SO(4)/M: rational Poincare polynomial (1 + t^3)^2"""
+        X = realcells.real_flag_variety("G2")
+        self.assertTrue(X.signed)
+        self.assertEqual(X.rational_betti(), [1, 0, 0, 2, 0, 0, 1])
+
+    def test_partial_flags_of_classical_types_are_complexes(self):
+        for name in ("B2", "B3", "C3", "D4"):
+            n = int(name[1:])
+            for crossed in parabolics(n):
+                if name == "D4" and len(crossed) > 2:
+                    continue
+                X = realcells.real_flag_variety(name, crossed)
+                self.assertTrue(X.square_zero(), (name, crossed))
+                for free, torsion in X.cohomology():
+                    self.assertTrue(all(t == 2 for t in torsion), (name, crossed))
 
     def test_even_quadrics_have_no_adjacent_nonzero_incidence_in_the_middle(self):
         # D_m/P_1 = Q_{2m-2}: the two middle cells are not joined to each other
