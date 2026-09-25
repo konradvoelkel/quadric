@@ -34,6 +34,7 @@ the status of each step) and [LITERATURE.md](LITERATURE.md) (sources).
     python3 -m bbcells example complete-conics      # blow-up of P^5 along the Veronese
     python3 -m bbcells spherical complete-quadrics 5   # assembled orbit by orbit, 450 cells
     python3 -m bbcells symmetric AIII 2 3           # complete symmetric varieties from Satake diagrams
+    python3 -m bbcells symmetric CI 2 --fan fan.json   # toroidal variety over it (blow-ups etc.)
     python3 -m bbcells real A3                      # H^*(Fl(R^4); Z)
 
 Every front end is tested against an independent oracle (point counts,

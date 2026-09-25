@@ -199,20 +199,41 @@ class SatakeDiagram(object):
         return spherical.wonderful_orbits(self.R.name, self.spherical_roots, self.satellite,
                                           parabolic=tuple(sorted(self.black)), strict=strict)
 
-    def fixed_point_data(self, strict=False):
-        """the fixed-point data; orbits beyond condition (R) (Hermitian
-        satellites) are accepted only if the result satisfies the holomorphic
-        Lefschetz identity and is independent of the cocharacter"""
+    def fixed_point_data(self, strict=False, certify=True):
+        """the fixed-point data. Orbits beyond condition (R) (Hermitian
+        satellites) get the W_L-average as normal weights; this is certified
+        by spherical.certify_normal_weights when there is a single unknown
+        (the orbits are then marked CERTIFIED), and otherwise accepted only if
+        the result passes all checks (cocharacter independence, holomorphic
+        Lefschetz, Poincare duality)."""
+        from dataclasses import replace
         orbits = self.orbits(strict)
+        if any(orbit.note for orbit in orbits):
+            certified = False
+            if certify:
+                try:
+                    admissible, _ = spherical.certify_normal_weights(self.R.name, orbits)
+                    certified = all(values == [0] for values in admissible.values())
+                    if not certified:
+                        raise ValueError("the ABBV identity admits %r: the W_L-average is "
+                                         "not the normal weight" % (admissible,))
+                except ValueError as error:
+                    if "only a single unknown" not in str(error):
+                        raise
+            if certified:
+                orbits = [replace(o, note=CERTIFIED) if o.note else o for o in orbits]
         X = spherical.assemble(self.R.name, orbits,
                                name="complete symmetric variety %s" % self.name)
-        if any(orbit.note for orbit in orbits):
+        if any(orbit.note == spherical.BEYOND_R for orbit in orbits):
             from bbcells.core import bb_cells
             report = bb_cells(X).check()
             if not report.ok:
                 raise ValueError("normal weights beyond condition (R) fail the checks:\n%s"
                                  % report)
         return X
+
+
+CERTIFIED = "normal weights beyond condition (R), certified by the ABBV identity"
 
 
 class _NotEqualRank(Exception):
@@ -282,6 +303,11 @@ def _recognize(letter, k, black, arrows):
         return None
     table = {("E", 6): [((), {(1, 6), (3, 5)}, 2),                   # EII
                         ((3, 4, 5), {(1, 6)}, 1)],                    # EIII
+             ("E", 7): [((), set(), 2),                                # EV
+                        ((2, 5, 7), set(), 1),                        # EVI
+                        ((2, 3, 4, 5), set(), 7)],                    # EVII
+             ("E", 8): [((), set(), 1),                                # EVIII
+                        ((2, 3, 4, 5), set(), 8)],                    # EIX
              ("F", 4): [((), set(), 1), ((1, 2, 3), set(), 4)],      # FI, FII
              ("G", 2): [((), set(), 2)]}
     for b, a, j in table.get((letter, k), []):
@@ -291,22 +317,37 @@ def _recognize(letter, k, black, arrows):
 
 
 def _non_reflection_part(R, nodes, parity, reflection_roots):
-    """words of coset representatives of Stab_{W_L}(t) modulo its reflection
-    subgroup (the identity omitted)"""
-    roots, index, table = spherical.weyl_table(R.name)
-    positive = {index[b] for b in R.positive_roots}
-    positive_refl = [index[b] for b in spherical.root_subsystem(R, reflection_roots)
-                     if b in set(R.positive_roots)]
-    simple = [(i, index[_unit(i, R.rank)]) for i in nodes]
-    nodes = set(nodes)
-    elements = []
-    for word, w in table:
-        if not word or not set(word) <= nodes:
-            continue                                 # not in W_L (reduced words)
-        if any(parity(roots[w[k]]) != parity(_unit(i, R.rank)) for i, k in simple):
-            continue                                 # w does not fix t
-        if all(w[k] in positive for k in positive_refl):
-            elements.append(word)                    # minimal in its coset
+    """words of generators of Stab_{W_L}(t) modulo its reflection subgroup,
+    by orbit-stabilizer on the W_L-orbit of t (sign vectors on the simple roots
+    of L) with Schreier generators; never enumerates W_L"""
+    nodes = sorted(nodes)
+    start = tuple(parity(_unit(i, R.rank)) for i in nodes)
+    position = {i: k for k, i in enumerate(nodes)}
+
+    def act(i, signs):                           # s_i . t, as parities of the simple roots
+        k = position[i]
+        return tuple((e - R.cartan[i][j] * signs[k]) % 2 for j, e in zip(nodes, signs))
+
+    transversal, frontier = {start: ()}, [start]
+    while frontier:
+        new = []
+        for e in frontier:
+            for i in nodes:
+                f = act(i, e)
+                if f not in transversal:
+                    transversal[f] = (i,) + transversal[e]
+                    new.append(f)
+        frontier = new
+    positive = set(R.positive_roots)
+    positive_refl = [b for b in spherical.root_subsystem(R, reflection_roots) if b in positive]
+    elements = set()
+    for e, u in transversal.items():
+        for i in nodes:
+            f = act(i, e)
+            word = tuple(reversed(transversal[f])) + (i,) + u       # u_f^{-1} s_i u_e
+            reduced = spherical.reduce_modulo(R, positive_refl, word)
+            if reduced:
+                elements.add(reduced)
     return sorted(elements, key=lambda word: (len(word), word))
 
 
@@ -364,17 +405,20 @@ def diagram(kind, *parameters):
                              name=name)
     exceptional = {"EI": ("E6", (), ()), "EII": ("E6", (), [(1, 6), (3, 5)]),
                    "EIII": ("E6", (3, 4, 5), [(1, 6)]), "EIV": ("E6", (2, 3, 4, 5), ()),
+                   "EV": ("E7", (), ()), "EVI": ("E7", (2, 5, 7), ()),
+                   "EVII": ("E7", (2, 3, 4, 5), ()), "EVIII": ("E8", (), ()),
+                   "EIX": ("E8", (2, 3, 4, 5), ()),
                    "FI": ("F4", (), ()), "FII": ("F4", (1, 2, 3), ()), "G": ("G2", (), ())}
     if kind in exceptional:
         cartan_type, black, arrows = exceptional[kind]
         return SatakeDiagram(cartan_type, black=black, arrows=arrows, name=name)
-    raise ValueError("unknown real form %r (E7 and E8 are too large for this front end)" % kind)
+    raise ValueError("unknown real form %r" % kind)
 
 
-def complete_symmetric_variety(kind, *parameters, strict=False):
+def complete_symmetric_variety(kind, *parameters, strict=False, certify=True):
     """FixedPointData of the complete symmetric variety of a named real form
     >>> X = complete_symmetric_variety("AI", 3)                 # complete conics
     >>> X.dim, len(X)
     (5, 12)
     """
-    return diagram(kind, *parameters).fixed_point_data(strict)
+    return diagram(kind, *parameters).fixed_point_data(strict, certify)

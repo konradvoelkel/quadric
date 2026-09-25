@@ -450,3 +450,68 @@ def toric_h_polynomial(cones):
         f_j = sum(1 for face in faces if len(face) == j)
         total = total + IntPoly((f_j,)) * x_minus_1 ** (n - j)
     return total
+
+
+def _det_one_minus_t(M):
+    """det(1 - t M) as an IntPoly in t (Faddeev-LeVerrier, exact integers)
+    >>> _det_one_minus_t(((0, 1), (1, 0)))
+    IntPoly((1, 0, -1))
+    """
+    n = len(M)
+    identity = [[int(i == j) for j in range(n)] for i in range(n)]
+    coefficients = [0] * (n + 1)              # det(x - M) = sum coefficients[k] x^k
+    coefficients[n] = 1
+    A = [[0] * n for _ in range(n)]
+    for k in range(1, n + 1):
+        A = [[sum(M[i][l] * A[l][j] for l in range(n)) + coefficients[n - k + 1] * identity[i][j]
+              for j in range(n)] for i in range(n)]
+        trace = sum(sum(M[i][l] * A[l][i] for l in range(n)) for i in range(n))
+        if trace % k:
+            raise AssertionError("non-integral characteristic polynomial")
+        coefficients[n - k] = -trace // k
+    # det(1 - tM) = t^n det(1/t - M) = sum_k coefficients[k] t^(n - k)
+    return IntPoly(tuple(coefficients[n - j] for j in range(n + 1)))
+
+
+def _series_inverse(p, n):
+    """power series 1/p(t) up to t^n (p(0) = 1), as a list of Fractions"""
+    from fractions import Fraction
+    c = list(p.coefficients) + [0] * (n + 1)
+    inverse = [Fraction(1, c[0])]
+    for k in range(1, n + 1):
+        inverse.append(-sum(c[j] * inverse[k - j] for j in range(1, k + 1)) / c[0])
+    return inverse
+
+
+def brion_peyre(group, dim, degrees):
+    """|G/H|(q) for connected reductive G with Weyl group degrees `degrees` and a
+    subgroup H containing a maximal torus T, from Brion-Peyre (Compositio 2002)
+    Thm 1(a): F_H(t) = F_G(t) t^dim P(t^{-1/2}), where F_H is the Molien series
+    of W_H = N_H(T)/T on Lie(T) (given as the list `group` of its matrices) and
+    F_G = prod 1/(1 - t^d). So t^dim |G/H|(1/t) = F_H(t) prod (1 - t^d).
+    >>> brion_peyre([((1,),), ((-1,),)], 2, [2])       # PGL_2/N(T) = P^2 - conic
+    IntPoly((0, 0, 1))
+    >>> brion_peyre([((1,),)], 2, [2])                 # PGL_2/T
+    IntPoly((0, 1, 1))
+    """
+    from collections import Counter
+    from fractions import Fraction
+    n = dim + 1
+    classes = Counter(_det_one_minus_t(M) for M in group)
+    series = [Fraction(0)] * (n + 1)
+    for p, count in classes.items():
+        for k, c in enumerate(_series_inverse(p, n)):
+            series[k] += count * c
+    series = [c / len(group) for c in series]
+    product = IntPoly((1,))
+    for d in degrees:
+        product = product * (IntPoly((1,)) - IntPoly.monomial(d))
+    coefficients = [sum(series[j] * (product.coefficients[k - j] if k - j < len(product.coefficients) else 0)
+                        for j in range(k + 1)) for k in range(n + 1)]
+    if any(c.denominator != 1 for c in coefficients) or coefficients[n] != 0:
+        raise AssertionError("the Molien series does not give a polynomial point count")
+    # t^dim E(1/t) = sum_k coefficients[k] t^k  =>  E(q) = sum_k coefficients[k] q^(dim - k)
+    E = [0] * (dim + 1)
+    for k in range(dim + 1):
+        E[dim - k] = int(coefficients[k])
+    return IntPoly(tuple(E))

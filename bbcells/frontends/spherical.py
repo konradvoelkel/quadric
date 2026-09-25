@@ -26,16 +26,13 @@ All weights are in simple-root coordinates of G (the torus of G_ad).
 
 from dataclasses import dataclass
 from fractions import Fraction
-from functools import lru_cache
 from itertools import combinations
 
+from bbcells.algebra import IntPoly
 from bbcells.core import FixedPointData
 from bbcells.frontends.flag import word_label
-from bbcells.linalg import rank as matrix_rank, solve
+from bbcells.linalg import null_space, rank as matrix_rank, solve
 from bbcells.rootsystem import RootSystem
-
-_WEYL_LIMIT = 60000
-
 
 def _negate(v):
     return tuple(-c for c in v)
@@ -75,24 +72,6 @@ def _reflection(R, beta, v):
     if c.denominator != 1:
         raise ValueError("s_%r does not preserve the lattice at %r" % (beta, v))
     return tuple(x - int(c) * b for x, b in zip(v, beta))
-
-
-@lru_cache(maxsize=4)
-def weyl_table(cartan_type):
-    """(sorted roots, their index, [(reduced word, permutation of the roots)]
-    for all of W in order of length); w = s_{word[0]} ... s_{word[-1]}"""
-    R = RootSystem(cartan_type)
-    roots_list = sorted(_all_roots(R))
-    index = {b: i for i, b in enumerate(roots_list)}
-    simple = [tuple(index[R.reflect(i, b)] for b in roots_list) for i in range(R.rank)]
-    permutation = {(): tuple(range(len(roots_list)))}
-    table = []
-    for _, word in R.orbit(set(), limit=_WEYL_LIMIT):
-        if word:                                           # s_{word[0]} o (the rest)
-            rest = permutation[word[1:]]
-            permutation[word] = tuple(simple[word[0]][k] for k in rest)
-        table.append((word, permutation[word]))
-    return roots_list, index, tuple(table)
 
 
 def homogeneous_fixed_points(cartan_type, generators=(), component_reflections=(),
@@ -165,47 +144,177 @@ def homogeneous_fixed_points(cartan_type, generators=(), component_reflections=(
         if {R.apply_word(word, b) for b in phi_refl} != phi_refl:
             raise ValueError("%r does not normalize the reflection part of W_H" % (word,))
     positive_h = [b for b in phi_refl if b in positive]
-    roots_list, index, table = weyl_table(R.name)
-    as_permutation = lambda f: tuple(index[f(b)] for b in roots_list)
-    checks = [index[b] for b in positive_h]
-    positive_index = {index[b] for b in positive}
-    representatives = {}                         # permutation -> word, by length
-    for word, w in table:
-        if all(w[k] in positive_index for k in checks):
-            representatives[w] = word
-    chosen = list(representatives)
-    if words:
-        s_beta = {b: as_permutation(lambda v, b=b: _reflection(R, b, v)) for b in positive_h}
-        glue = [as_permutation(lambda v, word=word: R.apply_word(word, v)) for word in words]
+    reps = coset_representatives(R, positive_h, words)
+    points = {}
+    for word, M in reps:
+        points[word_label(word)] = (tuple(_apply(M, b) for b in complement) +
+                                    tuple(_apply(M, v) for v in normal))
+    return points
 
-        def reduce(u):                           # the Dyer representative of u W_refl
+
+# Weyl group elements as integer matrices: the tuple of images of the simple
+# roots (columns), acting on simple-root coordinates.
+
+def _identity(r):
+    return tuple(tuple(int(i == j) for i in range(r)) for j in range(r))
+
+
+def _apply(M, v):
+    return tuple(sum(c * col[k] for c, col in zip(v, M)) for k in range(len(M)))
+
+
+def _left(R, i, M):
+    """s_i o M"""
+    return tuple(R.reflect(i, col) for col in M)
+
+
+_COROOTS = {}
+
+
+def _coroot_row(R, beta):
+    """(<beta^vee, alpha_j>)_j, cached"""
+    key = (R.name, beta)
+    if key not in _COROOTS:
+        _COROOTS[key] = tuple(R.coroot_pairing(beta, _unit_vector(j, R.rank))
+                              for j in range(R.rank))
+    return _COROOTS[key]
+
+
+def _right_reflection(R, M, beta):
+    """M o s_beta"""
+    image = _apply(M, beta)
+    row = _coroot_row(R, beta)
+    return tuple(tuple(c - p * b for c, b in zip(col, image)) if p else col
+                 for p, col in zip(row, M))
+
+
+def _unit_vector(j, r):
+    return tuple(int(k == j) for k in range(r))
+
+
+def _is_negative(v):
+    return all(c <= 0 for c in v)
+
+
+_TABLES = {}
+
+
+def _root_table(R):
+    """sorted roots, their index, the simple reflections as permutations of
+    the root indices, and the set of indices of positive roots (cached)"""
+    if R.name not in _TABLES:
+        roots = sorted(set(R.positive_roots) | {tuple(-c for c in b) for b in R.positive_roots})
+        index = {b: i for i, b in enumerate(roots)}
+        simple = [tuple(index[R.reflect(i, b)] for b in roots) for i in range(R.rank)]
+        positive = frozenset(index[b] for b in R.positive_roots)
+        _TABLES[R.name] = (roots, index, simple, positive)
+    return _TABLES[R.name]
+
+
+def coset_representatives(R, positive_h, component_words=(), limit=2000000):
+    """[(reduced word, matrix)] of the minimal-length representatives of W/W_H,
+    W_H generated by the reflections in the root subsystem with positive roots
+    `positive_h` and by the elements `component_words` (which must normalize
+    it). Never enumerates W: for a reflection subgroup W' and w minimal in
+    w W', s_i w is minimal in its coset unless w^{-1}(alpha_i) is a positive
+    root of W', in which case s_i w W' = w W' (Deodhar's lemma, which holds for
+    reflection subgroups by Dyer's criterion); so a search by length over
+    inverse permutations finds every representative with a reduced word."""
+    roots, index, simple, positive = _root_table(R)
+    n = len(roots)
+    in_h = frozenset(index[b] for b in positive_h)
+    simple_index = [index[_unit_vector(i, R.rank)] for i in range(R.rank)]
+    identity = tuple(range(n))
+    words = {identity: ()}                        # w^{-1} (as a permutation) -> word of w
+    level = [identity]
+    while level:
+        new = []
+        for v in level:
+            for i in range(R.rank):
+                image = v[simple_index[i]]        # w^{-1}(alpha_i)
+                if image not in positive or image in in_h:
+                    continue                      # shorter, or the same coset
+                u = tuple(v[k] for k in simple[i])        # (s_i w)^{-1} = w^{-1} s_i
+                if u not in words:
+                    words[u] = (i,) + words[v]
+                    new.append(u)
+                    if len(words) > limit:
+                        raise ValueError("more than %d cosets" % limit)
+        level = new
+
+    def forward(v):                               # w from w^{-1}
+        w = [0] * n
+        for k, image in enumerate(v):
+            w[image] = k
+        return tuple(w)
+
+    reps = {forward(v): word for v, word in words.items()}
+    if component_words:
+        reflection = {b: tuple(index[_reflection(R, b, c)] for c in roots) for b in positive_h}
+        glue = []
+        for word in component_words:
+            C = identity
+            for i in reversed(word):
+                C = tuple(simple[i][k] for k in C)            # s_i o C
+            glue.append(C)
+        h_indices = [index[b] for b in positive_h]
+
+        def reduce(u):                            # the minimal representative of u W_refl
             while True:
-                bad = next((b for b in positive_h if roots_list[u[index[b]]] not in positive),
+                bad = next((b for b, k in zip(positive_h, h_indices) if u[k] not in positive),
                            None)
                 if bad is None:
                     return u
-                u = tuple(u[k] for k in s_beta[bad])        # u o s_beta
+                u = tuple(u[k] for k in reflection[bad])       # u o s_beta
 
-        seen, chosen = set(), []
-        for w in representatives:                # by length: the first is minimal
-            if w in seen:
+        chosen, done = [], set()
+        for w in sorted(reps, key=lambda w: (len(reps[w]), reps[w])):
+            if w in done:
                 continue
-            chosen.append(w)
             orbit, stack = {w}, [w]
             while stack:
-                u = stack.pop()
-                for c in glue:
-                    v = reduce(tuple(u[k] for k in c))       # u o c
-                    if v not in orbit:
-                        orbit.add(v)
-                        stack.append(v)
-            seen |= orbit
-    points = {}
+                U = stack.pop()
+                for C in glue:
+                    V = reduce(tuple(U[k] for k in C))         # U o C
+                    if V not in orbit:
+                        orbit.add(V)
+                        stack.append(V)
+            done |= orbit
+            chosen.append(w)
+    else:
+        chosen = list(reps)
+    result = []
     for w in chosen:
-        word = representatives[w]
-        points[word_label(word)] = (tuple(roots_list[w[index[b]]] for b in complement) +
-                                    tuple(R.apply_word(word, v) for v in normal))
-    return points
+        word = reps[w]
+        M = tuple(roots[w[k]] for k in simple_index)          # images of the simple roots
+        result.append((word, M))
+    result.sort(key=lambda item: (len(item[0]), item[0]))
+    return result
+
+
+def reduce_modulo(R, positive_h, word):
+    """a reduced word of the minimal representative of w W_refl (w given by a
+    word), W_refl the reflection subgroup with positive roots positive_h"""
+    M = _identity(R.rank)
+    for i in reversed(word):
+        M = _left(R, i, M)
+    while True:
+        bad = next((b for b in positive_h if _is_negative(_apply(M, b))), None)
+        if bad is None:
+            return _word_of(R, M)
+        M = _right_reflection(R, M, bad)
+
+
+def _word_of(R, M):
+    """a reduced word of the Weyl group element M"""
+    word = []
+    while True:
+        i = next((i for i in range(len(M)) if _is_negative(M[i])), None)
+        if i is None:
+            return tuple(reversed(word))
+        # M o s_i: the image of alpha_j is M(s_i alpha_j)
+        M = tuple(_apply(M, R.reflect(i, _unit_vector(j, len(M)))) for j in range(len(M)))
+        word.append(i)
 
 
 def in_coordinates(points, simple_roots):
@@ -232,6 +341,9 @@ class OrbitDatum(object):
     normal: tuple = ()
     component_elements: tuple = ()
     note: str = ""
+    roots: tuple = ()               # wonderful case: the spherical roots I of O_I
+    normal_roots: tuple = ()        # the spherical roots of the normal weights, in order
+    levi: tuple = ()                # wonderful case: S^p + supp(I)
 
 
 def assemble(cartan_type, orbits, name=""):
@@ -252,8 +364,13 @@ def assemble(cartan_type, orbits, name=""):
         for word, wts in points.items():
             labels.append("%s:%s" % (orbit.name, word))
             weights.append(wts)
-            annotations.append(dict({"orbit": orbit.name, "word": word},
-                                    **({"note": orbit.note} if orbit.note else {})))
+            annotation = {"orbit": orbit.name, "word": word}
+            if orbit.note:
+                annotation["note"] = orbit.note
+            if orbit.roots or orbit.normal_roots:
+                annotation["roots"] = orbit.roots
+                annotation["normal_roots"] = orbit.normal_roots
+            annotations.append(annotation)
             dims.add(len(wts))
     if len(dims) != 1:
         raise ValueError("the orbits give tangent spaces of dimensions %s" % sorted(dims))
@@ -286,12 +403,13 @@ def levi_projection(R, levi, v):
     return tuple(int(x) for x in result)
 
 
-def _invariants_on_levi(R, levi, reflections, elements):
-    """dimension of the subspace of span(Phi_L) fixed by the reflections in
-    the given roots and by the given Weyl group elements"""
+def invariant_basis(R, levi, reflections, elements):
+    """a basis of primitive integer vectors of the subspace of span(Phi_L)
+    fixed by the reflections in the given roots and the given Weyl group elements"""
+    from math import gcd
     levi = sorted(levi)
     if not levi:
-        return 0
+        return []
     simple = lambda i: tuple(int(k == i) for k in range(R.rank))
     maps = ([lambda v, b=b: _reflection(R, b, v) for b in reflections] +
             [lambda v, word=word: R.apply_word(word, v) for word in elements])
@@ -299,7 +417,28 @@ def _invariants_on_levi(R, levi, reflections, elements):
     for f in maps:
         images = [tuple(x - y for x, y in zip(f(simple(i)), simple(i))) for i in levi]
         rows.extend([image[k] for image in images] for k in range(R.rank))
-    return len(levi) - (matrix_rank(rows) if rows else 0)
+    basis = null_space(rows, len(levi)) if rows else [
+        [int(k == j) for k in range(len(levi))] for j in range(len(levi))]
+    result = []
+    for vector in basis:
+        vector = [Fraction(x) for x in vector]
+        denominator = 1
+        for x in vector:
+            denominator = denominator * x.denominator // gcd(denominator, x.denominator)
+        integral = [int(x * denominator) for x in vector]
+        g = 0
+        for x in integral:
+            g = gcd(g, abs(x))
+        full = [0] * R.rank
+        for x, i in zip(integral, levi):
+            full[i] = x // g
+        result.append(tuple(full))
+    return result
+
+
+def _invariants_on_levi(R, levi, reflections, elements):
+    """dimension of the subspace of span(Phi_L) fixed by W_H (see invariant_basis)"""
+    return len(invariant_basis(R, levi, reflections, elements))
 
 
 BEYOND_R = "normal weights by the W_L-average beyond condition (R)"
@@ -353,7 +492,8 @@ def wonderful_orbits(cartan_type, spherical_roots, satellite, parabolic=(), stri
             normal = [levi_projection(R, levi, _negate(sigma[j])) for j in normal_roots]
             label = "O" + "".join(str(j + 1) for j in I) if I else "closed"
             orbits.append(OrbitDatum(label, tuple(generators), tuple(components),
-                                     tuple(unipotent), tuple(normal), tuple(elements), note))
+                                     tuple(unipotent), tuple(normal), tuple(elements), note,
+                                     tuple(I), tuple(normal_roots), tuple(sorted(levi))))
     return orbits
 
 
@@ -365,6 +505,38 @@ def wonderful_variety(cartan_type, spherical_roots, satellite, parabolic=(), nam
     """
     return assemble(cartan_type, wonderful_orbits(cartan_type, spherical_roots, satellite,
                                                   parabolic), name=name)
+
+
+def orbit_closure(X, roots):
+    """the fixed-point data of the closure of the orbit O_K (K = `roots`, indices
+    of spherical roots) in a wonderful variety assembled by wonderful_variety:
+    the fixed points of the orbits O_J with J c K, without the normal weights
+    of the D_gamma with gamma in K
+    >>> X = complete_quadrics(3)
+    >>> Z = orbit_closure(X, ())                      # the closed orbit G/B
+    >>> Z.dim, len(Z)
+    (3, 6)
+    """
+    roots = set(roots)
+    points, weights, annotations = [], [], []
+    for label, wts in zip(X.points, X.weights):
+        a = X.annotation(label)
+        if "normal_roots" not in a:
+            raise ValueError("the data does not record the orbits of a wonderful variety")
+        if not set(a["roots"]) <= roots:
+            continue
+        normal_roots = a["normal_roots"]
+        tangent = wts[:len(wts) - len(normal_roots)]
+        kept = [w for j, w in zip(normal_roots, wts[len(wts) - len(normal_roots):])
+                if j in roots]
+        points.append(label)
+        weights.append(tuple(tangent) + tuple(kept))
+        annotations.append(dict(a, normal_roots=tuple(j for j in normal_roots if j in roots)))
+    dims = {len(w) for w in weights}
+    (dim,) = dims
+    return FixedPointData(dim, X.rank, tuple(points), tuple(weights),
+                          name="orbit closure %s in %s" % (sorted(roots), X.name),
+                          annotations=tuple(annotations))
 
 
 def _runs(indices):
@@ -422,3 +594,189 @@ def complete_skew_forms(n):
     return wonderful_variety("A%d" % r, sigma, lambda I: None,
                              parabolic=tuple(range(0, r, 2)),
                              name="complete skew forms on k^%d" % (2 * n))
+
+
+def _word_from_label(label):
+    return () if label == "e" else tuple(int(x[1:]) - 1 for x in label.split("."))
+
+
+def certify_normal_weights(cartan_type, orbits, trials=3, seed=0):
+    """certify the W_L-average normal weights of the orbits marked BEYOND_R.
+
+    For such an orbit the true normal weight of D_gamma at the base point is
+    chi = proj(-gamma) + c zeta with c an integer and zeta a primitive vector
+    spanning the W_H-invariants in span(Phi_L) (docs/S6d.md, section 6: the
+    connected centre of L acts on O(D_gamma) along the component of X^Z
+    through x_I and z by -gamma, and chi is W_H-invariant). The
+    Atiyah-Bott-Berline-Vergne identity sum_p 1/e_p(lambda) = 0 is evaluated
+    exactly at random lambda as a function of c; for |c| > C the terms that
+    depend on c are smaller than the rest (an explicit bound), and all
+    integers |c| <= C are screened modulo a large prime (an exclusion there
+    is an exclusion over Q), for the smallest bound over several lambda and
+    then at every sampled lambda. Since the true c is admissible, a single
+    admissible value is the true one. Returns ({orbit name: sorted list of
+    the admissible c}, [the bounds C found]), or raises if there is more than
+    one unknown (a joint search is not implemented) or no bound exists.
+    """
+    import random
+    R = RootSystem(cartan_type)
+    rng = random.Random(seed)
+    marked = [o for o in orbits if o.note == BEYOND_R]
+    unknowns = []
+    for o in marked:
+        basis = invariant_basis(R, o.levi, list(o.generators) + list(o.component_reflections),
+                                o.component_elements)
+        if len(basis) != 1 or len(o.normal) != 1:
+            raise ValueError("orbit %s: %d invariant directions and %d normal weights; only a "
+                             "single unknown is certified" % (o.name, len(basis), len(o.normal)))
+        unknowns.append((o, basis[0]))
+    if len(unknowns) != 1:
+        raise ValueError("%d orbits beyond (R); only a single unknown is certified"
+                         % len(unknowns))
+    (orbit, zeta), = unknowns
+    data = [(o, homogeneous_fixed_points(cartan_type, o.generators, o.component_reflections,
+                                         o.unipotent_roots, o.normal, o.component_elements))
+            for o in orbits]
+    samples = []
+    for _ in range(6 * trials):
+        if len(samples) >= trials:
+            break
+        lam = [rng.randrange(1, 10 ** 6) for _ in range(R.rank)]
+        sample = _abbv_sample(R, data, orbit, zeta, lam)
+        if sample is not None:
+            samples.append(sample)
+    if not samples:
+        raise ValueError("no usable evaluation point")
+    bounds = [s[0] for s in samples]
+    bound = min(bounds)
+    admissible = set(range(-bound, bound + 1))
+    for _, test in samples:
+        admissible = {c for c in admissible if test(c)}
+    return {orbit.name: sorted(admissible)}, bounds
+
+
+def satellite_point_count(cartan_type, orbit):
+    """|L/H_L|(q) for the satellite of a wonderful orbit with T c H_L, by the
+    Brion-Peyre formula (oracles.brion_peyre), independent of normal weights"""
+    from bbcells.oracles import brion_peyre, levi_degrees
+    R = RootSystem(cartan_type)
+    levi = list(orbit.levi)
+    if not levi:
+        return IntPoly((1,))
+    position = {i: k for k, i in enumerate(levi)}
+    unit = lambda i: tuple(int(k == i) for k in range(R.rank))
+
+    def matrix(f):
+        columns = [f(unit(i)) for i in levi]
+        return tuple(tuple(col[levi[r]] for col in columns) for r in range(len(levi)))
+
+    generators = [matrix(lambda v, b=b: _reflection(R, b, v))
+                  for b in list(orbit.generators) + list(orbit.component_reflections)]
+    generators += [matrix(lambda v, w=w: R.apply_word(w, v)) for w in orbit.component_elements]
+    identity = tuple(tuple(int(r == c) for c in range(len(levi))) for r in range(len(levi)))
+    group, frontier = {identity}, [identity]
+    while frontier:
+        new = []
+        for M in frontier:
+            for S in generators:
+                P = tuple(tuple(sum(M[r][k] * S[k][c] for k in range(len(levi)))
+                                for c in range(len(levi))) for r in range(len(levi)))
+                if P not in group:
+                    group.add(P)
+                    new.append(P)
+        frontier = new
+    phi_l = set(R.positive_roots_of(levi))
+    phi_l |= {_negate(b) for b in phi_l}
+    phi_h = root_subsystem(R, orbit.generators)
+    phi_h |= {b for b in orbit.unipotent_roots if b in phi_l}
+    dim = len(phi_l) - len(phi_h & phi_l)
+    return brion_peyre(sorted(group), dim, levi_degrees(R.cartan, set(levi)))
+
+
+def orbit_count_check(cartan_type, orbits, X, rank):
+    """compare, for every orbit O_I with T-fixed points, the point count from
+    the BB cells (Moebius inversion over the orbit closures X^J, J c I) with
+    |G/P_{S_I}|(q) |L/H_L|(q) (Brion-Peyre). Returns {orbit: (bb, expected)}."""
+    from bbcells.core import bb_cells
+    from bbcells.oracles import from_degrees, levi_degrees
+    R = RootSystem(cartan_type)
+    closures = {}
+
+    def closure_count(J):
+        if J not in closures:
+            closures[J] = IntPoly.from_counts(bb_cells(orbit_closure(X, J)).counts)
+        return closures[J]
+
+    result = {}
+    for orbit in orbits:
+        I = tuple(orbit.roots)
+        bb = IntPoly(())
+        for size in range(len(I) + 1):
+            for J in combinations(I, size):
+                term = closure_count(tuple(J))
+                bb = bb + term if (len(I) - size) % 2 == 0 else bb - term
+        flag = from_degrees(R.degrees, levi_degrees(R.cartan, set(orbit.levi)))
+        result[orbit.name] = (bb, flag * satellite_point_count(cartan_type, orbit))
+    return result
+
+
+def _abbv_sample(R, data, orbit, zeta, lam):
+    """one evaluation point of the ABBV identity sum_p 1/e_p(lambda) = 0, as a
+    function g(c) of the unknown shift: returns (C, test) with g(c) != 0 for
+    all |c| > C, and test(c) = False only if g(c) != 0 (checked modulo a
+    prime), or None if lambda is unusable"""
+    from decimal import Decimal, localcontext
+    from math import exp, log
+    P = (1 << 61) - 1
+    pair = lambda w: sum(a * b for a, b in zip(w, lam))
+    denominators, varying = [], []
+    for o, points in data:
+        for label, weights in points.items():
+            values = [pair(w) for w in weights]
+            if o is orbit:
+                A = 1
+                for v in values[:-1]:
+                    A *= v
+                a, b = values[-1], pair(R.apply_word(_word_from_label(label), zeta))
+                if b == 0:
+                    denominators.append(A * a)
+                else:
+                    varying.append((A, a, b))
+            else:
+                e = 1
+                for v in values:
+                    e *= v
+                denominators.append(e)
+    if not varying or any(d == 0 or d % P == 0 for d in denominators):
+        return None
+    constant_mod = 0
+    for d in denominators:
+        constant_mod = (constant_mod + pow(d % P, P - 2, P)) % P
+    with localcontext() as context:
+        context.prec = 150
+        terms = [Decimal(1) / Decimal(d) for d in denominators]
+        constant = sum(terms, Decimal(0))
+        largest = max(abs(t) for t in terms)
+        if abs(constant) <= len(terms) * largest * Decimal(10) ** -140:
+            return None                        # too much cancellation to bound
+        log_constant = float(abs(constant).ln())
+    C = max(abs(Fraction(a, b)) for A, a, b in varying) + 1
+
+    def tail(C):          # upper bound for |sum of varying terms| / |constant| at |c| >= C
+        return sum(exp(-log_constant - log(abs(A)) - log(abs(b) * C - abs(a)))
+                   for A, a, b in varying)
+
+    while tail(C) >= 0.5:                      # the margin 1/2 absorbs rounding
+        C *= 2
+    terms_mod = [(A % P, a % P, b % P) for A, a, b in varying]
+
+    def test(c):
+        total = constant_mod
+        for A, a, b in terms_mod:
+            d = A * ((a + b * c) % P) % P
+            if d == 0:
+                return True                    # cannot exclude c this way
+            total = (total + pow(d, P - 2, P)) % P
+        return total == 0
+
+    return int(C) + 1, test

@@ -88,8 +88,18 @@ class TestGolden(unittest.TestCase):
         code, out, err = run_cli("symmetric", "AIII", "2", "2", "--format", "json")
         self.assertEqual(code, 0, err)
         self.assertEqual(json.loads(out)["counts"], [1, 2, 5, 7, 9, 7, 5, 2, 1])
-        code, out, err = run_cli("symmetric", "EV")
+        code, out, err = run_cli("symmetric", "EX")
         self.assertEqual(code, 2)
+
+    def test_cli_toroidal_fan(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "fan.json")
+            with open(path, "w") as handle:       # Sp_4/GL_2 blown up along G/B
+                json.dump({"cones": [[[-1, -1], [0, -1]], [[-1, 0], [-1, -1]]]}, handle)
+            code, out, err = run_cli("symmetric", "CI", "2", "--fan", path, "--format", "json")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(sum(json.loads(out)["counts"]), 18 + 8)
 
     def test_cli_real(self):
         code, out, err = run_cli("real", "A3")

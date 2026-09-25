@@ -99,19 +99,51 @@ class TestNewCases(unittest.TestCase):
         X = symmetric.complete_symmetric_variety("G")
         self.assertEqual((X.dim, len(X)), (8, 27))
 
-    def test_hermitian_satellites_are_marked_and_checked(self):
-        for case in [("AIII", 2, 3), ("DIII", 5), ("EIII",)]:
+    def test_hermitian_satellites_are_certified(self):
+        for case in [("AIII", 2, 3), ("AIII", 2, 4)]:
             X = symmetric.complete_symmetric_variety(*case)
-            self.assertTrue(any(a.get("note") == spherical.BEYOND_R for a in X.annotations))
+            self.assertTrue(any(a.get("note") == symmetric.CERTIFIED for a in X.annotations))
             self.assertTrue(bb_cells(X).check().ok, case)
             with self.assertRaises(ValueError):
                 symmetric.complete_symmetric_variety(*case, strict=True)
+
+    def test_certificate_excludes_other_shifts(self):
+        D = symmetric.diagram("AIII", 2, 3)
+        admissible, bounds = spherical.certify_normal_weights(D.R.name, D.orbits(strict=False))
+        self.assertEqual(admissible, {"O2": [0]})
+        self.assertTrue(all(b >= 1 for b in bounds))
+
+    def test_orbit_counts_against_brion_peyre(self):
+        # |O_I| from the BB cells of orbit closures (Moebius inversion) against
+        # |G/P_{S_I}| |L/H_L| from the Molien series of W_H (Brion-Peyre)
+        for case in [("AI", 4), ("AIII", 2, 3), ("AIII", 2, 2), ("CI", 3), ("G",),
+                     ("DI", 4, 4), ("BI", 3, 4), ("DIII", 5)]:
+            D = symmetric.diagram(*case)
+            orbits = D.orbits(strict=False)
+            X = D.fixed_point_data(certify=False)
+            for name, (bb, expected) in spherical.orbit_count_check(
+                    D.R.name, orbits, X, len(D.spherical_roots)).items():
+                self.assertEqual(bb, expected, (case, name))
+
+    def test_uncertified_cases_are_checked(self):
+        X = symmetric.complete_symmetric_variety("EIII", certify=False)
+        self.assertTrue(any(a.get("note") == spherical.BEYOND_R for a in X.annotations))
+        self.assertTrue(bb_cells(X).check().ok)
+
+    def test_e7_e8_recognition(self):
+        # the open-orbit satellite G/K: the dimension check inside satellite_node
+        # compares dim K from the Satake diagram with the Borel-de Siebenthal node
+        expected = {"EVII": 36, "EIX": 64}                 # E6 + T1, E7 + A1
+        for kind, fixed in expected.items():
+            D = symmetric.diagram(kind)
+            data = D.satellite(tuple(range(len(D.spherical_roots))))
+            self.assertEqual(len(data["generators"]), fixed, kind)
 
     def test_invalid_diagrams(self):
         with self.assertRaises(ValueError):
             symmetric.SatakeDiagram("A3", black=[2], arrows=[(1, 2)])
         with self.assertRaises(ValueError):
-            symmetric.diagram("EV")
+            symmetric.diagram("EX")
 
 
 if __name__ == "__main__":

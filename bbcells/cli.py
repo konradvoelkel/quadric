@@ -100,7 +100,16 @@ def _data_spherical(args):
 
 def _data_symmetric(args):
     from bbcells.frontends import symmetric
-    return symmetric.complete_symmetric_variety(args.kind, *args.parameters)
+    if args.fan is None:
+        return symmetric.complete_symmetric_variety(args.kind, *args.parameters)
+    import json
+    from bbcells.frontends import toroidal
+    with open(args.fan) as handle:
+        cones = json.load(handle)["cones"]
+    D = symmetric.diagram(args.kind, *args.parameters)
+    return toroidal.toroidal_variety(D.R.name, D.spherical_roots, D.satellite, cones,
+                                     parabolic=tuple(sorted(D.black)), strict=False,
+                                     name="toroidal %s" % D.name)
 
 
 def _two_orbit_case(args):
@@ -232,6 +241,9 @@ def build_parser():
                                  "DIII n, EI, EII, EIII, EIV, FI, FII, G")
     p.add_argument("kind")
     p.add_argument("parameters", type=int, nargs="*")
+    p.add_argument("--fan", help="JSON {\"cones\": [...]}: a smooth fan subdividing the valuation "
+                   "cone, rays in the coordinates <gamma_i, n> (all <= 0); gives the toroidal "
+                   "variety over the complete symmetric variety")
     _add_common(p)
     p.set_defaults(build=_data_symmetric)
 

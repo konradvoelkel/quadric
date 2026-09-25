@@ -396,6 +396,39 @@ prints usage.
   the Atiyah–Bott formula for $\chi_y$ modulo a large prime. **Done when:**
   every front end passes it and it detects a sign error that the BB-based
   checks miss. *(Done.)*
+- [x] **S6g Toroidal varieties over a wonderful model** (M).
+  `frontends/toroidal.py`: fixed points are (orbit $O_J$, full-dimensional
+  cone in the face $F_J$); the weights come from $\mathrm{pr}_J$ of the dual
+  basis (`docs/S6d.md` §7). **Done when:** it agrees with blow-ups along
+  orbit closures and with the orbit point count. *(Done.)*
+- [x] **S6h Cosets without W** (S). A search by Deodhar's lemma for reflection
+  subgroups; $\mathrm{Stab}_{W_L}(t)$ by orbit-stabilizer with Schreier
+  generators; $E_7$/$E_8$ Satake diagrams. **Done when:** EVII builds.
+  *(Done: 23,464 fixed points, all checks pass.)*
+- [x] **S6i Hermitian certificate and orbit counts** (M). ABBV certificate
+  for one unknown; Brion–Peyre point counts orbit by orbit (`docs/S6d.md`
+  §§6, 8). *(Done: c = 0 is certified for AIII(2,3), AIII(2,4), AIII(2,5),
+  DIII(5) and EIII; the orbit counts agree everywhere.)*
+- [x] **S6j Equivariant cohomology beyond GKM** (M). `brion.py`: components of
+  $X^{\ker\chi}$ from fixed-point data; Brion's congruences mod $\chi$ and
+  $\chi^2$. **Done when:** it reproduces the GKM edges of flag and toric
+  varieties and gives a free module with the BB Poincaré series for
+  complete quadrics. *(Done.)*
+
+## 3b. Next steps (research; see `docs/S6d.md` §10)
+
+- [ ] **S7.1 General Luna data**: colour calculus, Levi-part step, a table of
+  full-rank wonderful reductive subgroups; normal weights beyond (R) from
+  colour coefficients or the certificate.
+- [ ] **S7.2 Joint certificate** for several unknowns, and a full proof of the
+  Hermitian case.
+- [ ] **S7.3 Schubert calculus beyond GKM**: flow-up classes and structure
+  constants on Brion components; the oracle is DGMP 1988 for complete
+  quadrics.
+- [ ] **S7.4 Toroidal $X$ with $\Lambda\supsetneq\mathbb Z\Sigma$** (finite covers).
+- [ ] **S7.5 Real incidences for non-GKM varieties** (M5 beyond GKM).
+- [ ] **S7.6 Cell counts without listing fixed points**, for $E_7$/$E_8$ with
+  $\chi\gtrsim10^6$.
 
 ---
 

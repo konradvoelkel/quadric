@@ -246,6 +246,27 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   *Infinite dimensional Lie algebras*, ch. 8 (automorphisms of finite order).
   Inner involutions as $\mathrm{Ad}(t_j)$ for one node $j$ of mark 1 or 2.
 
+- ✓ A. Tchoudjem, *Cohomologie des fibrés en droites sur les variétés
+  magnifiques de rang minimal* and related work; arXiv:0709.2584. Fixed
+  points of complete symmetric varieties that are not of minimal rank,
+  with the orbit part of their tangent weights.
+- ✓ M. Banerjee, M. B. Can, M. Joyce, arXiv:1610.02698. Complete quadrics:
+  fixed points are "barred permutations" (1, 3, 12, 66, 450; OEIS A080599),
+  with tangent weights and cell dimensions. Their cell counts agree with
+  `spherical.complete_quadrics`.
+- ✓ M. Michałek, L. Monin, J. Wiśniewski, arXiv:2004.07735, Prop 4.9. The
+  $T$-weights at every fixed point of complete quadrics; infinitely many
+  one-dimensional $T$-orbits (Rem 4.10).
+- ✓ M. Brion, E. Peyre, *The virtual Poincaré polynomials of homogeneous
+  spaces*, Compositio Math. 134 (2002); arXiv:math/0102052. Thm 1(a) gives
+  $|G/H|(q)$ from the Molien series of $N_H(T)/T$; this is
+  `oracles.brion_peyre` (`docs/S6d.md` §8).
+- ✓ E. Strickland, *Schubert-type cells for complete quadrics*, Adv. Math. 62
+  (1986); *Equivariant Betti numbers for symmetric varieties*, J. Algebra
+  145 (1992). C. De Concini, M. Goresky, R. MacPherson, C. Procesi, *On the
+  geometry of quadrics and their degenerations*, Comment. Math. Helv. 63
+  (1988). The oracle for S7.3.
+
 **General smooth projective spherical varieties**
 
 - ✓a M. Brion, *Equivariant cohomology and equivariant intersection theory*,

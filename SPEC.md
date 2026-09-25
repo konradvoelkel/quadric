@@ -123,6 +123,7 @@ bbcells/
     horospherical.py  smooth toroidal horospherical varieties         [L2]
     spherical.py   orbit-wise fixed points; wonderful varieties       [R]
     symmetric.py   complete symmetric varieties from Satake diagrams  [R]
+    toroidal.py    toroidal varieties over a wonderful model          [R]
   cli.py
   sage_adapter.py  optional cross-checks against SageMath (not written, D5)
 tools/
@@ -332,7 +333,9 @@ Minimum test cases. All must pass before a front end counts as done.
      roots, $S^p$ and satellites, including complete quadrics and complete
      skew forms in every dimension. M6c is finished by deriving the satellites of
      symmetric varieties from Satake diagrams (all real forms of types A–D,
-     $E_6$, $F_4$, $G_2$; `docs/S6d.md` §6).
+     $E_6$–$E_8$, $F_4$, $G_2$; `docs/S6d.md` §6). M6d also has toroidal varieties
+     over a wonderful model (§7) and equivariant cohomology beyond GKM
+     (`brion.py`, §9). The open research steps are S7.1–S7.6 in `PLAN.md`.
 
 ## 5. Decisions (v0.2)
 
