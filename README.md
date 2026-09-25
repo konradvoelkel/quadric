@@ -20,3 +20,13 @@ computing cells for the type $D_{3}$ space
 ## Roadmap
 
 This script is the seed of a more general tool for BB cell structures from combinatorial data; see [SPEC.md](SPEC.md) and [LITERATURE.md](LITERATURE.md).
+
+## Development
+
+The package `bbcells/` needs only Python ≥ 3.10 and its standard library.
+
+    python3 -m unittest            # all tests, including doctests
+    python3 -m bbcells --help      # command line interface
+
+`quadric.py` is kept unchanged as the original script and serves as a
+regression oracle for the quadric front end.

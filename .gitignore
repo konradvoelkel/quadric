@@ -1,3 +1,5 @@
 literature/cache/
 __pycache__/
 *.pyc
+build/
+*.egg-info/

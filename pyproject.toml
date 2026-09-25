@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bbcells"
+version = "0.1.0.dev0"
+description = "Bialynicki-Birula cell structures, motives and quadratic invariants from combinatorial data"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+authors = [{ name = "Konrad Voelkel" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.scripts]
+bbcells = "bbcells.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["bbcells*"]
+
+[tool.setuptools.package-data]
+bbcells = ["schema/*.json"]
