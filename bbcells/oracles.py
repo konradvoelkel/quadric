@@ -209,3 +209,69 @@ def real_grassmannian_rational_poincare(k, n):
     if k % 2 == 1 and n % 2 == 0:
         return (IntPoly.monomial(2 * m - 1) + 1) * gaussian_binomial(m - 1, j).substitute_power(4)
     return gaussian_binomial(m, j).substitute_power(4)
+
+
+def reduced_rational_betti(faces, top):
+    """reduced rational Betti numbers b~_0..b~_top of a simplicial complex
+    given by its faces (frozensets, closed under subsets, containing the
+    empty face); b~_{-1} = 1 for the empty complex is reported at index -1
+    via the returned dict"""
+    from bbcells.linalg import rank as matrix_rank
+    by_dim = {}
+    for f in faces:
+        by_dim.setdefault(len(f) - 1, []).append(tuple(sorted(f)))
+    for d in by_dim:
+        by_dim[d].sort()
+    index = {d: {f: i for i, f in enumerate(fs)} for d, fs in by_dim.items()}
+
+    def boundary_rank(d):
+        """rank of the boundary C_d -> C_{d-1} (augmented: C_{-1} = empty face)"""
+        if d not in by_dim or d - 1 not in by_dim:
+            return 0
+        rows = []
+        for f in by_dim[d]:
+            row = [0] * len(by_dim[d - 1])
+            for k in range(len(f)):
+                row[index[d - 1][f[:k] + f[k + 1:]]] = (-1) ** k
+            rows.append(row)
+        return matrix_rank(rows)
+
+    betti = {}
+    for d in range(-1, top + 1):
+        n = len(by_dim.get(d, []))
+        betti[d] = n - boundary_rank(d) - boundary_rank(d + 1)
+    return betti
+
+
+def real_toric_rational_betti(rays, cones):
+    """rational Betti numbers of the real points X(R) of the smooth complete
+    toric variety of a fan, by Choi-Park (arXiv:1311.7056, Theorem
+    `cohomofsmallcover`) = Suciu-Trevisan:
+        H^p(X(R); Q) = sum over omega in the row space of Lambda (mod 2) of
+                       H~^{p-1}(K_omega; Q),
+    with Lambda the n x m matrix of the rays mod 2 and K_omega the full
+    subcomplex of the fan's simplicial complex on the rays in omega.
+    >>> real_toric_rational_betti([(1,), (-1,)], [(0,), (1,)])          # RP^1 = circle
+    [1, 1]
+    """
+    import itertools
+    n, m = len(rays[0]), len(rays)
+    faces = set()
+    for cone in cones:
+        for size in range(len(cone) + 1):
+            for sub in itertools.combinations(sorted(cone), size):
+                faces.add(frozenset(sub))
+    rows = [[r[i] % 2 for r in rays] for i in range(n)]
+    row_space = set()
+    for coefficients in itertools.product((0, 1), repeat=n):
+        vector = tuple(sum(c * row[j] for c, row in zip(coefficients, rows)) % 2
+                       for j in range(m))
+        row_space.add(vector)
+    betti = [0] * (n + 1)
+    for vector in row_space:
+        omega = {j for j in range(m) if vector[j]}
+        sub = [f for f in faces if f <= omega]
+        reduced = reduced_rational_betti(sub, n - 1)
+        for p in range(n + 1):
+            betti[p] += reduced.get(p - 1, 0)
+    return betti

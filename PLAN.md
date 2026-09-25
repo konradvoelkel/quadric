@@ -294,7 +294,7 @@ prints usage.
   the cooriented complex respectively; (3) the sign example in
   arXiv:1910.11149 has $N_I(a,b) = 2$, so its incidence is 0 although the
   paper states $+2$. Its $c_1,\dots,c_4 = 3,2,1,2$ are reproduced.)*
-- [ ] **S5.2 Real toric oracle** (M). The rational Betti numbers of $X(\mathbb{R})$
+- [x] **S5.2 Real toric oracle** (M). The rational Betti numbers of $X(\mathbb{R})$
   for smooth toric $X$ via the Suciu–Trevisan / Choi–Park formula
   (arXiv:1311.7056), used only as an oracle for later work on toric
   incidences.
