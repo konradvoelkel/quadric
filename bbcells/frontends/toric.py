@@ -130,6 +130,28 @@ def fixed_point_data(fan):
     return _fixed_point_data(fan)
 
 
+def orbit_closure(fan, face):
+    """FixedPointData of the orbit closure V(tau) for the cone tau spanned by
+    the given rays, with the torus of the ambient variety: fixed points are
+    the maximal cones containing tau (same labels as fixed_point_data), and
+    the tangent weights are the dual basis elements of the rays not in tau.
+    >>> line = orbit_closure(projective_space(3), (0, 1))
+    >>> line.dim, line.points
+    (1, ('s0,1,2', 's0,1,3'))
+    """
+    face = set(face)
+    points, weights = [], []
+    for c in fan.cones:
+        if face <= set(c):
+            dual = fan.dual_basis(c)
+            points.append(_label(c))
+            weights.append(tuple(m for i, m in zip(c, dual) if i not in face))
+    if not points:
+        raise ValueError("%r is not a face of the fan" % (sorted(face),))
+    return FixedPointData(fan.dim - len(face), fan.dim, tuple(points), tuple(weights),
+                          name="V(%s)" % ",".join(str(i) for i in sorted(face)))
+
+
 # -- constructions ---------------------------------------------------------
 
 def projective_space(n):

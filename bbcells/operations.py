@@ -83,3 +83,98 @@ def restrict(data, matrix, name=None):
     return FixedPointData(data.dim, new_rank, data.points, tuple(weights), edges=edges,
                           name=name if name is not None else data.name,
                           annotations=data.annotations)
+
+
+def _counter(weights):
+    from collections import Counter
+    return Counter(weights)
+
+
+def identify(sub, ambient):
+    """match the fixed points of a T-stable smooth subvariety to those of the
+    ambient variety (same torus), by multiset inclusion of tangent weights.
+    Returns {sub label: ambient label}; raises unless the match is unique.
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)))
+    >>> P1xP1 = product(P1, P1)
+    >>> diagonal = FixedPointData(1, 2, ("d0", "doo"), (((1, 0),), ((-1, 0),)))
+    >>> identify(diagonal, P1xP1)
+    Traceback (most recent call last):
+    ...
+    ValueError: fixed point 'd0' of the subvariety matches 2 fixed points: ['0|0', '0|oo']
+    """
+    if sub.rank != ambient.rank:
+        raise ValueError("subvariety and ambient variety need the same torus")
+    ambient_counters = [(label, _counter(wts)) for label, wts in zip(ambient.points, ambient.weights)]
+    mapping, used = {}, set()
+    for label, wts in zip(sub.points, sub.weights):
+        needed = _counter(wts)
+        matches = [a for a, have in ambient_counters
+                   if all(have[w] >= c for w, c in needed.items())]
+        if len(matches) != 1:
+            raise ValueError("fixed point %r of the subvariety matches %d fixed points: %r"
+                             % (label, len(matches), matches[:5]))
+        if matches[0] in used:
+            raise ValueError("two fixed points of the subvariety match %r" % (matches[0],))
+        used.add(matches[0])
+        mapping[label] = matches[0]
+    return mapping
+
+
+def normal_weights(sub, ambient, mapping):
+    """{sub label: tuple of the normal weights} (ambient weights minus sub weights)"""
+    result = {}
+    for label, wts in zip(sub.points, sub.weights):
+        remaining = _counter(ambient.weights_of(mapping[label]))
+        remaining.subtract(_counter(wts))
+        normal = []
+        for w, c in sorted(remaining.items()):
+            if c < 0:
+                raise ValueError("weights at %r are not contained in the ambient ones" % label)
+            normal.extend([w] * c)
+        result[label] = tuple(normal)
+    return result
+
+
+def blowup(ambient, center, mapping=None, name=None):
+    """blow-up along a T-stable smooth centre (PLAN.md 1.6). Over a fixed point
+    p of the centre with pairwise distinct normal weights nu_1..nu_c, the new
+    fixed points are the eigenlines [nu_j], labelled 'p~j', with tangent
+    weights wt(T_p Z), nu_j, and nu_k - nu_j (k != j). Edges are not kept.
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))))
+    >>> point = FixedPointData(0, 2, ("a",), ((),))
+    >>> F1 = blowup(P2, point, {"a": "a"})     # a point needs an explicit embedding
+    >>> F1.points
+    ('b', 'c', 'a~0', 'a~1')
+    >>> F1.weights_of("a~0")
+    ((0, 1), (1, -1))
+    """
+    if center.dim >= ambient.dim - 1:
+        raise ValueError("the centre must have codimension >= 2")
+    mapping = identify(center, ambient) if mapping is None else dict(mapping)
+    normals = normal_weights(center, ambient, mapping)
+    in_center = {mapping[p]: p for p in center.points}
+    points, weights, annotations = [], [], []
+    for label, wts in zip(ambient.points, ambient.weights):
+        if label not in in_center:
+            points.append(label)
+            weights.append(wts)
+            annotations.append(dict(ambient.annotation(label)))
+    for label in ambient.points:
+        if label not in in_center:
+            continue
+        z = in_center[label]
+        normal = normals[z]
+        if len(set(normal)) != len(normal):
+            raise ValueError("normal weights at %r are not distinct: %r; the fixed points "
+                             "of the exceptional divisor are not isolated" % (label, normal))
+        for j, nu in enumerate(normal):
+            points.append("%s~%d" % (label, j))
+            new = tuple(center.weights_of(z)) + (nu,) + tuple(
+                tuple(a - b for a, b in zip(other, nu)) for k, other in enumerate(normal)
+                if k != j)
+            weights.append(new)
+            annotations.append({"over": label, "normal_weight": nu})
+    return FixedPointData(ambient.dim, ambient.rank, tuple(points), tuple(weights),
+                          name=name or "Bl(%s)" % (ambient.name or "X"),
+                          annotations=tuple(annotations))

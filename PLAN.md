@@ -254,7 +254,7 @@ prints usage.
   series check $P_X(t)/(1-t^2)^r$. **Done when:** $H_T^*(\mathbb{P}^n)$ and
   $H_T^*(\mathrm{Gr}(2,4))$ reproduce the known ring structure after
   setting the equivariant parameters to $0$.
-- [ ] **S3.4 `operations.blowup`** (M). Implements 1.6. Needs `Z` as its own
+- [x] **S3.4 `operations.blowup`** (M). Implements 1.6. Needs `Z` as its own
   `FixedPointData` and an embedding map of fixed points; the embedding is
   checked by multiset inclusion $\mathrm{wt}_Z(p) \subset \mathrm{wt}_X(p)$.
   **Done when:** blowing up a point in $\mathbb{P}^2$ gives $F_1$ (compare
@@ -330,7 +330,7 @@ prints usage.
   **Done when:** oracles §4.4 pass. Afterwards, cross-reference the rest of
   Akhiezer's list with Knop's table of cuspidal rank-one spherical
   varieties (arXiv:1303.2466, §`sec:TABLE`) and add the remaining cases.
-- [ ] **S6c.1 Complete conics** (S). $\mathrm{Bl}_{v_2(\mathbb{P}^2)}\mathbb{P}^5$
+- [x] **S6c.1 Complete conics** (S). $\mathrm{Bl}_{v_2(\mathbb{P}^2)}\mathbb{P}^5$
   via `blowup` (S3.4), with the $SL_3$-torus on $\mathbb{P}(\mathrm{Sym}^2)$.
   The normal weights at each $x_i^2$ are pairwise distinct, so 1.6 applies.
   **Done when:** $1 + 2q + 3q^2 + 3q^3 + 2q^4 + q^5$ and exactly 12 fixed
