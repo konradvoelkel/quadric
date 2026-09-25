@@ -59,6 +59,19 @@ class TestTwoOrbit(unittest.TestCase):
                      two_orbit.quaternionic_projective_space(2)):
             self.assertEqual(identify(case.boundary, case.completion), case.mapping, case.name)
 
+    def test_projective_space_minus_quadric(self):
+        # [P^{n+1}] - [Q_n] = L^{n+1} (n odd), L^{n+1} - L^{n/2} (n even)
+        for n in range(2, 9):
+            expected = L ** (n + 1) - (L ** (n // 2) if n % 2 == 0 else IntPoly(()))
+            self.check_case(two_orbit.projective_space_minus_quadric(n), expected)
+
+    def test_g2_and_spin7(self):
+        self.check_case(two_orbit.g2_on_p6(), L ** 6)
+        spin = two_orbit.spin7_on_p7()
+        self.check_case(spin, L ** 7 - L ** 3)
+        # Spin(7)/G2 = SO(8)/SO(7): the same class as the affine quadric AQ_7
+        self.assertEqual(spin.k0_class(), two_orbit.affine_quadric(7).k0_class())
+
     def test_folding_restricts_e6_roots_to_f4_roots(self):
         E6, F4 = RootSystem("E6"), RootSystem("F4")
         images = set()

@@ -8,7 +8,23 @@ a flag variety of G. Everything is computed with the torus T of G:
   * the fixed points of D are identified inside Xbar by weight inclusion,
   * [X] = [Xbar] - [D] in K_0(Var) and chi_c^{A^1}(X) = chi(Xbar) - chi(D).
 
-Cases: affine quadrics AQ_n, HP^n, OP^2, and PGL_n/GL_{n-1}.
+Cases, cross-referenced with Knop's table of rank-one spherical varieties
+(arXiv:1303.2466, section sec:TABLE; G/H with H reductive, characteristic 0):
+
+    Knop's row                      completion       boundary        function
+    SO(n+1)/SO(n) (double covers)   Q_n              Q_{n-1}         affine_quadric
+    SO(2n+1)/<s>SO(2n),
+    PSO(2n)/SO(2n-1), PGL4/PSp4     P^{n+1}          Q_n             projective_space_minus_quadric
+    PGL(n)/GL(n-1)                  P^{n-1} x P^{n-1}v  incidence    pgl_mod_gl
+    PSp(2n)/Sp(2).Sp(2n-2)          Gr(2, 2n)        IG(2, 2n)       quaternionic_projective_space
+    F4/Spin(9)                      E6/P1            F4/P4           octonionic_projective_plane
+    G2/<s>SL(3)                     P^6              Q_5 = G2/P1     g2_on_p6
+    SO(7)/G2                        P^7 (spinors)    Q_6 = B3/P3     spin7_on_p7
+    (PGL2 x PGL2)/PGL2              P^3              P^1 x P^1       frontends.wonderful ("A1")
+
+Not covered: the rows with non-reductive H (P_n(SO(2n)), P_1(Sp(2)).Sp(2n-2),
+GL(2)U... in G2), whose completions are not of this homogeneous form, and
+the rows that exist only in characteristic 2.
 """
 
 from dataclasses import dataclass
@@ -175,3 +191,58 @@ def _permutation(word, n):
             x = i + 1 if x == i else i if x == i + 1 else x
         result[j] = x
     return result
+
+
+def projective_space_minus_quadric(n):
+    """P^{n+1} minus the quadric Q_n: SO(n+2)/S(O(1) x O(n+1)) (non-isotropic
+    lines), with the torus of SO(n+2). Covers Knop's rows SO(2n+1)/<s>SO(2n),
+    PSO(2n)/SO(2n-1) (up to the double cover by AQ) and PGL(4)/PSp(4) = n = 4.
+    >>> print(projective_space_minus_quadric(4).k0_class().format("L"))
+    -L^2 + L^5
+    """
+    Q = quadric.quadric(n)
+    m = Q.rank
+    weights, labels = [], []
+    for i in range(m):
+        weights.append(tuple(int(k == i) for k in range(m)))
+        labels.append("x_%d" % i)
+    for i in range(m):
+        weights.append(tuple(-int(k == i) for k in range(m)))
+        labels.append("y_%d" % i)
+    if n % 2 == 1:                     # SO(2m+1): the zero weight
+        weights.append((0,) * m)
+        labels.append("z")
+    P = linear.projectivization(weights, labels, name="P^%d" % (n + 1))
+    return two_orbit(P, Q, "P^%d - Q_%d" % (n + 1, n), {p: p for p in Q.points})
+
+
+def g2_on_p6():
+    """P^6 = P(V_7) minus Q_5 = G2/P1 for G2: G2/(<s> SL3) (Knop's row
+    G2/<s_{a_1}>.SL(3)). The weights of V_7 are the short roots and 0.
+    >>> print(g2_on_p6().k0_class().format("L"))
+    L^6
+    """
+    from bbcells.rootsystem import RootSystem
+    R = RootSystem("G2")
+    short = [b for b in R.positive_roots if R.inner(b, b) < 2]
+    weights = short + [tuple(-c for c in b) for b in short] + [(0, 0)]
+    P = linear.projectivization(weights, name="P^6")
+    return two_orbit(P, flag.flag_variety("G2", {1}, name="G2/P1"), "G2/(<s>SL3)")
+
+
+def spin7_on_p7():
+    """P^7 = P(spin representation) minus Q_6 = B3/P3 (pure spinors) for
+    Spin(7): SO(7)/G2 (Knop's row SO(7)/G_2). Characters in fundamental-weight
+    coordinates: the spin weights are the W-orbit of omega_3.
+    >>> print(spin7_on_p7().k0_class().format("L"))
+    -L^3 + L^7
+    """
+    from bbcells.rootsystem import RootSystem
+    R = RootSystem("B3")
+    spin = [mu for mu, _ in R.orbit({0, 1})]            # W . omega_3
+    P = linear.projectivization(spin, name="P^7")
+    boundary = flag.flag_variety("B3", {3}, name="B3/P3")
+    to_weights = [[R.root_to_weight(tuple(int(k == j) for k in range(3)))[i] for j in range(3)]
+                  for i in range(3)]
+    boundary = restrict(boundary, to_weights, name="B3/P3")
+    return two_orbit(P, boundary, "SO(7)/G2")

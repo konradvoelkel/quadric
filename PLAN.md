@@ -349,7 +349,12 @@ prints usage.
   checked by weight inclusion.)*
   **Done when:** oracles §4.4 pass. Afterwards, cross-reference the rest of
   Akhiezer's list with Knop's table of cuspidal rank-one spherical
-  varieties (arXiv:1303.2466, §`sec:TABLE`) and add the remaining cases.
+  varieties (arXiv:1303.2466, §`sec:TABLE`) and add the remaining cases. *(Done: the table in
+  `two_orbit.py` maps every characteristic-0 row of Knop's table with
+  reductive $H$ to a case: added $\mathbb{P}^{n+1}\smallsetminus Q_n$,
+  $\mathbb{P}^6\smallsetminus Q_5$ for $G_2$, and $\mathbb{P}^7\smallsetminus Q_6$ for
+  $Spin_7$; rows with non-reductive $H$ or only in characteristic 2 are
+  listed as not covered.)*
 - [x] **S6c.1 Complete conics** (S). $\mathrm{Bl}_{v_2(\mathbb{P}^2)}\mathbb{P}^5$
   via `blowup` (S3.4), with the $SL_3$-torus on $\mathbb{P}(\mathrm{Sym}^2)$.
   The normal weights at each $x_i^2$ are pairwise distinct, so 1.6 applies.

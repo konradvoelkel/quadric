@@ -87,14 +87,17 @@ def _data_example(args):
 def _two_orbit_case(args):
     from bbcells.frontends import two_orbit
     family = args.family.upper()
-    if family == "OP2":
-        return two_orbit.octonionic_projective_plane()
+    fixed = {"OP2": two_orbit.octonionic_projective_plane, "G2": two_orbit.g2_on_p6,
+             "SPIN7": two_orbit.spin7_on_p7}
+    if family in fixed:
+        return fixed[family]()
     if args.n is None:
         raise ValueError("%s needs a dimension parameter n" % args.family)
     builders = {"AQ": two_orbit.affine_quadric, "HP": two_orbit.quaternionic_projective_space,
-                "PGL": two_orbit.pgl_mod_gl}
+                "PGL": two_orbit.pgl_mod_gl, "PQ": two_orbit.projective_space_minus_quadric}
     if family not in builders:
-        raise ValueError("unknown family %r; use AQ, HP, OP2 or PGL" % args.family)
+        raise ValueError("unknown family %r; use AQ, PQ, HP, PGL (with n) or OP2, G2, SPIN7"
+                         % args.family)
     return builders[family](args.n)
 
 
@@ -197,8 +200,9 @@ def build_parser():
     p.set_defaults(build=_data_example)
 
     p = commands.add_parser("two-orbit",
-                            help="rank-one two-orbit completions: AQ n, HP n, OP2, PGL n")
-    p.add_argument("family", help="AQ (affine quadric), HP, OP2 or PGL (PGL_n/GL_{n-1})")
+                            help="rank-one two-orbit completions: AQ n, PQ n, HP n, PGL n, OP2, G2, SPIN7")
+    p.add_argument("family", help="AQ (affine quadric), PQ (P^{n+1} - Q_n), HP, PGL "
+                   "(PGL_n/GL_{n-1}), OP2, G2 (P^6 - Q_5), SPIN7 (P^7 - Q_6)")
     p.add_argument("n", type=int, nargs="?")
     p.add_argument("--format", choices=("text", "json"), default="text")
     p.set_defaults(run=_run_two_orbit)
