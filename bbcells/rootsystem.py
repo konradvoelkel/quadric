@@ -232,11 +232,24 @@ class RootSystem(object):
         >>> RootSystem("B2").coroot_on_weight((1, 1), (0, 1))
         1
         """
-        norm = self.inner(beta, beta)
-        value = sum(b * self._lengths[k] / norm * mu[k] for k, b in enumerate(beta))
-        if value.denominator != 1:
-            raise ValueError("non-integral pairing")
-        return int(value)
+        return sum(c * m for c, m in zip(self.coroot(beta), mu))
+
+    def coroot(self, beta):
+        """beta^vee in simple-coroot coordinates (integers), cached for all roots
+        >>> RootSystem("B2").coroot((1, 1)), RootSystem("B2").coroot((-1, -2))
+        ((2, 1), (-1, -1))
+        """
+        cache = self.__dict__.setdefault("_coroots", {})
+        if beta not in cache:
+            norm = self.inner(beta, beta)
+            coordinates = []
+            for k, b in enumerate(beta):
+                value = b * self._lengths[k] / norm
+                if value.denominator != 1:
+                    raise ValueError("%r is not a root" % (beta,))
+                coordinates.append(int(value))
+            cache[beta] = tuple(coordinates)
+        return cache[beta]
 
     def reflect_weight_by_root(self, beta, mu):
         """s_beta(mu) = mu - <beta^vee, mu> beta, all in fundamental-weight coordinates"""
