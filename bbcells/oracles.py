@@ -275,3 +275,58 @@ def real_toric_rational_betti(rays, cones):
         for p in range(n + 1):
             betti[p] += reduced.get(p - 1, 0)
     return betti
+
+
+def batyrev_moreau(cartan_type, crossed, lattice_basis, cones):
+    """[X] for a smooth complete horospherical embedding from its colored fan,
+    by Batyrev-Moreau (arXiv:1203.0671, Theorem t:main) for smooth cones:
+      [X] = [G/P] (L - 1)^r sum_{faces sigma} prod_{v in sigma} 1/(L^{a_v} - 1),
+    a_v = 1 for uncolored rays, a_alpha = 2 <rho_S - rho_I, alpha^vee> for colors.
+    Same input format as frontends.horospherical.colored_horospherical.
+    >>> batyrev_moreau("A1", {1}, [(1,)], [([(1,)], {1}), ([(-1,)], set())])   # P^2
+    IntPoly((1, 1, 1))
+    """
+    import itertools
+    from bbcells.rootsystem import RootSystem
+    R = RootSystem(cartan_type)
+    levi = {i - 1 for i in range(1, R.rank + 1) if i not in set(crossed)}
+    r = len(lattice_basis)
+    a = {}
+    for alpha in crossed:
+        simple = tuple(int(k == alpha - 1) for k in range(R.rank))
+        a[alpha] = 2 - sum(R.coroot_pairing(simple, gamma) for gamma in R.positive_roots_of(levi))
+    rho = {alpha: tuple(v[alpha - 1] for v in lattice_basis) for alpha in crossed}
+    faces = {}
+    for gens, colors in cones:
+        weight_of = {}
+        for g in gens:
+            colored = [alpha for alpha in colors if rho[alpha] == tuple(g)]
+            values = {a[alpha] for alpha in colored}
+            if len(values) > 1:
+                raise ValueError("inconsistent colors on %r" % (g,))
+            weight_of[tuple(g)] = values.pop() if values else 1
+        for size in range(len(gens) + 1):
+            for sub in itertools.combinations(sorted(weight_of), size):
+                faces[frozenset(sub)] = tuple(sorted(weight_of[v] for v in sub))
+    # common denominator D = product over faces' denominators via lcm of q-integers
+    denominators = [IntPoly((1,))]
+    for exponents in faces.values():
+        d = IntPoly((1,))
+        for e in exponents:
+            d = d * q_integer(e)
+        denominators.append(d)
+    D = IntPoly((1,))
+    for d in denominators:
+        # multiply D by the part of d not yet dividing D (simple lcm by trial)
+        try:
+            exact_division(D, d)
+        except ValueError:
+            D = D * d
+    numerator = IntPoly(())
+    for exponents in faces.values():
+        term = (IntPoly((-1, 1)) ** (r - len(exponents)))
+        d = IntPoly((1,))
+        for e in exponents:
+            d = d * q_integer(e)
+        numerator = numerator + term * exact_division(D, d)
+    return exact_division(flag_variety(cartan_type, crossed) * numerator, D)

@@ -71,3 +71,72 @@ class TestHorospherical(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestColoredHorospherical(unittest.TestCase):
+    """PLAN.md S6a.2 (Batyrev-Moreau oracle) and S6a.3 (colored fans)"""
+
+    SL3_CONES = [([(1, 0), (0, 1)], {1}), ([(0, 1), (-1, -1)], set()), ([(-1, -1), (1, 0)], {1})]
+
+    @staticmethod
+    def multisets(data):
+        return sorted(sorted(w) for w in data.weights)
+
+    def test_projective_spaces_as_colored_embeddings(self):
+        """SL_n acting on P(k^n + k): exactly the weights of the linear model"""
+        from bbcells.frontends import linear
+        for n in (2, 3, 4, 5):
+            r = n - 1
+            X = horospherical.colored_horospherical(
+                "A%d" % r, {1}, [tuple(int(k == 0) for k in range(r))],
+                [([(1,)], {1}), ([(-1,)], set())])
+            eps = []
+            for i in range(n):
+                v = [0] * r
+                if i < r:
+                    v[i] += 1
+                if i > 0:
+                    v[i - 1] -= 1
+                eps.append(tuple(v))
+            P = linear.projectivization(eps + [tuple([0] * r)])
+            self.assertEqual(self.multisets(X), self.multisets(P), n)
+
+    def test_uncolored_fans_agree_with_the_toroidal_front_end(self):
+        for cartan_type, crossed, basis, fan in CASES:
+            cones = [([fan.rays[i] for i in cone], set()) for cone in fan.cones]
+            colored = horospherical.colored_horospherical(cartan_type, crossed, basis, cones)
+            toroidal = horospherical.toroidal_horospherical(cartan_type, crossed, basis, fan)
+            self.assertEqual(self.multisets(colored), self.multisets(toroidal), cartan_type)
+
+    def test_batyrev_moreau_oracle(self):
+        cases = [("A1", {1}, [(1,)], [([(1,)], {1}), ([(-1,)], set())]),
+                 ("A3", {1}, [(1, 0, 0)], [([(1,)], {1}), ([(-1,)], set())]),
+                 ("C2", {1}, [(1, 0)], [([(1,)], {1}), ([(-1,)], set())]),
+                 ("C3", {1}, [(1, 0, 0)], [([(1,)], {1}), ([(-1,)], set())]),
+                 ("A2", {1, 2}, [(1, 0), (0, 1)], self.SL3_CONES)]
+        for cartan_type, crossed, basis, cones in cases:
+            X = horospherical.colored_horospherical(cartan_type, crossed, basis, cones)
+            cells = bb_cells(X)
+            self.assertTrue(cells.check().ok, cartan_type)
+            self.assertEqual(IntPoly.from_counts(cells.counts),
+                             oracles.batyrev_moreau(cartan_type, crossed, basis, cones),
+                             cartan_type)
+
+    def test_batyrev_moreau_on_toroidal_fans_is_the_fibration_formula(self):
+        for cartan_type, crossed, basis, fan in CASES:
+            cones = [([fan.rays[i] for i in cone], set()) for cone in fan.cones]
+            fibre = IntPoly.from_counts(bb_cells(toric.fixed_point_data(fan)).counts)
+            self.assertEqual(oracles.batyrev_moreau(cartan_type, crossed, basis, cones),
+                             oracles.flag_variety(cartan_type, crossed) * fibre, cartan_type)
+
+    def test_non_smooth_colored_cones_are_refused(self):
+        cones = [([(1, 0), (0, 1)], {1, 2}), ([(0, 1), (-1, -1)], {2}),
+                 ([(-1, -1), (1, 0)], {1})]
+        with self.assertRaisesRegex(ValueError, "not smooth"):
+            horospherical.colored_horospherical("A2", {1, 2}, [(1, 0), (0, 1)], cones)
+
+    def test_inconsistent_colors_are_refused(self):
+        cones = [([(1, 0), (0, 1)], {1, 2}), ([(0, 1), (-1, -1)], set()),
+                 ([(-1, -1), (1, 0)], {1})]
+        with self.assertRaisesRegex(ValueError, "different colors"):
+            horospherical.colored_horospherical("A2", {1, 2}, [(1, 0), (0, 1)], cones)

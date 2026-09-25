@@ -320,13 +320,13 @@ prints usage.
   $G/P\times Y$; the twist is pinned by comparing
   $SL_3\times_{P_1}\mathbb{P}^1$ with the blow-up of $\mathbb{P}(k^3\oplus k)$
   computed by `operations.blowup`.)*
-- [ ] **S6a.2 Batyrev–Moreau oracle** (M). Implement
+- [x] **S6a.2 Batyrev–Moreau oracle** (M). Implement
   $E(X) = E(G/H)\sum_{n\in|\Sigma|\cap N}(uv)^{\omega_X(n)}$ (arXiv:1203.0671)
   straight from a colored fan, including $\omega_X$ and the weighted
   Stanley–Reisner series. Read the definition of $\omega_X$ in the paper
   first (the step starts with a note in `docs/`). Check against S6a.1 in the
   toroidal case.
-- [ ] **S6a.3 Smooth colored horospherical** (research). BB data from the
+- [x] **S6a.3 Smooth colored horospherical** (research). BB data from the
   local structure theorem and Pasquier's smoothness criterion; S6a.2 is the
   oracle.
 - [x] **S6b.1 `frontends/two_orbit.py`, rank-one two-orbit completions** (M).
