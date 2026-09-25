@@ -6,6 +6,7 @@ Command line interface.
     python3 -m bbcells quadric 4 --cocharacter=-1,-2,-3
     python3 -m bbcells wonderful A2
     python3 -m bbcells example complete-conics
+    python3 -m bbcells two-orbit HP 2
     python3 -m bbcells toric fan.json --cocharacter 1,5,25 --format latex
     python3 -m bbcells raw fixed_points.json --format json
 """
@@ -82,6 +83,37 @@ def _data_example(args):
     return getattr(importlib.import_module(module), function)()
 
 
+def _two_orbit_case(args):
+    from bbcells.frontends import two_orbit
+    family = args.family.upper()
+    if family == "OP2":
+        return two_orbit.octonionic_projective_plane()
+    if args.n is None:
+        raise ValueError("%s needs a dimension parameter n" % args.family)
+    builders = {"AQ": two_orbit.affine_quadric, "HP": two_orbit.quaternionic_projective_space,
+                "PGL": two_orbit.pgl_mod_gl}
+    if family not in builders:
+        raise ValueError("unknown family %r; use AQ, HP, OP2 or PGL" % args.family)
+    return builders[family](args.n)
+
+
+def _run_two_orbit(args):
+    import json
+    from bbcells.output import to_json_dict
+    case = _two_orbit_case(args)
+    if args.format == "json":
+        k0, gw = case.k0_class(), case.gw_euler_compact_support()
+        print(json.dumps({"name": case.name, "k0_class_L": list(k0.coefficients),
+                          "gw_euler_compact_support": {"plus": gw.plus, "minus": gw.minus},
+                          "open_fixed_points": list(case.open_fixed_points),
+                          "completion": to_json_dict(case.completion_cells(), checks=False),
+                          "boundary": to_json_dict(case.boundary_cells(), checks=False)},
+                         indent=1))
+    else:
+        print(case.summary())
+    return 0
+
+
 def _data_raw(args):
     from bbcells.frontends import raw
     return raw.load(args.file)
@@ -135,6 +167,13 @@ def build_parser():
     _add_common(p)
     p.set_defaults(build=_data_example)
 
+    p = commands.add_parser("two-orbit",
+                            help="rank-one two-orbit completions: AQ n, HP n, OP2, PGL n")
+    p.add_argument("family", help="AQ (affine quadric), HP, OP2 or PGL (PGL_n/GL_{n-1})")
+    p.add_argument("n", type=int, nargs="?")
+    p.add_argument("--format", choices=("text", "json"), default="text")
+    p.set_defaults(run=_run_two_orbit)
+
     p = commands.add_parser("raw", help="fixed points and tangent weights as JSON")
     p.add_argument("file")
     _add_common(p)
@@ -149,6 +188,8 @@ def main(argv=None):
         parser.print_help()
         return 0
     try:
+        if hasattr(args, "run"):
+            return args.run(args)
         data = args.build(args)
         cells = bb_cells(data, args.cocharacter)
     except (ValueError, OSError) as error:

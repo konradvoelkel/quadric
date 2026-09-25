@@ -67,6 +67,15 @@ class TestGolden(unittest.TestCase):
         code, out, err = run_cli("example", "complete-conics", "--format", "json")
         self.assertEqual(json.loads(out)["counts"], [1, 2, 3, 3, 2, 1])
 
+    def test_cli_two_orbit(self):
+        code, out, err = run_cli("two-orbit", "OP2")
+        self.assertEqual(code, 0, err)
+        self.assertIn("[X] = L^8 + L^12 + L^16", out)
+        code, out, err = run_cli("two-orbit", "AQ", "3", "--format", "json")
+        self.assertEqual(json.loads(out)["k0_class_L"], [0, -1, 0, 1])
+        code, out, err = run_cli("two-orbit", "HP")
+        self.assertEqual(code, 2)
+
     def test_cli_errors_are_reported(self):
         code, out, err = run_cli("toric", "--named", "P2", "--cocharacter", "1,1")
         self.assertEqual(code, 2)

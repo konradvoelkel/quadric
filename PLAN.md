@@ -313,7 +313,7 @@ prints usage.
 - [ ] **S6a.3 Smooth colored horospherical** (research). BB data from the
   local structure theorem and Pasquier's smoothness criterion; S6a.2 is the
   oracle.
-- [ ] **S6b.1 `frontends/two_orbit.py`, rank-one two-orbit completions** (M).
+- [x] **S6b.1 `frontends/two_orbit.py`, rank-one two-orbit completions** (M).
   $\overline{X} = G'/P'$ with boundary $D = G/Q$, via flag, restriction (1.5)
   and an explicit torus embedding $T_G \subset T_{G'}$ per case; $D^T$ is
   identified inside $\overline{X}^T$ by weight-multiset inclusion. Outputs
@@ -327,6 +327,10 @@ prints usage.
   - $PGL_n/GL_{n-1}$: $\mathbb{P}^{n-1}\times\check{\mathbb{P}}^{n-1} \supset$
     incidence variety, with diagonal $PGL_n \subset PGL_n \times PGL_n$.
 
+  *(Implemented: in low dimension, and for the incidence variety where
+  $\varepsilon_j - \varepsilon_i$ occurs twice at $(p_i, H_j)$, weight inclusion is
+  ambiguous, so these cases use explicit geometric embeddings that are then
+  checked by weight inclusion.)*
   **Done when:** oracles §4.4 pass. Afterwards, cross-reference the rest of
   Akhiezer's list with Knop's table of cuspidal rank-one spherical
   varieties (arXiv:1303.2466, §`sec:TABLE`) and add the remaining cases.
