@@ -34,6 +34,7 @@ def to_text(cells, show_weights=False, checks=True):
         1
     checks:
       [ok] cocharacter independence: only one generic cocharacter up to sign (rank 1); skipped
+      [ok] holomorphic Lefschetz: sum_p prod (1 + y e^-w)/(1 - e^-w) = chi_y(X)
       [ok] Poincare duality: counts (1, 1) are symmetric
       [ok] connected: c_0 = 1, c_n = 1 (expected 1 and 1)
     """

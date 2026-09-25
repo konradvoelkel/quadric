@@ -64,6 +64,11 @@
    "detail": "same counts for 3 other cocharacters"
   },
   {
+   "name": "holomorphic Lefschetz",
+   "passed": true,
+   "detail": "sum_p prod (1 + y e^-w)/(1 - e^-w) = chi_y(X)"
+  },
+  {
    "name": "Poincare duality",
    "passed": true,
    "detail": "counts (1, 1, 1) are symmetric"

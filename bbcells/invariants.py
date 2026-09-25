@@ -161,9 +161,58 @@ def _alternative_cocharacters(data, lam):
     return result
 
 
+_PRIME = (1 << 61) - 1
+
+
+def lefschetz_chi_y(data, counts, trials=2, seed=0):
+    """compare both sides of the holomorphic Lefschetz formula (Atiyah-Bott)
+        chi_y(X) = sum_p prod_{w in T_p X} (1 + y e^{-w}) / (1 - e^{-w}),
+    whose left side is sum_d c_d (-y)^d for a variety with a BB decomposition
+    into affine cells. The right side is a rational function on T that must
+    be constant; it is evaluated modulo a large prime at pseudo-random points
+    (a probabilistic identity test). Returns None on agreement, else a message.
+    >>> from bbcells.core import FixedPointData
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)))
+    >>> lefschetz_chi_y(P1, (1, 1)) is None
+    True
+    >>> lefschetz_chi_y(FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-2,),))), (1, 1))
+    'the fixed-point sum is not constant on T'
+    """
+    import random
+    rng = random.Random(seed)
+    P = _PRIME
+    for _ in range(trials):
+        while True:
+            z = [rng.randrange(2, P - 1) for _ in range(data.rank)]
+            zinv = [pow(x, P - 2, P) for x in z]
+            y = rng.randrange(2, P - 1)
+            total, degenerate = 0, False
+            for weights in data.weights:
+                numerator, denominator = 1, 1
+                for w in weights:
+                    u = 1
+                    for c, x, xi in zip(w, z, zinv):
+                        if c:
+                            u = u * pow(xi if c > 0 else x, abs(c), P) % P    # e^{-w}
+                    if u == 1:
+                        degenerate = True
+                        break
+                    numerator = numerator * (1 + y * u) % P
+                    denominator = denominator * (1 - u) % P
+                if degenerate:
+                    break
+                total = (total + numerator * pow(denominator, P - 2, P)) % P
+            if not degenerate:
+                break
+        expected = sum(c * pow(-y, d, P) for d, c in enumerate(counts)) % P
+        if total != expected:
+            return "the fixed-point sum is not constant on T"
+    return None
+
+
 def check(cells):
-    """consistency checks: independence of the cocharacter, Poincare duality,
-    connectedness (c_0 = c_n = 1). A failure means the input data is not the
+    """consistency checks: independence of the cocharacter, the holomorphic
+    Lefschetz formula for chi_y, Poincare duality, connectedness (c_0 = c_n = 1). A failure means the input data is not the
     fixed-point data of a smooth projective connected variety.
     >>> from bbcells.core import FixedPointData
     >>> bad = FixedPointData(1, 2, ("a", "b"), (((1, 0),), ((0, 1),)))
@@ -172,6 +221,7 @@ def check(cells):
     False
     >>> print(report)
     [FAIL] cocharacter independence: counts (0, 2) for (1, 1), but (1, 1) for (1, -3)
+    [FAIL] holomorphic Lefschetz: the fixed-point sum is not constant on T
     [FAIL] Poincare duality: counts (0, 2) are not symmetric
     [FAIL] connected: c_0 = 0, c_n = 2 (expected 1 and 1)
     """
@@ -195,6 +245,9 @@ def check(cells):
         else:
             items.append(CheckItem("cocharacter independence", True,
                                    "same counts for %d other cocharacters" % len(alternatives)))
+    defect = lefschetz_chi_y(data, counts)
+    items.append(CheckItem("holomorphic Lefschetz", defect is None,
+                           defect or "sum_p prod (1 + y e^-w)/(1 - e^-w) = chi_y(X)"))
     symmetric = counts == counts[::-1]
     items.append(CheckItem("Poincare duality", symmetric,
                            "counts %r are %ssymmetric" % (counts, "" if symmetric else "not ")))

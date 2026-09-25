@@ -41,5 +41,26 @@ class TestInvariants(unittest.TestCase):
                          r"\mathbb{Z} \oplus \mathbb{Z}(1)[2]^{\oplus 2} \oplus \mathbb{Z}(2)[4]")
 
 
+
+class TestLefschetz(unittest.TestCase):
+    """the holomorphic Lefschetz check sees errors the BB-based checks miss"""
+
+    def test_flipped_normal_weight_is_detected(self):
+        from bbcells.core import FixedPointData, bb_cells
+        from bbcells.frontends import spherical
+        X = spherical.complete_quadrics(3)
+        weights = []
+        for label, wts in zip(X.points, X.weights):
+            if X.annotation(label)["orbit"] != "closed":    # last weight: normal to the orbit
+                wts = wts[:-1] + (tuple(-c for c in wts[-1]),)
+            weights.append(wts)
+        wrong = FixedPointData(X.dim, X.rank, X.points, tuple(weights))
+        report = {item.name: item.passed for item in bb_cells(wrong).check().items}
+        self.assertTrue(report["cocharacter independence"])
+        self.assertTrue(report["Poincare duality"])
+        self.assertFalse(report["holomorphic Lefschetz"])
+        self.assertTrue(bb_cells(X).check().ok)
+
+
 if __name__ == "__main__":
     unittest.main()
