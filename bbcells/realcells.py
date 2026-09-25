@@ -163,11 +163,10 @@ def kocherlakota_incidences(cartan_type, crossed=None):
 
 
 def real_flag_variety(cartan_type, crossed=None):
-    """the real cell complex of G/P with signs where available:
-    type A: Matszangosz (cooriented complex); types B, C, D: Rabelo-San Martin
-    (cellular complex, orientations from the classical matrix realizations);
-    exceptional types: signs from d o d = 0 when this determines the
-    homology, otherwise Kocherlakota's unsigned incidences
+    """the signed real cell complex of G/P: type A: Matszangosz (cooriented
+    complex); other types: Rabelo-San Martin (cellular complex), with
+    orientations from exact matrix realizations (B, C, D) or from Chevalley
+    bases (E via Frenkel-Kac, F4 and G2 by folding)
     >>> X = real_flag_variety("A2", {1})            # RP^2
     >>> X.cohomology()                              # Z, 0, Z/2
     [(1, []), (0, []), (0, [2])]
@@ -177,15 +176,7 @@ def real_flag_variety(cartan_type, crossed=None):
     letter = RootSystem(cartan_type).letter
     if letter == "A":
         return type_a_signed(cartan_type, crossed)
-    if letter in "BCD":
-        return rabelo_san_martin(cartan_type, crossed)
-    try:
-        return cellular_real_flag_variety(cartan_type, crossed)
-    except ValueError:
-        data, unsigned = kocherlakota_incidences(cartan_type, crossed)
-        dims = {p: data.annotation(p)["length"] for p in data.points}
-        return RealCellComplex(data.name + "(R)", dims, unsigned, signed=False,
-                               convention="cellular")
+    return rabelo_san_martin(cartan_type, crossed)
 
 
 # -- Matszangosz, type A, signed ---------------------------------------------
@@ -567,7 +558,7 @@ def cellular_real_flag_variety(cartan_type, crossed=None, max_choices=256):
 
 # -- Rabelo-San Martin signs for classical types (PLAN.md S5.4) --------------
 
-def rabelo_san_martin(cartan_type, crossed=None):
+def rabelo_san_martin(cartan_type, crossed=None, realization=None):
     """the cellular chain complex of G/P(R) for classical G with signs from
     arXiv:1810.00934 (Theorem `teoforcw1`): for w = r_1 ... r_n (our fixed
     reduced words) and w' = r_1 ... ^r_i ... r_n,
@@ -576,11 +567,17 @@ def rabelo_san_martin(cartan_type, crossed=None):
     the orientation of the deleted word's tangent frame at the common point
     n_{w'} b_0 relative to the frame of w's fixed word (Tits lifts satisfy the
     braid relations, and the composite is a diffeomorphism of the open cube)."""
+    from bbcells.chevalley import Lifts
     from bbcells.liealgebra import ClassicalRealization
     R = RootSystem(cartan_type)
-    if R.letter not in "ABCD":
-        raise ValueError("the matrix realization covers the classical types only")
-    realization = ClassicalRealization(R.letter, R.rank)
+    if realization is None:
+        realization = "matrix" if R.letter in "ABCD" else "chevalley"
+    if realization == "matrix":
+        realization = ClassicalRealization(R.letter, R.rank)
+    elif realization == "chevalley":
+        realization = Lifts(cartan_type)
+    else:
+        raise ValueError("realization must be 'matrix' or 'chevalley'")
     data, magnitudes = kocherlakota_incidences(cartan_type, crossed)
     word = {p: tuple(i - 1 for i in data.annotation(p)["word"]) for p in data.points}
     mu = {p: data.annotation(p)["weight"] for p in data.points}

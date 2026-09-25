@@ -155,6 +155,29 @@ class TestOtherTypes(unittest.TestCase):
         self.assertEqual(realcells.real_flag_variety("G2", {1}).rational_betti(),
                          [1, 0, 0, 1, 0, 0])
 
+    def test_exceptional_full_flags_against_the_maximal_compact_subgroup(self):
+        """G2: K = SO(4); F4: K = Sp(3) Sp(1)"""
+        t = IntPoly.monomial
+        so4 = (t(3) + 1) ** 2
+        f4 = (t(3) + 1) ** 2 * (t(7) + 1) * (t(11) + 1)
+        for name, expected in (("G2", so4), ("F4", f4)):
+            X = realcells.real_flag_variety(name)
+            self.assertTrue(X.square_zero(), name)
+            self.assertEqual(IntPoly.from_counts(X.rational_betti()), expected, name)
+
+    def test_matrix_and_chevalley_realizations_agree(self):
+        for name, crossed in (("A3", None), ("A3", {2}), ("D4", {1}), ("D4", {2})):
+            self.assertEqual(
+                realcells.rabelo_san_martin(name, crossed, "matrix").cellular_homology(),
+                realcells.rabelo_san_martin(name, crossed, "chevalley").cellular_homology(),
+                (name, crossed))
+
+    def test_rabelo_san_martin_agrees_with_square_zero_where_that_determines_the_signs(self):
+        for name, crossed in (("G2", {1}), ("F4", {1}), ("F4", {4}), ("E6", {1}), ("E6", {2})):
+            self.assertEqual(realcells.rabelo_san_martin(name, crossed).cellular_homology(),
+                             realcells.cellular_real_flag_variety(name, crossed).cellular_homology(),
+                             (name, crossed))
+
     def test_g2(self):
         """G2/B(R) = SO(4)/M: rational Poincare polynomial (1 + t^3)^2"""
         X = realcells.real_flag_variety("G2")
