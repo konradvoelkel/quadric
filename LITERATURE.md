@@ -110,7 +110,16 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   type A partial flag varieties; all torsion in $H^*(\mathrm{Fl}(\mathbb{R});\mathbb{Z})$
   is 2-torsion. **The main test oracle for M5.**
 - ✓ R. R. Kocherlakota, *Integral homology of real flag manifolds and loop
-  spaces of symmetric spaces*, Adv. Math. 110 (1995), 1–46. Real Bruhat cell
+  spaces of symmetric spaces*, Adv. Math. 110 (1995), 1–46. (Also confirmed
+  by the bibliography of arXiv:1910.11149.)
+- ✓a Á. K. Matszangosz, *On the cohomology rings of real flag manifolds:
+  Schubert cycles*, arXiv:1910.11149. Incidence coefficients of real Schubert
+  cells in type A partial flag manifolds **with signs**:
+  $[\Omega_I,\Omega_J] = 0$ or $(-1)^{s(I,J)}2$ according to the parity of
+  $N_I(a,b)$. **The algorithm for PLAN S5.1.**
+- ✓ L. Rabelo, L. A. B. San Martin, *Cellular homology of real flag
+  manifolds*, Indag. Math. 30 (2019), 745–772 (from the bibliography of
+  arXiv:1910.11149). Signs for general real flag manifolds; PLAN S5.4. Real Bruhat cell
   incidences are $0$ or $\pm 2$; the model for the matrices $E_d$ in SPEC §3.5.
 - ✓a L. Casian, Y. Kodama, *On the cohomology of real Grassmann manifolds*,
   arXiv:1309.5520. Explicit incidence graphs via checkered Young diagrams.
@@ -138,6 +147,15 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   CIRM 1 (2010), 33–53.
 - ✓m F. Knop, *On the set of orbits for a Borel subgroup*, Comment. Math. Helv.
   70 (1995), 285–309.
+- ✓a F. Knop, *Spherical roots of spherical varieties*, Ann. Inst. Fourier 64
+  (2014), 2503–2526; arXiv:1303.2466. Contains Akhiezer's classification of
+  rank-one spherical varieties extended to all characteristics $\neq 2$,
+  with a **table of cuspidal rank-one spherical varieties for adjoint
+  groups** (§`sec:TABLE`), which is the case list for PLAN S6b.1.
+- **?** D. Akhiezer, *Equivariant completions of homogeneous algebraic
+  varieties by homogeneous divisors*, Ann. Global Anal. Geom. 1 (1983). The
+  original rank-one list, cited as [Ahi83] in arXiv:1805.04338; venue from
+  memory.
 - ✓a F. Knop, *Localization of spherical varieties*, Algebra Number Theory 8
   (2014), 703–728; arXiv:1303.2561.
 - ✓a G. Gagliardi, *A combinatorial smoothness criterion for spherical

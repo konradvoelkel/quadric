@@ -135,6 +135,10 @@ quadric.py         legacy, kept as regression oracle
 tests/
 ```
 
+The authoritative module list, with `operations.py` (product, restriction
+to a subtorus, blow-up) and `oracles.py` (independent formulas used as test
+oracles), is in `PLAN.md` §2.
+
 ### 3.1 Core data type [L0]
 
 ```python
@@ -314,7 +318,10 @@ Minimum test cases. All must pass before a front end counts as done.
      (arXiv:1203.0671), which gives the Betti numbers straight from the
      colored fan;
    - **M6b** smooth complete spherical varieties of rank one, with
-     arXiv:1805.04338 as reference;
+     arXiv:1805.04338 as reference. By Akhiezer's classification, the
+     two-orbit completion $\overline{X}$ is a flag variety $G'/P'$ of a
+     larger group with boundary a flag variety $G/Q$, so this reduces to the
+     flag front end plus restriction to a subtorus (`PLAN.md` S6b.1);
    - **M6c** complete symmetric varieties (De Concini–Procesi);
    - **M6d [R]** general smooth complete toroidal spherical varieties from
      Luna–Vust data, using Brion's GKM description and the local structure

@@ -194,6 +194,23 @@
     "abstract": "Survey article on the geometry of spherical varieties. Invited survey for Transformation Groups.",
     "metadata_source": "abs-page"
   },
+  "1303.2466": {
+    "id": "1303.2466",
+    "latest_version": "1303.2466v3",
+    "title": "Spherical roots of spherical varieties",
+    "authors": [
+      "Friedrich Knop"
+    ],
+    "published": "Mon, 11 Mar 2013",
+    "updated": "Sun, 9 Mar 2014",
+    "journal_ref": "Annales de l'institut Fourier, 64 no. 6 (2014), 2503-2526",
+    "doi": "10.5802/aif.2919",
+    "primary_category": null,
+    "msc_classes": "14M27, 14L30, 14G17",
+    "comments": "v1; 19 pages; v2: 19 pages, reformatted to LaTeX, slightly expanded, a couple of minor errors corrected; v3: 19 pages, minor modifications, final version",
+    "abstract": "Brion proved that the valuation cone of a complex spherical variety is a fundamental domain for a finite reflection group, called the little Weyl group. The principal goal of this paper is to generalize this fundamental theorem to fields of characteristic unequal to 2. We also prove a weaker version which holds in characteristic 2, as well. Our main tool is a generalization of Akhiezer's classification of spherical rank-1-varieties.",
+    "metadata_source": "abs-page"
+  },
   "1303.2561": {
     "id": "1303.2561",
     "latest_version": "1303.2561v3",
@@ -366,6 +383,23 @@
     "msc_classes": null,
     "comments": "Significant revision, streamlined proofs, 34p",
     "abstract": "We complement our previous computation of the Chow-Witt rings of classifying spaces of special linear groups by an analogous computation for the general linear groups. This case involves discussion of non-trivial dualities. The computation proceeds along the lines of the classical computation of the integral cohomology of ${\\rm BO}(n)$ with local coefficients, as done by Cadek. The computations of Chow-Witt rings of classifying spaces of ${\\rm GL}_n$ are then used to compute the Chow-Witt rings of the finite Grassmannians. As before, the formulas are close parallels of the formulas describing integral cohomology rings of real Grassmannians.",
+    "metadata_source": "abs-page"
+  },
+  "1910.11149": {
+    "id": "1910.11149",
+    "latest_version": "1910.11149v1",
+    "title": "On the cohomology rings of real flag manifolds: Schubert cycles",
+    "authors": [
+      "Ákos K. Matszangosz"
+    ],
+    "published": "Thu, 24 Oct 2019",
+    "updated": "Thu, 24 Oct 2019",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14M15, 57T15 (primary), 14P25, 55N91, 57N80, 57R95 (secondary)",
+    "comments": "44 pages, 4 figures",
+    "abstract": "We give an algorithm to compute the integer cohomology groups of any real partial flag manifold, by computing the incidence coefficients of the Schubert cells. For even flag manifolds we determine the integer cohomology groups, by proving that any torsion class has order 2 (generalizing a result of Ehresmann). We conjecture this to hold for any real flag manifold. We obtain results concerning which Schubert varieties represent integer cohomology classes, their structure constants and how to express them in terms of characteristic classes. For even flag manifolds and Grassmannians we also describe Schubert calculus. The Schubert calculus can be used to obtain lower bounds for certain real enumerative geometry problems (Schubert problems).",
     "metadata_source": "abs-page"
   },
   "2003.09457": {
