@@ -101,8 +101,8 @@ uses 0-based labels, so tests translate between them.
 Pure Python ≥ 3.10 with the standard library only, using exact arithmetic
 through `fractions.Fraction` and `int` (decision D1). Tests use `unittest`
 and `doctest`, so no test dependency is needed; `pytest` can still run them.
-Optional SageMath adapters live in a separate module, are never imported by
-the core, and their tests are skipped when Sage is absent. The package
+Optional SageMath adapters would live in a separate module, never imported by
+the core (not written; decision D5). The package
 `bbcells/` lives in this repository next to the untouched legacy script
 `quadric.py` (decision D2).
 
@@ -122,8 +122,9 @@ bbcells/
     wonderful.py   wonderful compactification of adjoint G           [L1]
     horospherical.py  smooth toroidal horospherical varieties         [L2]
     spherical.py   orbit-wise fixed points; wonderful varieties       [R]
+    symmetric.py   complete symmetric varieties from Satake diagrams  [R]
   cli.py
-  sage_adapter.py  optional cross-checks against SageMath (never required)
+  sage_adapter.py  optional cross-checks against SageMath (not written, D5)
 tools/
   fetch_arxiv.py   literature fetcher (see LITERATURE.md §8)
 literature/
@@ -329,7 +330,9 @@ Minimum test cases. All must pass before a front end counts as done.
      theorem, with smoothness checked by Gagliardi's criterion.
      First step done (`docs/S6d.md`): wonderful varieties from spherical
      roots, $S^p$ and satellites, including complete quadrics and complete
-     skew forms in every dimension.
+     skew forms in every dimension. M6c is finished by deriving the satellites of
+     symmetric varieties from Satake diagrams (all real forms of types A–D,
+     $E_6$, $F_4$, $G_2$; `docs/S6d.md` §6).
 
 ## 5. Decisions (v0.2)
 
@@ -362,6 +365,17 @@ Reasons:
 - Complete symmetric varieties come with classical Betti numbers
   (De Concini–Springer) but need the symmetric-pair machinery (restricted
   roots, the little Weyl group), which is more work to implement.
+
+**D5 — no SageMath adapter (2026-09-25).** `sage_adapter.py` (D1, §2) is
+not written. SageMath is not installable in the CI or development
+environment, so an adapter could not be tested. Its intended cross-checks
+are covered without Sage:
+- toric Betti numbers, by the h-vector of the fan
+  (`oracles.toric_h_polynomial`);
+- Weyl group lengths and degrees, by `oracles.py`;
+- consistency in general, by the holomorphic Lefschetz check.
+
+The module can still be added later as an optional extra.
 
 **D4 — attaching data.** Track $\eta$-coefficients as integers interpreted in
 $W(\mathbb{Z}) \cong \mathbb{Z}$, conditional on hypothesis H1 (§3.5), and

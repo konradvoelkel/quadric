@@ -33,11 +33,13 @@ the status of each step) and [LITERATURE.md](LITERATURE.md) (sources).
     python3 -m bbcells two-orbit OP2                # [OP^2] = L^8 + L^12 + L^16
     python3 -m bbcells example complete-conics      # blow-up of P^5 along the Veronese
     python3 -m bbcells spherical complete-quadrics 5   # assembled orbit by orbit, 450 cells
+    python3 -m bbcells symmetric AIII 2 3           # complete symmetric varieties from Satake diagrams
     python3 -m bbcells real A3                      # H^*(Fl(R^4); Z)
 
 Every front end is tested against an independent oracle (point counts,
 Weyl group degrees, blow-up and fibration formulas, published tables, and
-this script for quadrics).
+this script for quadrics). Every computation is also checked against the
+holomorphic Lefschetz formula for $\chi_y$.
 
 ## Development
 

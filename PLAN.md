@@ -126,7 +126,7 @@ bbcells/
   frontends/
     raw.py toric.py flag.py quadric.py wonderful.py
     horospherical.py two_orbit.py complete_conics.py spherical.py
-  sage_adapter.py               optional cross-checks, never imported by core
+  sage_adapter.py               (not written, SPEC D5)
   oracles.py                    independent formulas of §4 (point counts etc.)
 tests/
   test_<module>.py              one file per module; oracle tests in test_oracles.py
@@ -381,6 +381,21 @@ prints usage.
   dimension. They match the S6c front ends exactly, and the
   orbit-decomposition point counts for $n\le6$ and $n\le4$. Open: satellites
   from Luna data, toroidal non-wonderful $X$, and GKM edges across orbits.)*
+- [x] **S6e Complete symmetric varieties from Satake diagrams** (research,
+  finishes SPEC M6c). `frontends/symmetric.py` computes the spherical roots
+  $\alpha-\theta\alpha$, $S^p$ = black nodes, and the satellites. The
+  satellites use the equal-rank test $\varepsilon=-w_0$ on subdiagrams and
+  Borel–de Siebenthal nodes, with $W_H = \mathrm{Stab}_{W_L}(t)$ possibly
+  containing non-reflections. Real forms of types A–D, $E_6$, $F_4$, $G_2$
+  are covered. **Done when:** it reproduces the earlier families exactly;
+  the exceptional isomorphisms $B_2=C_2$, $D_3=A_3$ and $D_4$ triality agree;
+  and every new case passes the checks. *(Done; Hermitian satellites beyond
+  condition (R) are marked and validated by the checks, see `docs/S6d.md`
+  §6.)*
+- [x] **S6f Holomorphic Lefschetz check** (S). `invariants.check` also tests
+  the Atiyah–Bott formula for $\chi_y$ modulo a large prime. **Done when:**
+  every front end passes it and it detects a sign error that the BB-based
+  checks miss. *(Done.)*
 
 ---
 

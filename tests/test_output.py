@@ -84,6 +84,13 @@ class TestGolden(unittest.TestCase):
         self.assertEqual(code, 0, err)
         self.assertIn("6 fixed points", out)
 
+    def test_cli_symmetric(self):
+        code, out, err = run_cli("symmetric", "AIII", "2", "2", "--format", "json")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(json.loads(out)["counts"], [1, 2, 5, 7, 9, 7, 5, 2, 1])
+        code, out, err = run_cli("symmetric", "EV")
+        self.assertEqual(code, 2)
+
     def test_cli_real(self):
         code, out, err = run_cli("real", "A3")
         self.assertEqual(code, 0, err)

@@ -8,6 +8,7 @@ Command line interface.
     python3 -m bbcells example complete-conics
     python3 -m bbcells two-orbit HP 2
     python3 -m bbcells spherical complete-quadrics 5
+    python3 -m bbcells symmetric AIII 2 3
     python3 -m bbcells real A3 --parabolic 2
     python3 -m bbcells toric fan.json --cocharacter 1,5,25 --format latex
     python3 -m bbcells raw fixed_points.json --format json
@@ -95,6 +96,11 @@ SPHERICAL = {
 def _data_spherical(args):
     from bbcells.frontends import spherical
     return getattr(spherical, SPHERICAL[args.family])(args.n)
+
+
+def _data_symmetric(args):
+    from bbcells.frontends import symmetric
+    return symmetric.complete_symmetric_variety(args.kind, *args.parameters)
 
 
 def _two_orbit_case(args):
@@ -219,6 +225,15 @@ def build_parser():
     p.add_argument("n", type=int)
     _add_common(p)
     p.set_defaults(build=_data_spherical)
+
+    p = commands.add_parser("symmetric",
+                            help="complete symmetric varieties of G_ad/G_ad^theta from Satake "
+                                 "diagrams: AI n, AII n, AIII p q, BI p q, CI n, CII p q, DI p q, "
+                                 "DIII n, EI, EII, EIII, EIV, FI, FII, G")
+    p.add_argument("kind")
+    p.add_argument("parameters", type=int, nargs="*")
+    _add_common(p)
+    p.set_defaults(build=_data_symmetric)
 
     p = commands.add_parser("two-orbit",
                             help="rank-one two-orbit completions: AQ n, PQ n, HP n, PGL n, OP2, G2, SPIN7")

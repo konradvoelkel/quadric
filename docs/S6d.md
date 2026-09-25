@@ -2,9 +2,12 @@
 
 Status (2026-09-25): implemented for wonderful varieties whose satellites
 are given (`bbcells/frontends/spherical.py`), with complete quadrics and
-complete skew forms in every dimension as the first families. Deriving
-the satellites from Luna data alone, and general toroidal (non-wonderful)
-varieties, remain open (§5).
+complete skew forms in every dimension as the first families. For
+symmetric varieties the satellites are derived from the Satake diagram
+(`bbcells/frontends/symmetric.py`, §6), covering all real forms of types
+A–D, $E_6$, $F_4$ and $G_2$. Every result is also tested against the
+holomorphic Lefschetz formula (§5). General (non-symmetric) satellites and
+toroidal non-wonderful varieties remain open (§7).
 
 Conventions are those of `PLAN.md` §1: characters are in simple-root
 coordinates of $G$ (the torus of $G_{\mathrm{ad}}$). The base point of $G/P$
@@ -146,25 +149,140 @@ $\sum n!/2^{\#\{j: k_j=2\}}$ over the compositions of $n$ into parts 1 and 2:
   complete quadrics in $\mathbb{P}^4$ have $\chi^{\mathbb{A}^1} =
   224\langle1\rangle + 226\langle-1\rangle$, so $\chi(X(\mathbb{R})) = -2$.
 
-## 5. What is not done
+## 5. The holomorphic Lefschetz check
 
-1. **Satellites from Luna data.** The satellites $H_{L,I}\supset T$ are
-   supplied per family. Deriving them from $(\Sigma, S^p, \mathbf{A})$ alone
-   requires two things:
+The BB-based checks (cocharacter independence, Poincaré duality) are weak
+for data assembled orbit by orbit. Flipping the sign of the normal weights
+of both intermediate orbits of complete conics keeps them intact.
+
+Every `check()` now also tests the Atiyah–Bott formula
+
+$$\chi_y(X) = \sum_{d} c_d(-y)^d = \sum_{p\in X^T}\ \prod_{w\in T_pX}\frac{1+y\,e^{-w}}{1-e^{-w}}.$$
+
+The right side is a rational function on $T$ that has to be constant. It is
+evaluated modulo $2^{61}-1$ at pseudo-random points, as a probabilistic
+identity test (`invariants.lefschetz_chi_y`). Every front end passes it, and
+it rejects the flipped complete conics (`tests/test_invariants.py`).
+
+## 6. Complete symmetric varieties from Satake diagrams
+
+`frontends/symmetric.py` derives the satellites for symmetric varieties,
+which settles the first open item of the previous version of this note for
+that class. The input is a Satake diagram (black nodes, arrows) of an involution $\theta$.
+The output is the complete symmetric variety of De Concini–Procesi, i.e.
+the wonderful compactification of $G_{\mathrm{ad}}/G_{\mathrm{ad}}^\theta$.
+
+- $\theta = -w_\bullet\circ\varepsilon$ on characters. Here $\varepsilon$
+  follows the arrows on white nodes and acts on black nodes by the
+  opposition involution of the black subdiagram, and $w_\bullet$ is the
+  longest element of the black subsystem.
+- The spherical roots are $\alpha-\theta(\alpha)$, one for each arrow orbit
+  of white simple roots, and $S^p$ is the set of black nodes. These match
+  the S6b.1 normals in every rank-one case, and they give $2\alpha_i$ for
+  complete quadrics.
+- The satellite of $I$ is the symmetric pair on the subdiagram
+  $S^p\cup\operatorname{supp}I$. It has fixed points if and only if every
+  component of that subdiagram is $\theta$-stable and of equal rank, which
+  is checked as $\varepsilon = -w_0$ on the component.
+- An equal-rank involution is $\mathrm{Ad}(t_j)$ with $\alpha_j(t_j)=-1$ for
+  a Borel–de Siebenthal node $j$, and $\alpha_i(t_j) = 1$ otherwise (Kac's
+  classification of inner involutions). The node is found by recognizing
+  the subdiagram in Bourbaki numbering, trying every diagram isomorphism, so
+  that $D_4$ triality is handled. The patterns are:
+  - AIII$(p,q)$: node $p$;
+  - BI$(p,q)$: half of whichever of $p,q$ is even;
+  - CI: node $n$;
+  - CII$(p,q)$: node $p$;
+  - DI$(p,q)$: node $p/2$;
+  - DIII: the white tail node;
+  - EII: node 2;
+  - EIII: node 1;
+  - FI: node 1;
+  - FII: node 4;
+  - G: node 2.
+
+  Every recognition is cross-checked. $\dim K$ computed from the Satake
+  diagram, $\operatorname{rk} + |\Phi| - r - (|\Phi|-|\Phi_\bullet|)/2$, must
+  equal $\operatorname{rk} + \#\{\beta : \beta(t_j)=1\}$.
+- $W_H = \operatorname{Stab}_{W_L}(t_j)$ in the adjoint torus. This need not
+  be a reflection group: for AIII$(p,p)$ it contains the swap of the two
+  blocks. So `homogeneous_fixed_points` accepts non-reflection
+  `component_elements`. The cosets are Dyer representatives of the
+  reflection part, glued by the component group.
+
+**Hermitian satellites beyond (R).** AIII$(p,q)$ with $p\ne q$, $p\geq2$,
+DIII$(n)$ with $n$ odd, and EIII have satellites whose $W_H$ fixes a line in
+$\operatorname{span}\Phi_L$: the centre of the Hermitian $K$. There the
+proposition of §3 leaves the component $c\zeta$ of the normal weight along
+this line open. With `strict=False` (the default of the symmetric front
+end), the $W_L$-average ($c=0$) is used and the orbits are annotated. The
+result is accepted only if it passes all checks, including §5.
+
+For AIII$(2,3)$, AIII$(2,4)$ and DIII$(5)$, the shifts $c=\pm1,\pm2$ were
+tried, applied to all such orbits at once. Every one fails cocharacter
+independence, Lefschetz and Poincaré duality, while $c=0$ passes. This is
+evidence, not a proof, that the $W_L$-average is right in the Hermitian case
+as well.
+
+**Verification.**
+
+- Exact fixed-point data agrees with the earlier front ends:
+  - AI$(n)$ = complete quadrics ($n\le5$);
+  - AII$(n)$ = complete skew forms ($n\le3$);
+  - AIII$(1,q)$ = $PGL_n/GL_{n-1}$;
+  - CII$(1,q)$ = $\mathbb{HP}^q$;
+  - BI$(1,2k)$ = $\mathbb{P}^{2k}\smallsetminus Q_{2k-1}$;
+  - FII = $\mathbb{OP}^2$.
+- Exceptional isomorphisms give the same data from different diagrams on
+  different root systems, after relabelling nodes:
+  - CI(2) = BI(2,3) and CII(1,1) = BI(1,4) ($B_2 = C_2$);
+  - DI(3,3) = AI(4), DI(1,5) = AII(2), DI(2,4) = AIII(2,2) and
+    DIII(3) = AIII(1,3) ($D_3 = A_3$);
+  - DI(2,6) = DIII(4) (triality).
+- New varieties (dimension: number of fixed points), all passing every
+  check:
+
+  | form | fixed points |
+  |---|---|
+  | AIII(2,2) | 8: 39 |
+  | AIII(3,3) | 18: 1180 |
+  | CI(3) | 12: 148 |
+  | CI(4) | 20: 1624 |
+  | CII(2,2) | 16: 123 |
+  | BI(3,4) | 12: 147 |
+  | DI(4,4) | 16: 747 |
+  | DIII(6) | 30: 4576 |
+  | G | 8: 27 |
+  | FI | 28: 4788 |
+  | EIV | 26: 270 |
+  | EII | 40: 110916 |
+  | EI | 42: 370170 |
+  | AIII(2,3) (beyond R) | 12: 190 |
+  | DIII(5) (beyond R) | 20: 656 |
+  | EIII (beyond R) | 32: 2619 |
+
+  For $G_2/SO_4$, the count $27 = 12+6+6+3$ can be checked by hand.
+
+## 7. What is not done
+
+1. **Satellites from Luna data** in general (not symmetric). This needs
+   two things:
    - deciding when a cuspidal spherical system comes from a full-rank
      subgroup;
    - producing its root data $(\Phi_H, W_H)$.
 
-   For symmetric varieties this should follow from Satake diagrams
-   ($L_{S_I}^\theta$). In general it is the construction step of the
-   Bravi–Pezzini classification, which is not implemented.
-2. **Toroidal, non-wonderful $X$.** Orbits $O_\sigma$ correspond to cones of a
+   That is the construction step of the Bravi–Pezzini classification, and
+   it is not implemented. For symmetric varieties it is done (§6). $E_7$ and
+   $E_8$ are out of reach of the brute-force Weyl group enumeration.
+2. **A proof of the Hermitian case** of the normal-weight rule (§6).
+3. **Toroidal, non-wonderful $X$.** Orbits $O_\sigma$ correspond to cones of a
    fan in the valuation cone. They fibre over the orbits of the wonderful
    model by torus fibres. Which cones carry fixed points, and their normal
    weights, would follow from the same lemma, but no front end exists.
    Colored (non-toroidal) varieties would additionally need Gagliardi's
    smoothness criterion (SPEC M6d).
-3. **GKM edges** between orbits are not produced. So equivariant cohomology
-   (S3.3) and the real incidences (M5) are not available for these
-   varieties yet; only the cell counts and the invariants that follow from
-   them are.
+4. **GKM edges** between orbits are not produced. Complete quadrics are not
+   GKM for $T$ anyway: $\alpha$ and $2\alpha$ both occur at the same point.
+   So equivariant cohomology (S3.3) and the real incidences (M5) are not
+   available for these varieties; only the cell counts and the invariants
+   that follow from them are.

@@ -58,6 +58,16 @@ class TestToricOracles(unittest.TestCase):
 
 class TestToricConventions(unittest.TestCase):
 
+    def test_h_vector_oracle(self):
+        # the face count of the fan, independent of fixed points and weights
+        fans = [toric.projective_space(3), toric.hirzebruch(3), toric.del_pezzo_6(),
+                toric.product(toric.hirzebruch(1), toric.projective_space(2)),
+                toric.star_subdivision(toric.projective_space(3), (0, 1))]
+        for fan in fans:
+            expected = oracles.toric_h_polynomial(fan.cones)
+            self.assertEqual(IntPoly.from_counts(bb_cells(toric.fixed_point_data(fan)).counts),
+                             expected)
+
     def test_open_cell_at_the_cone_containing_lambda(self):
         """PLAN.md 1.1: the open cell is at the cone containing lambda"""
         fan = toric.hirzebruch(2)

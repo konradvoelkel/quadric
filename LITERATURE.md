@@ -237,6 +237,15 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   over $\mathbb{F}_q$, which enters the orbit-decomposition oracle for
   complete quadrics (S6d).
 
+- ✓m S. Araki, *On root systems and an infinitesimal classification of
+  irreducible symmetric spaces*, J. Math. Osaka City Univ. 13 (1962), 1–34;
+  S. Helgason, *Differential geometry, Lie groups, and symmetric spaces*,
+  Academic Press 1978, Table VI. Satake diagrams in `frontends/symmetric.py`.
+- ✓m A. Borel, J. de Siebenthal, *Les sous-groupes fermés de rang maximum des
+  groupes de Lie clos*, Comment. Math. Helv. 23 (1949), 200–221; V. Kac,
+  *Infinite dimensional Lie algebras*, ch. 8 (automorphisms of finite order).
+  Inner involutions as $\mathrm{Ad}(t_j)$ for one node $j$ of mark 1 or 2.
+
 **General smooth projective spherical varieties**
 
 - ✓a M. Brion, *Equivariant cohomology and equivariant intersection theory*,
@@ -273,6 +282,10 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
 
 ## 6. Toric varieties and GKM theory (M1, M3)
 
+- ✓m M. F. Atiyah, R. Bott, *A Lefschetz fixed point formula for elliptic
+  complexes II. Applications*, Ann. of Math. 88 (1968), 451–491. The
+  holomorphic Lefschetz formula behind the $\chi_y$ check in
+  `invariants.check`.
 - ✓m V. Danilov, *The geometry of toric varieties*, Russian Math. Surveys 33
   (1978), 97–154.
 - ✓m W. Fulton, *Introduction to toric varieties*, Ann. of Math. Stud. 131

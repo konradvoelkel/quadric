@@ -428,3 +428,25 @@ def complete_skew_forms(n):
 def complete_conics():
     """[P^5] - [P^2] + [P^2][P^2] (PLAN.md 4.5)"""
     return blowup(projective_space(5), projective_space(2), 3)
+
+
+def toric_h_polynomial(cones):
+    """Betti numbers b_{2k} = h_k of a smooth complete toric variety from its
+    maximal cones alone: sum_k h_k x^k = sum_j f_j (x - 1)^{n - j}, with f_j
+    the number of j-dimensional cones (all faces of the maximal cones)
+    >>> toric_h_polynomial([(0, 1), (1, 2), (2, 0)])            # P^2
+    IntPoly((1, 1, 1))
+    """
+    from itertools import combinations
+    cones = [tuple(c) for c in cones]
+    n = len(cones[0])
+    faces = set()
+    for c in cones:
+        for j in range(n + 1):
+            faces.update(combinations(sorted(c), j))
+    total = IntPoly(())
+    x_minus_1 = IntPoly((-1, 1))
+    for j in range(n + 1):
+        f_j = sum(1 for face in faces if len(face) == j)
+        total = total + IntPoly((f_j,)) * x_minus_1 ** (n - j)
+    return total
