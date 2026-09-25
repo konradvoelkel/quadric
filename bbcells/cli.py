@@ -3,6 +3,7 @@ Command line interface.
 
     python3 -m bbcells toric --named P3
     python3 -m bbcells flag E6 --parabolic 1
+    python3 -m bbcells quadric 4 --cocharacter -1,-2,-3
     python3 -m bbcells toric fan.json --cocharacter 1,5,25 --format latex
     python3 -m bbcells raw fixed_points.json --format json
 """
@@ -55,6 +56,11 @@ def _data_flag(args):
     return flag.flag_variety(args.cartan_type, set(args.parabolic) if args.parabolic else None)
 
 
+def _data_quadric(args):
+    from bbcells.frontends import quadric
+    return quadric.quadric(args.n)
+
+
 def _data_raw(args):
     from bbcells.frontends import raw
     return raw.load(args.file)
@@ -90,6 +96,11 @@ def build_parser():
                         "(default: all nodes, i.e. G/B)")
     _add_common(p)
     p.set_defaults(build=_data_flag)
+
+    p = commands.add_parser("quadric", help="smooth split quadric Q_n in P^{n+1}")
+    p.add_argument("n", type=int)
+    _add_common(p)
+    p.set_defaults(build=_data_quadric)
 
     p = commands.add_parser("raw", help="fixed points and tangent weights as JSON")
     p.add_argument("file")

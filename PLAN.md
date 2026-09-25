@@ -222,12 +222,14 @@ prints usage.
   in $q = t^2$ for all $(G, P)$ of rank $\le 4$ and for $E_6/P_1$;
   Grassmannians give Gaussian binomials; and with dominant $\lambda$,
   `dim_of[wP] == length(w)`.
-- [ ] **S2.3 `frontends/quadric.py` and legacy regression** (S). $Q_n$ via
+- [x] **S2.3 `frontends/quadric.py` and legacy regression** (S). $Q_n$ via
   flag, with the fixed-point labels of 1.3. The test imports `quadric.py`
   as a module and compares cell by cell for $n \le 8$ and all sign/permutation
   chambers where $n \le 5$ (legacy with $\lambda$ = ours with $-\lambda$).
   **Done when:** the regression passes; note that `quadric.py` itself is not
-  modified.
+  modified. *(Implemented: $Q_2 = \mathbb{P}^1\times\mathbb{P}^1$ needs both nodes of
+  $D_2$ crossed, because the Levi $GL_1\times SO(2)$ of the line stabilizer has
+  no roots.)*
 
 ### M3 — GKM data and derived operations (SPEC §3.4)
 
