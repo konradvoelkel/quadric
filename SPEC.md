@@ -121,7 +121,7 @@ bbcells/
     product.py     products of any of the above
     wonderful.py   wonderful compactification of adjoint G           [L1]
     horospherical.py  smooth toroidal horospherical varieties         [L2]
-    spherical.py   colored fan / spherical system (placeholder)       [R]
+    spherical.py   orbit-wise fixed points; wonderful varieties       [R]
   cli.py
   sage_adapter.py  optional cross-checks against SageMath (never required)
 tools/
@@ -327,6 +327,9 @@ Minimum test cases. All must pass before a front end counts as done.
    - **M6d [R]** general smooth complete toroidal spherical varieties from
      Luna–Vust data, using Brion's GKM description and the local structure
      theorem, with smoothness checked by Gagliardi's criterion.
+     First step done (`docs/S6d.md`): wonderful varieties from spherical
+     roots, $S^p$ and satellites, including complete quadrics and complete
+     skew forms in every dimension.
 
 ## 5. Decisions (v0.2)
 

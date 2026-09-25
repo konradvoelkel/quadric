@@ -125,7 +125,7 @@ bbcells/
   cli.py, __main__.py
   frontends/
     raw.py toric.py flag.py quadric.py wonderful.py
-    horospherical.py two_orbit.py complete_conics.py
+    horospherical.py two_orbit.py complete_conics.py spherical.py
   sage_adapter.py               optional cross-checks, never imported by core
   oracles.py                    independent formulas of §4 (point counts etc.)
 tests/
@@ -368,10 +368,19 @@ prints usage.
   against the blow-up formula; together with complete conics, the rank-one
   complete symmetric varieties (S6b.1) and the group case (M4). Arbitrary
   symmetric pairs need fixed points in non-closed orbits and belong to S6d.)*
-- [ ] **S6d General toroidal spherical** (research, SPEC M6d). Requires
+- [x] **S6d General toroidal spherical** (research, SPEC M6d). Requires
   $T$-fixed points in non-closed $G$-orbits, which already occur for
   $\mathbb{P}^1\times\mathbb{P}^1 \supset SL_2/T$. Plan the approach only
-  after S6a–S6c.
+  after S6a–S6c. *(Done as far as it goes without a Luna-data-to-subgroup
+  step; see `docs/S6d.md`. `frontends/spherical.py` assembles $X^T$ orbit by
+  orbit: $O^T = W/W_H$ with weights $w(\Phi\smallsetminus\Phi_H) + w(N)$.
+  For wonderful $X$ the base point data comes from the spherical roots,
+  $S^p$ and the satellites; the normal weights are the $W_L$-averages of
+  $-\gamma$ under a checked spanning condition. Complete quadrics in
+  $\mathbb{P}^{n-1}$ and complete skew forms on $k^{2n}$ work in every
+  dimension. They match the S6c front ends exactly, and the
+  orbit-decomposition point counts for $n\le6$ and $n\le4$. Open: satellites
+  from Luna data, toroidal non-wonderful $X$, and GKM edges across orbits.)*
 
 ---
 
@@ -414,6 +423,13 @@ The 1.4 weights reproduce the $A_1$ and $A_2$ rows exactly (prototype check).
 | $PGL_n/GL_{n-1}$ | $\mathbb{L}^{n-1}(1 + \mathbb{L} + \dots + \mathbb{L}^{n-1})$ |
 
 **4.5 Complete conics.** $[\mathbb{P}^5] - [\mathbb{P}^2] + [\mathbb{P}^2]^2 = 1,2,3,3,2,1$.
+
+**4.7 Complete quadrics and complete skew forms** (S6d). The orbit
+decomposition over compositions $(k_1,\dots,k_r)$ of $n$ gives
+$|X|(q) = \sum |G/P_{(k)}|(q)\prod_j F(k_j)$, with $F(k)$ the number of smooth
+quadrics in $\mathbb{P}^{k-1}$ (nonsingular symmetric matrices divided by
+$q-1$), or $|GL_{2k}|/((q-1)|Sp_{2k}|)$ for skew forms. Complete quadrics in
+$\mathbb{P}^4$: $1,4,10,21,36,53,65,70,65,53,36,21,10,4,1$ (450 fixed points).
 
 **4.6 Real points.** $H^*(\mathbb{RP}^n;\mathbb{Z})$; real Grassmannians
 (Casian–Kodama); 2-torsion only for type A flags (HMW).

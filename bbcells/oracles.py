@@ -347,3 +347,84 @@ def complete_quadrics_p3():
     S2_tilde = S2 - P(3) + P(3) * P(2)
     X1 = blowup(P(9), P(3), 6)
     return blowup(X1, S2_tilde, 3)
+
+
+def compositions(n):
+    """the compositions of n (ordered tuples of positive parts)
+    >>> list(compositions(3))
+    [(1, 1, 1), (1, 2), (2, 1), (3,)]
+    """
+    if n == 0:
+        yield ()
+        return
+    for first in range(1, n + 1):
+        for rest in compositions(n - first):
+            yield (first,) + rest
+
+
+def gaussian_multinomial(parts):
+    """|GL_n/P| for the parabolic P of block sizes `parts`"""
+    result = q_factorial(sum(parts))
+    for k in parts:
+        result = exact_division(result, q_factorial(k))
+    return result
+
+
+def _nondegenerate_symmetric(k):
+    """nondegenerate symmetric k x k matrices over F_q (q odd, MacWilliams):
+    q^{k(k+1)/2 - m^2} prod_{i<=m} (q^{2i-1} - 1), m = ceil(k/2)"""
+    m = (k + 1) // 2
+    result = IntPoly.monomial(k * (k + 1) // 2 - m * m)
+    for i in range(1, m + 1):
+        result = result * (IntPoly.monomial(2 * i - 1) - IntPoly((1,)))
+    return result
+
+
+def _nondegenerate_alternating(k):
+    """nondegenerate alternating 2k x 2k matrices, |GL_{2k}|/|Sp_{2k}| =
+    q^{k(k-1)} prod_{i<=k} (q^{2i-1} - 1)"""
+    result = IntPoly.monomial(k * (k - 1))
+    for i in range(1, k + 1):
+        result = result * (IntPoly.monomial(2 * i - 1) - IntPoly((1,)))
+    return result
+
+
+def complete_quadrics(n):
+    """[complete quadrics in P^{n-1}] from the orbit decomposition: the orbits
+    are indexed by compositions (k_1, ..., k_r) of n and fibre over the partial
+    flag variety of that type with fibre prod_j PGL_{k_j}/PO_{k_j} (the smooth
+    quadrics in P^{k_j - 1}, counted as nondegenerate forms up to scalar)
+    >>> complete_quadrics(3) == complete_conics()
+    True
+    >>> complete_quadrics(4) == complete_quadrics_p3()
+    True
+    """
+    q_minus_1 = IntPoly((-1, 1))
+    total = IntPoly(())
+    for parts in compositions(n):
+        term = gaussian_multinomial(parts)
+        for k in parts:
+            term = term * exact_division(_nondegenerate_symmetric(k), q_minus_1)
+        total = total + term
+    return total
+
+
+def complete_skew_forms(n):
+    """[complete skew forms on k^{2n}], likewise: compositions of n, flags of
+    type (2k_1, ..., 2k_r), fibres prod_j PGL_{2k_j}/PSp_{2k_j}
+    >>> complete_skew_forms(2) == projective_space(5)
+    True
+    """
+    q_minus_1 = IntPoly((-1, 1))
+    total = IntPoly(())
+    for parts in compositions(n):
+        term = gaussian_multinomial([2 * k for k in parts])
+        for k in parts:
+            term = term * exact_division(_nondegenerate_alternating(k), q_minus_1)
+        total = total + term
+    return total
+
+
+def complete_conics():
+    """[P^5] - [P^2] + [P^2][P^2] (PLAN.md 4.5)"""
+    return blowup(projective_space(5), projective_space(2), 3)

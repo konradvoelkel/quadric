@@ -7,6 +7,7 @@ Command line interface.
     python3 -m bbcells wonderful A2
     python3 -m bbcells example complete-conics
     python3 -m bbcells two-orbit HP 2
+    python3 -m bbcells spherical complete-quadrics 5
     python3 -m bbcells real A3 --parabolic 2
     python3 -m bbcells toric fan.json --cocharacter 1,5,25 --format latex
     python3 -m bbcells raw fixed_points.json --format json
@@ -83,6 +84,17 @@ def _data_example(args):
                          % (args.name, ", ".join(sorted(EXAMPLES))))
     module, function = EXAMPLES[args.name]
     return getattr(importlib.import_module(module), function)()
+
+
+SPHERICAL = {
+    "complete-quadrics": "complete_quadrics",
+    "complete-skew-forms": "complete_skew_forms",
+}
+
+
+def _data_spherical(args):
+    from bbcells.frontends import spherical
+    return getattr(spherical, SPHERICAL[args.family])(args.n)
 
 
 def _two_orbit_case(args):
@@ -199,6 +211,14 @@ def build_parser():
     p.add_argument("name")
     _add_common(p)
     p.set_defaults(build=_data_example)
+
+    p = commands.add_parser("spherical",
+                            help="wonderful varieties assembled orbit by orbit: "
+                                 "complete-quadrics n (in P^{n-1}), complete-skew-forms n (on k^{2n})")
+    p.add_argument("family", choices=sorted(SPHERICAL))
+    p.add_argument("n", type=int)
+    _add_common(p)
+    p.set_defaults(build=_data_spherical)
 
     p = commands.add_parser("two-orbit",
                             help="rank-one two-orbit completions: AQ n, PQ n, HP n, PGL n, OP2, G2, SPIN7")

@@ -76,6 +76,14 @@ class TestGolden(unittest.TestCase):
         code, out, err = run_cli("two-orbit", "HP")
         self.assertEqual(code, 2)
 
+    def test_cli_spherical(self):
+        code, out, err = run_cli("spherical", "complete-quadrics", "4", "--format", "json")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(json.loads(out)["counts"], [1, 3, 6, 10, 13, 13, 10, 6, 3, 1])
+        code, out, err = run_cli("spherical", "complete-skew-forms", "2")
+        self.assertEqual(code, 0, err)
+        self.assertIn("6 fixed points", out)
+
     def test_cli_real(self):
         code, out, err = run_cli("real", "A3")
         self.assertEqual(code, 0, err)

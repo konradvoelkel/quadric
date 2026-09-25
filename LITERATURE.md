@@ -223,6 +223,19 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
 - ✓a M. Brion, R. Joshua, *Equivariant Chow ring and Chern classes of wonderful
   symmetric varieties of minimal rank*, Transform. Groups 13 (2008), 471–493;
   arXiv:0705.1035.
+- ✓m B. Wasserman, *Wonderful varieties of rank two*, Transform. Groups 1
+  (1996), 375–403. Tables of spherical systems $(\Sigma, S^p)$ with the
+  corresponding subgroups. The rank-one spherical roots used in
+  `frontends/spherical.py` (e.g. $\alpha_1+2\alpha_2+3\alpha_3+2\alpha_4$ for
+  $F_4/\mathrm{Spin}_9$) were checked against the normal weights of the
+  S6b.1 completions, not copied from this table.
+- ✓m M. Dyer, *Reflection subgroups of Coxeter systems*, J. Algebra 135
+  (1990), 57–73. Each coset of a reflection subgroup has a unique element of
+  minimal length; used to enumerate $W/W_H$ in S6d.
+- ✓m J. MacWilliams, *Orthogonal matrices over finite fields*, Amer. Math.
+  Monthly 76 (1969), 152–164. The number of nonsingular symmetric matrices
+  over $\mathbb{F}_q$, which enters the orbit-decomposition oracle for
+  complete quadrics (S6d).
 
 **General smooth projective spherical varieties**
 
