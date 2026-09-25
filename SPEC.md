@@ -249,7 +249,10 @@ $[S^{2d+2,d+1}, S^{2d+1,d}] = \pi_{1,1}(\mathbb{S}) \cong W(k)\cdot\eta$.
   orientation conventions. So $E_d$ is stored as an **integer matrix**, and
   the documented meaning of each entry is "coefficient in $W(\mathbb{Z})$".
   Before H1 is proved or found in the literature, every output that depends
-  on it is labelled `conditional_on="H1"`. Test oracles for H1: Kocherlakota
+  on it is labelled `conditional_on="H1"`. Supporting evidence: the unstable
+  Thom-space cell structures of arXiv:1805.04338 (`thm:unstable-thom-cells`)
+  are constructed over any base smooth over a Dedekind ring, in particular
+  over $\mathbb{Z}$. Test oracles for H1: Kocherlakota
   (real $G/P$), Hudson–Matszangosz–Wendt (type A flags; all torsion is
   2-torsion), Casian–Kodama (Grassmannians), Choi–Park (real toric; odd
   torsion occurs there, which the integer model can represent).
@@ -306,7 +309,10 @@ Minimum test cases. All must pass before a front end counts as done.
    $H^*(X(\mathbb{R});\mathbb{Z})$; check hypothesis H1 against the oracles.
 6. **M6:** spherical classes in the order fixed by decision D3:
    - **M6a** smooth toroidal horospherical varieties (toric bundles over
-     $G/P$);
+     $G/P$). Test oracle: the Batyrev–Moreau formula
+     $E(X) = E(G/H)\sum_{n\in|\Sigma|\cap N}(uv)^{\omega_X(n)}$
+     (arXiv:1203.0671), which gives the Betti numbers straight from the
+     colored fan;
    - **M6b** smooth complete spherical varieties of rank one, with
      arXiv:1805.04338 as reference;
    - **M6c** complete symmetric varieties (De Concini–Procesi);

@@ -1,0 +1,571 @@
+{
+  "0705.1035": {
+    "id": "0705.1035",
+    "latest_version": "0705.1035v1",
+    "title": "Equivariant Chow ring and Chern classes of wonderful symmetric varieties of minimal rank",
+    "authors": [
+      "Michel Brion",
+      "Roy Joshua"
+    ],
+    "published": "Tue, 8 May 2007",
+    "updated": "Tue, 8 May 2007",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14C15, 14L30, 14M17, 14M25",
+    "comments": "LaTeX, 21 pages",
+    "abstract": "We describe the equivariant Chow ring of the wonderful compactification $X$ of a symmetric space of minimal rank, via restriction to the associated toric variety $Y$. Also, we show that the restrictions to $Y$ of the tangent bundle $T_X$ and its logarithmic analogue $S_X$ decompose into a direct sum of line bundles. This yields closed formulae for the equivariant Chern classes of $T_X$ and $S_X$, and, in turn, for the Chern classes of reductive groups considered by Kiritchenko.",
+    "metadata_source": "abs-page"
+  },
+  "0907.2852": {
+    "id": "0907.2852",
+    "latest_version": "0907.2852v4",
+    "title": "Wonderful Varieties: A geometrical realization",
+    "authors": [
+      "S. Cupit-Foutou"
+    ],
+    "published": "Thu, 16 Jul 2009",
+    "updated": "Thu, 21 Aug 2014",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14L30, 14M17, 14D22, 20G05",
+    "comments": "v2, 34 pages, major changes; v3 some gaps fixed; v4 53 pages, some details added",
+    "abstract": "A geometrical realization of wonderful varieties by means of a suitable class of invariant Hilbert schemes is given. As a consequence, Luna's conjecture asserting that wonderful varieties are classified by spherical systems, triples of combinatorial invariants, is proved.",
+    "metadata_source": "abs-page"
+  },
+  "0909.3765": {
+    "id": "0909.3765",
+    "latest_version": "0909.3765v2",
+    "title": "Primitive spherical systems",
+    "authors": [
+      "P. Bravi"
+    ],
+    "published": "Mon, 21 Sep 2009",
+    "updated": "Fri, 4 Jun 2010",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "20G05",
+    "comments": "v1: 34 pages. v2: 70 pages",
+    "abstract": "A spherical system is a combinatorial object, arising in the theory of wonderful varieties, defined in terms of a root system. All spherical systems can be obtained by means of some general combinatorial procedures (such as parabolic induction and wonderful fiber product) from the so-called primitive spherical systems. Here we classify primitive spherical systems. As an application, we prove that the quotients of a spherical system are in correspondence with the so-called distinguished subsets of colors.",
+    "metadata_source": "abs-page"
+  },
+  "0909.3771": {
+    "id": "0909.3771",
+    "latest_version": "0909.3771v2",
+    "title": "Wonderful varieties of type B and C",
+    "authors": [
+      "P. Bravi",
+      "G. Pezzini"
+    ],
+    "published": "Mon, 21 Sep 2009",
+    "updated": "Mon, 3 Oct 2011",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14L30 (Primary), 14M17, 20G05 (Secondary)",
+    "comments": "Withdrawn by the authors once superseded by arXiv:1103.0380 , arXiv:1106.3187 and arXiv:1109.6777",
+    "abstract": "We show that the proof of Luna's conjecture about the classification of general wonderful G-varieties can be reduced to the analysis of finitely many families of primitive cases. We work out all primitive cases arising with any classical group G.",
+    "metadata_source": "abs-page"
+  },
+  "1012.0454": {
+    "id": "1012.0454",
+    "latest_version": "1012.0454v2",
+    "title": "More examples of motivic cell structures",
+    "authors": [
+      "Matthias Wendt"
+    ],
+    "published": "Thu, 2 Dec 2010",
+    "updated": "Tue, 24 Apr 2012",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14F42",
+    "comments": "11 pages, small revision, updated bibliography",
+    "abstract": "In this note, we describe motivic cell structures arising from the Bialynicki-Birula decomposition. This provides a description of the stable A^1-homotopy types of smooth projective G_m-varieties where the G_m-action has isolated fixed points.",
+    "metadata_source": "abs-page"
+  },
+  "1103.0380": {
+    "id": "1103.0380",
+    "latest_version": "1103.0380v2",
+    "title": "Wonderful subgroups of reductive groups and spherical systems",
+    "authors": [
+      "Paolo Bravi",
+      "Guido Pezzini"
+    ],
+    "published": "Wed, 2 Mar 2011",
+    "updated": "Tue, 8 Apr 2014",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14M27 (Primary) 20G05 (Secondary)",
+    "comments": "v1: 34 pages, this is the first of three papers which are going to supersede arXiv:0909.3771 ; v2: 39 pages, revised version accepted for publication in Journal of Algebra",
+    "abstract": "Let G be a semisimple complex algebraic group, and H a wonderful subgroup of G. We prove several results relating the subgroup H to the properties of a combinatorial invariant S of G/H, called its spherical system. It is also possible to consider a spherical system S as a datum defined by purely combinatorial axioms, and under certain circumstances our results prove the existence of a wonderful subgroup H associated to S. As a byproduct, we reduce for any group G the proof of the classification of wonderful G-varieties, known as the Luna conjecture, to its verification on a small family of cases, called primitive.",
+    "metadata_source": "abs-page"
+  },
+  "1106.3187": {
+    "id": "1106.3187",
+    "latest_version": "1106.3187v2",
+    "title": "Primitive wonderful varieties",
+    "authors": [
+      "Paolo Bravi",
+      "Guido Pezzini"
+    ],
+    "published": "Thu, 16 Jun 2011",
+    "updated": "Thu, 15 Oct 2015",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14M27 (Primary), 20G05 (Secondary)",
+    "comments": "v1: 16 pages, this is the second of three papers which are going to supersede arXiv:0909.3771 ; v2: 30 pages, to appear in Math. Z",
+    "abstract": "We complete the classification of wonderful varieties initiated by D. Luna. We review the results that reduce the problem to the family of primitive varieties, and report the references where some of them have already been studied. Finally, we analyze the rest case-by-case.",
+    "metadata_source": "abs-page"
+  },
+  "1109.6777": {
+    "id": "1109.6777",
+    "latest_version": "1109.6777v2",
+    "title": "The spherical systems of the wonderful reductive subgroups",
+    "authors": [
+      "Paolo Bravi",
+      "Guido Pezzini"
+    ],
+    "published": "Fri, 30 Sep 2011",
+    "updated": "Wed, 18 Oct 2017",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "20G05 (Primary) 14M27 (Secondary)",
+    "comments": "v2: enumeration of the main list in Section 3 updated to agree with the published version",
+    "abstract": "We provide the spherical systems of the wonderful reductive subgroups of any reductive group.",
+    "metadata_source": "abs-page"
+  },
+  "1203.0671": {
+    "id": "1203.0671",
+    "latest_version": "1203.0671v2",
+    "title": "The arc space of horospherical varieties and motivic integration",
+    "authors": [
+      "Victor Batyrev",
+      "Anne Moreau"
+    ],
+    "published": "Sat, 3 Mar 2012",
+    "updated": "Mon, 17 Dec 2012",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14L30, 14M27",
+    "comments": "27 pages, the proofs of Proposition 2.4 and Theorem 3.1 have been substantially modified, a general argument was added in the proof of Lemma 5.4., to appear in Compositio Math",
+    "abstract": "For arbitrary connected reductive group G we consider the motivic integral over the arc space of an arbitrary Q-Gorenstein horospherical G-variety associated with a colored fan and prove a formula for the stringy E-function of a horospherical variety X which generalizes the one for toric varieties. We remark that in contrast to toric varieties the stringy E-function of a Gorenstein horospherical variety X may be not a polynomial if some cones in the fan of X have nonempty sets of colors. Using the stringy E-function, we can formulate and prove a new smoothness criterion for locally factorial horospherical varieties. We expect that this smoothness criterion holds for arbitrary spherical varieties.",
+    "metadata_source": "abs-page"
+  },
+  "1210.4523": {
+    "id": "1210.4523",
+    "latest_version": "1210.4523v3",
+    "title": "Merging divisorial with colored fans",
+    "authors": [
+      "Klaus Altmann",
+      "Valentina Kiritchenko",
+      "Lars Petersen"
+    ],
+    "published": "Tue, 16 Oct 2012",
+    "updated": "Wed, 14 Jan 2015",
+    "journal_ref": "Michigan Mathematical Journal, 64 (2015), 3-38",
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14L30",
+    "comments": "34 pages, 6 figures, final version to appear in Michigan Math. J",
+    "abstract": "Given a spherical homogeneous space G/H of minimal rank, we provide a simple procedure to describe its embeddings as varieties with torus action in terms of divisorial fans. The torus in question is obtained as the identity component of the quotient group N/H, where N is the normalizer of H in G. The resulting Chow quotient is equal to (a blowup of) the simple toroidal compactification of G/(H N^0). In the horospherical case, for example, it is equal to a flag variety, and the slices (coefficients) of the divisorial fan are merely shifts of the colored fan along the colors.",
+    "metadata_source": "abs-page"
+  },
+  "1211.1277": {
+    "id": "1211.1277",
+    "latest_version": "1211.1277v1",
+    "title": "On the geometry of spherical varieties",
+    "authors": [
+      "Nicolas Perrin"
+    ],
+    "published": "Tue, 6 Nov 2012",
+    "updated": "Tue, 6 Nov 2012",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": null,
+    "comments": "40 pages",
+    "abstract": "Survey article on the geometry of spherical varieties. Invited survey for Transformation Groups.",
+    "metadata_source": "abs-page"
+  },
+  "1303.2561": {
+    "id": "1303.2561",
+    "latest_version": "1303.2561v3",
+    "title": "Localization of spherical varieties",
+    "authors": [
+      "Friedrich Knop"
+    ],
+    "published": "Mon, 11 Mar 2013",
+    "updated": "Sat, 23 Nov 2013",
+    "journal_ref": "Algebra Number Theory 8 (2014), 703-728",
+    "doi": "10.2140/ant.2014.8.703",
+    "primary_category": null,
+    "msc_classes": "14M27",
+    "comments": "v1: 25 pages; v2: 21 pages, reformatted to LaTeX, otherwise minor changes; v3: 22 pages, final version",
+    "abstract": "We prove some fundamental structural results for spherical varieties in arbitrary characteristic. In particular, we study Luna's two types of localization and use it to analyze spherical roots, colors and their interrelation. At the end, we propose a preliminary definition of a p-spherical system.",
+    "metadata_source": "abs-page"
+  },
+  "1307.7702": {
+    "id": "1307.7702",
+    "latest_version": "1307.7702v2",
+    "title": "A combinatorial smoothness criterion for spherical varieties",
+    "authors": [
+      "Giuliano Gagliardi"
+    ],
+    "published": "Mon, 29 Jul 2013",
+    "updated": "Tue, 16 Dec 2014",
+    "journal_ref": "Manuscripta Math. 146 (2015), no. 3-4, 445-461",
+    "doi": "10.1007/s00229-014-0713-7",
+    "primary_category": null,
+    "msc_classes": "14M27, 14L30, 20G05",
+    "comments": "14 pages, 2 tables",
+    "abstract": "We suggest a combinatorial criterion for the smoothness of an arbitrary spherical variety using the classification of multiplicity-free spaces, generalizing an earlier result of Camus for spherical varieties of type $A$.",
+    "metadata_source": "abs-page"
+  },
+  "1309.5520": {
+    "id": "1309.5520",
+    "latest_version": "1309.5520v1",
+    "title": "On the cohomology of real Grassmann manifolds",
+    "authors": [
+      "Luis Casian",
+      "Yuji Kodama"
+    ],
+    "published": "Sat, 21 Sep 2013",
+    "updated": "Sat, 21 Sep 2013",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": null,
+    "comments": "13 pages",
+    "abstract": "We give an explicit and simple construction of the incidence graph for the integral cohomology of real Grassmann manifold Gr(k,n) in terms of the Young diagrams filled with the letter q in checkered pattern. It turns out that there are two types of graphs, one for the trivial coefficients and other for the twisted coefficients, and they compute the homology groups of the orientable and non-orientable cases of Gr(k,n) via the Poincar\\'e-Verdier duality. We also give an explicit formula of the Poincar\\'e polynomial for Gr(k,n) and show that the Poincar\\'e polynomial is also related to the number of points on Gr(k,n) over a finite field {F}_q with q being a power of prime which is also used in the Young diagrams.",
+    "metadata_source": "abs-page"
+  },
+  "1311.7056": {
+    "id": "1311.7056",
+    "latest_version": "1311.7056v1",
+    "title": "On the cohomology and their torsion of real toric objects",
+    "authors": [
+      "Suyoung Choi",
+      "Hanchul Park"
+    ],
+    "published": "Wed, 27 Nov 2013",
+    "updated": "Wed, 27 Nov 2013",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "Primary 57N65, Secondary 57S17, 05E45",
+    "comments": "14 pages, 3 figures",
+    "abstract": "In this paper, we do the two things. 1. We present a formula to compute the rational cohomology ring of a real topological toric manifold, and thus that of a small cover or a real toric manifold, which implies the formula of Suciu and Trevisan. Furthermore, the formula also works for other coefficient $\\mathbb{Z}_q = \\mathbb{Z}/q\\mathbb{Z}$, where $q$ is a positive odd integer. 2. We construct infinitely many real toric manifolds and small covers whose integral cohomology have a $q$-torsion for any positive odd integer $q$.",
+    "metadata_source": "abs-page"
+  },
+  "1404.2486": {
+    "id": "1404.2486",
+    "latest_version": "1404.2486v2",
+    "title": "Algebraic rational cells and equivariant intersection theory",
+    "authors": [
+      "Richard Gonzales"
+    ],
+    "published": "Wed, 9 Apr 2014",
+    "updated": "Mon, 20 Jul 2015",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14C15, 14L30, 14M27",
+    "comments": "Second version. 24 pages. Substantial changes in the presentation. In particular, the results on Poincaré duality (Section 6 of first version) are omitted; they are published in a separate paper (see this http URL )",
+    "abstract": "We provide a notion of algebraic rational cell with applications to intersection theory on singular varieties with torus action. Based on this notion, we study the algebraic analogue of $\\mathbb{Q}$-filtrable varieties: algebraic varieties where a torus acts with isolated fixed points, such that the associated Bialynicki-Birula decomposition consists of algebraic rational cells. We show that the rational equivariant Chow group of any $\\mathbb{Q}$-filtrable variety is freely generated by the cell closures. We apply this result to group embeddings, and more generally to spherical varieties. This paper is an extension of arxiv.org/abs/1112.0365 to equivariant Chow groups.",
+    "metadata_source": "abs-page"
+  },
+  "1411.6594": {
+    "id": "1411.6594",
+    "latest_version": "1411.6594v3",
+    "title": "Hirzebruch class and Bialynicki-Birula decomposition",
+    "authors": [
+      "Andrzej Weber"
+    ],
+    "published": "Mon, 24 Nov 2014",
+    "updated": "Mon, 23 Nov 2015",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14C17, 14E15, 14F43, 55N91",
+    "comments": "16 pages",
+    "abstract": "Suppose an algebraic torus acts on a complex algebraic variety $X$. Then a great part of information about global invariants of $X$ are encoded in some data localized around the fixed points. The goal of this note is to present a connection between two approaches to localization for $C^*$-action. The homological results are related to $S^1$-action, while from $R^*_{>0}$-action we obtain a geometric decomposition. We study the resulting decompositions of Hirzebruch $\\chi_y$-genus and their relative versions. We show that via a limit process the second decomposition is obtained from the first one. The results are also valid for singular varieties.",
+    "metadata_source": "abs-page"
+  },
+  "1511.02203": {
+    "id": "1511.02203",
+    "latest_version": "1511.02203v2",
+    "title": "Spherical Tropicalization",
+    "authors": [
+      "Jenia Tevelev",
+      "Tassos Vogiannou"
+    ],
+    "published": "Fri, 6 Nov 2015",
+    "updated": "Fri, 28 Aug 2020",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": null,
+    "comments": "An author added, multiple corrections and improvements. Submitted version, 24 pages",
+    "abstract": "We extend tropicalization and tropical compactification of subvarieties of algebraic tori to subvarieties of spherical homogeneous spaces. Given a tropical compactification of a subvariety, we show that the support of the colored fan of the ambient spherical variety agrees with the tropicalization of the subvariety. The proof is based on our equivariant version of the attening by blow-up theorem. We provide many examples.",
+    "metadata_source": "abs-page"
+  },
+  "1603.04926": {
+    "id": "1603.04926",
+    "latest_version": "1603.04926v2",
+    "title": "Equivariant $K$-theory of smooth projective spherical varieties",
+    "authors": [
+      "S. Banerjee",
+      "Mahir Bilen Can"
+    ],
+    "published": "Wed, 16 Mar 2016",
+    "updated": "Mon, 13 Feb 2017",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "19E08 (Primary), 14M27(Secondary)",
+    "comments": "Exposition improved, several typos fixed, errors fixed, Comments Welcome",
+    "abstract": "We present a description of the equivariant $K$-theory of a smooth projective spherical variety. This provides an integral $K$-theory version of Brion's calculation of equivariant Chow-cohomology of such varieties. We consider the equivariant $K$-theory of wonderful compactifications of minimal rank symmetric varieties. We obtain a formula for their structure constants in terms of certain lower dimensional Schubert classes. This generalizes results of Uma on equivariant compactifications of adjoint groups.",
+    "metadata_source": "abs-page"
+  },
+  "1805.04338": {
+    "id": "1805.04338",
+    "latest_version": "1805.04338v1",
+    "title": "Motivic Cell Structures for Spherical Varieties",
+    "authors": [
+      "Konrad Voelkel"
+    ],
+    "published": "Fri, 11 May 2018",
+    "updated": "Fri, 11 May 2018",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14F42, 20Gxx",
+    "comments": "12 pages, comments welcome",
+    "abstract": "In this note, we give a general method to obtain unstable motivic cell structures, following Wendt's application of the Bialynicki-Birula algebraic Morse theory. We then apply the method to spherical varieties, with special attention to the case of rank 1, to obtain unstable motivic cell structures after a finite number of $\\mathbb{P}^1$-suspensions. This work is a partial derivative of the first two chapters of the author's 2016 PhD thesis.",
+    "metadata_source": "abs-page"
+  },
+  "1805.06142": {
+    "id": "1805.06142",
+    "latest_version": "1805.06142v2",
+    "title": "Chow-Witt rings of Grassmannians",
+    "authors": [
+      "Matthias Wendt"
+    ],
+    "published": "Wed, 16 May 2018",
+    "updated": "Mon, 23 Mar 2020",
+    "journal_ref": "Algebr. Geom. Topol. 24 (2024) 1-48",
+    "doi": "10.2140/agt.2024.24.1",
+    "primary_category": null,
+    "msc_classes": null,
+    "comments": "Significant revision, streamlined proofs, 34p",
+    "abstract": "We complement our previous computation of the Chow-Witt rings of classifying spaces of special linear groups by an analogous computation for the general linear groups. This case involves discussion of non-trivial dualities. The computation proceeds along the lines of the classical computation of the integral cohomology of ${\\rm BO}(n)$ with local coefficients, as done by Cadek. The computations of Chow-Witt rings of classifying spaces of ${\\rm GL}_n$ are then used to compute the Chow-Witt rings of the finite Grassmannians. As before, the formulas are close parallels of the formulas describing integral cohomology rings of real Grassmannians.",
+    "metadata_source": "abs-page"
+  },
+  "2003.09457": {
+    "id": "2003.09457",
+    "latest_version": "2003.09457v5",
+    "title": "Compactly supported $\\mathbb{A}^{1}$-Euler characteristic and the Hochschild complex",
+    "authors": [
+      "Niny Arcila-Maya",
+      "Candace Bethea",
+      "Morgan Opie",
+      "Kirsten Wickelgren",
+      "Inna Zakharevich"
+    ],
+    "published": "Fri, 20 Mar 2020",
+    "updated": "Mon, 25 Apr 2022",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14F42 (Primary), 19E15, 13D03, 55M05 (Secondary)",
+    "comments": "24 pages. Accepted for publication in Topology and its Applications",
+    "abstract": "We show the $\\mathbb{A}^{1}$-Euler characteristic of a smooth, projective scheme over a characteristic $0$ field is represented by its Hochschild complex together with a canonical bilinear form, and give an exposition of the compactly supported $\\mathbb{A}^{1}$-Euler characteristic $\\chi^{c}_{\\mathbb{A}^{1}}: K_0(\\mathbf{Var}_{k}) \\to \\text{GW}(k)$ from the Grothendieck group of varieties to the Grothendieck--Witt group of bilinear forms. We also provide example computations.",
+    "metadata_source": "abs-page"
+  },
+  "2006.12043": {
+    "id": "2006.12043",
+    "latest_version": "2006.12043v2",
+    "title": "Cohomology rings of toric bundles and the ring of conditions",
+    "authors": [
+      "Johannes Hofscheier",
+      "Askold Khovanskii",
+      "Leonid Monin"
+    ],
+    "published": "Mon, 22 Jun 2020",
+    "updated": "Tue, 20 Apr 2021",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": null,
+    "comments": "27 pages, 2 figures, comments are welcome!",
+    "abstract": "The celebrated BKK Theorem expresses the number of roots of a system of generic Laurent polynomials in terms of the mixed volume of the corresponding system of Newton polytopes.Pukhlikov and the second author noticed that the cohomology ring of smooth projective toric varieties over $\\mathbb{C}$ can be computed via the BKK Theorem. This complemented the known descriptions of the cohomology ring of toric varieties, like the one in terms of Stanley-Reisner algebras. Sankaran and Uma generalized the \"Stanley-Reisner description\" to the case of toric bundles, i.e. equivariant compactifications of (not necessarily algebraic) torus principal bundles. We provide a description of the cohomology ring of toric bundles which is based on a generalization of the \\BKK Theorem, and thus extends the approach by Pukhlikov and the second author. Indeed, for every cohomology class of the base of the toric bundle, we obtain a BKK-type theorem. Furthermore, our proof relies on a description of graded-commutative algebras which satisfy Poincar\\'e duality. From this computation of the cohomology ring of toric bundles, we obtain a description of the ring of conditions of horospherical homogeneous spaces as well as a version of Brion-Kazarnovskii theorem for them. We conclude the manuscript with a number of examples. In particular, we apply our results to toric bundles over a full flag variety $G/B$. The description that we get generalizes the corresponding description of the cohomology ring of toric varieties as well as the one of full flag varieties $G/B$ previously obtained by Kaveh.",
+    "metadata_source": "abs-page"
+  },
+  "2008.08961": {
+    "id": "2008.08961",
+    "latest_version": "2008.08961v3",
+    "title": "The cohomology rings of real toric spaces and smooth real toric varieties",
+    "authors": [
+      "Matthias Franz"
+    ],
+    "published": "Thu, 20 Aug 2020",
+    "updated": "Wed, 7 Apr 2021",
+    "journal_ref": "Proc. Roy. Soc. Edinburgh Sect. A 152 (2022), 720-737",
+    "doi": "10.1017/prm.2021.30",
+    "primary_category": null,
+    "msc_classes": "14M25, 57S12 (Primary), 14F45, 55M35 (Secondary)",
+    "comments": "15 pages; main result generalized to arbitrary coefficients, title adjusted",
+    "abstract": "We compute the cohomology rings of smooth real toric varieties and of real toric spaces, which are quotients of real moment-angle complexes by freely acting subgroups of the ambient 2-torus. The differential graded algebra we present is in fact an equivariant dga model, valid for arbitrary coefficients. We deduce from our description that smooth toric varieties are M-varieties.",
+    "metadata_source": "abs-page"
+  },
+  "2302.11003": {
+    "id": "2302.11003",
+    "latest_version": "2302.11003v2",
+    "title": "Chow-Witt rings and topology of flag varieties",
+    "authors": [
+      "Thomas Hudson",
+      "Ákos K. Matszangosz",
+      "Matthias Wendt"
+    ],
+    "published": "Tue, 21 Feb 2023",
+    "updated": "Fri, 15 Nov 2024",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14M15, 14F25, 19G12, 57T15",
+    "comments": "62 pages. Revised Leray-Hirsch theorem and annihilator computation, fixed typos. To appear in Journal of Topology",
+    "abstract": "The paper computes the Witt-sheaf cohomology rings of partial flag varieties in type A in terms of the Pontryagin classes of the subquotient bundles. The proof is based on a Leray-Hirsch-type theorem for Witt-sheaf cohomology for the maximal rank cases, and a detailed study of cohomology ring presentations and annihilators of characteristic classes for the general case. The computations have consequences for the topology of real flag manifolds: we show that all torsion in the integral cohomology is 2-torsion, which was not known in full generality previously. This allows for example to compute the Poincar\\'e polynomials of complete flag varieties for cohomology with twisted integer coefficients. The computations also allow to describe the Chow-Witt rings of flag varieties, and we sketch an enumerative application to counting flags satisfying multiple incidence conditions to given hypersurfaces.",
+    "metadata_source": "abs-page"
+  },
+  "2305.01571": {
+    "id": "2305.01571",
+    "latest_version": "2305.01571v3",
+    "title": "Horospherical stacks and stacky coloured fans",
+    "authors": [
+      "Sean Monahan"
+    ],
+    "published": "Tue, 2 May 2023",
+    "updated": "Wed, 26 Feb 2025",
+    "journal_ref": "(2025) Transactions of the American Mathematical Society; Vol. 378; pp. 1167-1214",
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14A20 (Primary) 14M27, 14L30, 05E14 (Secondary)",
+    "comments": "48 pages. Published: \"Transactions of the American Mathematical Society\"",
+    "abstract": "We introduce a combinatorial theory of horospherical stacks which is motivated by the work of Geraschenko and Satriano on toric stacks. A horospherical stack corresponds to a combinatorial object called a stacky coloured fan. We give many concrete examples, including a class of easy-to-draw examples called coloured fantastacks. The main results in this paper are combinatorial descriptions of horospherical stacks, the morphisms between them, their decolourations, and their good moduli spaces.",
+    "metadata_source": "abs-page"
+  },
+  "2502.21155": {
+    "id": "2502.21155",
+    "latest_version": "2502.21155v2",
+    "title": "The generalised Mukai conjecture for spherical varieties",
+    "authors": [
+      "Giuliano Gagliardi",
+      "Johannes Hofscheier",
+      "Heath Pearson"
+    ],
+    "published": "Fri, 28 Feb 2025",
+    "updated": "Sat, 27 Dec 2025",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14M27 (Primary) 14J45, 14M25, 14E30 (Secondary)",
+    "comments": "A question of Gongyo on nef partitions is answered. There are new examples, and the previous version has been split into two separate papers",
+    "abstract": "We prove the generalised Mukai conjecture for $\\mathbb{Q}$-factorial spherical Fano varieties. In this case, a stronger inequality holds featuring an extra term - the minimum absolute complexity of a log Calabi-Yau pair - which measures how close the Fano variety is to being toric.",
+    "metadata_source": "abs-page"
+  },
+  "2601.06376": {
+    "id": "2601.06376",
+    "latest_version": "2601.06376v1",
+    "title": "Toricness and smoothness criteria for spherical varieties",
+    "authors": [
+      "Giuliano Gagliardi",
+      "Johannes Hofscheier",
+      "Heath Pearson"
+    ],
+    "published": "Sat, 10 Jan 2026",
+    "updated": "Sat, 10 Jan 2026",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14M27 (Primary) 14M25, 20G05 (Secondary)",
+    "comments": "The results of this paper originally appeared as part of arXiv:2502.21155v1",
+    "abstract": "We prove equivalent numerical conditions for a complete spherical variety to admit a toric structure, and for the smoothness of an arbitrary spherical variety along any given G-orbit. The conditions are in terms of spherical skeletons, a coarse ''subset'' of the Luna-Vust data of a spherical variety. Our smoothness criterion improves upon classical criteria by removing the dependency on external reference tables.",
+    "metadata_source": "abs-page"
+  },
+  "2604.07056": {
+    "id": "2604.07056",
+    "latest_version": "2604.07056v1",
+    "title": "On computing the spherical roots for a class of spherical subgroups",
+    "authors": [
+      "Roman Avdeev"
+    ],
+    "published": "Wed, 8 Apr 2026",
+    "updated": "Wed, 8 Apr 2026",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14M27, 14M17, 20G07",
+    "comments": "v1: 27 pages",
+    "abstract": "Given a connected reductive algebraic group $G$, we consider the class of spherical subgroups $H \\subset G$ such that $H$ is regularly embedded in a parabolic subgroup $P \\subset G$ and $H,P$ have a common Levi subgroup $L$. In a previous paper, the author developed a fast algorithm that reduces the computation of the set of spherical roots for such subgroups $H$ to the case where the quotient of Lie algebras $\\operatorname{Lie} P / \\operatorname{Lie} H$ is a strictly indecomposable spherical $L$-module. In this paper, we complete the classification of all such cases and compute the spherical roots for each of them, which enables one to use the above fast algorithm directly for computing the spherical roots for arbitrary spherical subgroups in the class under consideration.",
+    "metadata_source": "abs-page"
+  },
+  "math/0407305": {
+    "id": "math/0407305",
+    "latest_version": "math/0407305v3",
+    "title": "On motivic decompositions arising from the method of Bialynicki-Birula",
+    "authors": [
+      "Patrick Brosnan"
+    ],
+    "published": "Fri, 16 Jul 2004",
+    "updated": "Fri, 13 Aug 2004",
+    "journal_ref": null,
+    "doi": "10.1007/s00222-004-0419-7",
+    "primary_category": null,
+    "msc_classes": "11E04; 14C25",
+    "comments": "Vastly improved with (1) references to important previous work on the subject by S. del Bano, (2) an explicit combinatorial description of the decomposition of projective homogeneous varieties in terms of reflection groups and (3) an illustrative example",
+    "abstract": "Recently, V. Chernousov, S. Gille and A. Merkurjev have obtained a decomposition of the motive of an isotropic smooth projective homogeneous variety analogous to the Bruhat decomposition. Using the method of Bialynicki-Birula, I generalize this decomposition to the case of a (possibly anisotropic) smooth projective variety homogeneous under the action of an isotropic reductive group. This answers a question of N. Karpenko.",
+    "metadata_source": "abs-page"
+  },
+  "math/0410472": {
+    "id": "math/0410472",
+    "latest_version": "math/0410472v1",
+    "title": "Wonderful varieties of type D",
+    "authors": [
+      "Paolo Bravi",
+      "Guido Pezzini"
+    ],
+    "published": "Thu, 21 Oct 2004",
+    "updated": "Thu, 21 Oct 2004",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "14L30 (Primary) 14M17 (Secondary)",
+    "comments": "60 pages, AMSLaTeX, 11 eps files",
+    "abstract": "Let G be a complex connected semisimple group, whose simple components have type A or D. We prove that wonderful G-varieties are classified by means of combinatorial objects called spherical systems. This is a generalization of a known result of Luna for groups of type A; thanks to another result of Luna, this implies also the classification of all spherical G-varieties for the groups G we are considering. For these G we also prove the smoothness of the embedding of Demazure.",
+    "metadata_source": "abs-page"
+  },
+  "math/9802063": {
+    "id": "math/9802063",
+    "latest_version": "math/9802063v1",
+    "title": "Equivariant cohomology and equivariant intersection theory",
+    "authors": [
+      "Michel Brion"
+    ],
+    "published": "Fri, 13 Feb 1998",
+    "updated": "Fri, 13 Feb 1998",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": null,
+    "comments": "49 pages, 4 figures, latex2e, epsfig package required",
+    "abstract": "This text is an introduction to equivariant cohomology, a classical tool for topological transformation groups, and to equivariant intersection theory, a much more recent topic initiated by D. Edidin and W. Graham. It is based on lectures given at Montr\\'eal is Summer 1997. Our main aim is to obtain explicit descriptions of cohomology or Chow rings of certain manifolds with group actions which arise in representation theory, e.g. homogeneous spaces and their compactifications. As another appplication of equivariant intersection theory, we obtain simple versions of criteria for smoothness or rational smoothness of Schubert varieties (due to Kumar, Carrell-Peterson and Arabia) whose statements and proofs become quite transparent in this framework.",
+    "metadata_source": "abs-page"
+  }
+}
