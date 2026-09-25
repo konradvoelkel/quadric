@@ -14,10 +14,15 @@ Output:
 
 Needs outbound HTTPS to arxiv.org and export.arxiv.org. Requests are spaced
 3 seconds apart, as the arXiv API terms ask. Standard library only.
+
+Metadata comes from the arXiv API. If the API refuses the request (it has
+answered 406 to requests from some cloud networks), the script falls back to
+the citation meta tags and the journal-ref/DOI cells of the abstract pages.
 """
 
 import argparse
 import gzip
+import html
 import io
 import json
 import re
@@ -36,6 +41,7 @@ CACHE_DIR = OUT_DIR / "cache"
 METADATA_FILE = OUT_DIR / "arxiv_metadata.json"
 
 API_URL = "https://export.arxiv.org/api/query?id_list=%s&max_results=%d"
+ABS_URL = "https://arxiv.org/abs/%s"
 PDF_URL = "https://arxiv.org/pdf/%s"
 SRC_URL = "https://arxiv.org/e-print/%s"
 USER_AGENT = "quadric-bbcells-literature-fetch/0.1 (https://github.com/konradvoelkel/quadric)"
@@ -123,6 +129,78 @@ def parse_atom(xml_bytes):
     return result
 
 
+META_PATTERN = re.compile(r'<meta\s+name="citation_([a-z_]+)"\s+content="([^"]*)"', re.S)
+CELL_PATTERN = re.compile(r'<td class="tablecell (jref|doi|msc-classes|comments)[^"]*">(.*?)</td>', re.S)
+TAG_PATTERN = re.compile(r"<[^>]+>")
+
+
+def _clean(fragment):
+    return " ".join(html.unescape(TAG_PATTERN.sub(" ", fragment)).split()) or None
+
+
+def _first_last(name):
+    """arXiv meta tags give 'Last, First'
+    >>> _first_last("Voelkel, Konrad")
+    'Konrad Voelkel'
+    >>> _first_last("Bravi")
+    'Bravi'
+    """
+    last, _, first = name.partition(",")
+    return " ".join((first.strip() + " " + last.strip()).split())
+
+
+def parse_abs_page(page, arxiv_id):
+    """metadata from an arxiv.org/abs/ID page, same keys as parse_atom"""
+    meta = {}
+    for key, value in META_PATTERN.findall(page):
+        meta.setdefault(key, []).append(" ".join(html.unescape(value).split()))
+    cells = {key: _clean(value) for key, value in CELL_PATTERN.findall(page)}
+    if "title" not in meta:
+        return None
+    versions = [int(v) for v in re.findall(r"\[v(\d+)\]", page)]
+    doi = cells.get("doi")
+    return {
+        "id": arxiv_id,
+        "latest_version": "%sv%d" % (arxiv_id, max(versions) if versions else 1),
+        "title": meta["title"][0],
+        "authors": [_first_last(a) for a in meta.get("author", [])],
+        "published": _version_date(page, 1) or meta.get("date", [None])[0],
+        "updated": _version_date(page, max(versions)) if versions else None,
+        "journal_ref": cells.get("jref"),
+        "doi": doi.split()[0].replace("https://doi.org/", "") if doi else None,
+        "primary_category": None,
+        "msc_classes": cells.get("msc-classes"),
+        "comments": cells.get("comments"),
+        "abstract": meta.get("abstract", [None])[0],
+        "metadata_source": "abs-page",
+    }
+
+
+def _version_date(page, version):
+    """date line after '[vN]' in the submission history, e.g. 'Wed, 16 May 2018'"""
+    found = re.search(r"\[v%d\].*?</strong>\s*([A-Z][a-z]{2}, \d{1,2} [A-Z][a-z]{2} \d{4})"
+                      % version, page, re.S)
+    return found.group(1) if found else None
+
+
+def gzip_original_name(data):
+    """the FNAME field of a gzip header, if present
+    >>> gzip_original_name(gzip.compress(b"x"))
+    >>> import io; buf = io.BytesIO()
+    >>> with gzip.GzipFile(filename="paper.tex", mode="wb", fileobj=buf) as f: _ = f.write(b"x")
+    >>> gzip_original_name(buf.getvalue())
+    'paper.tex'
+    """
+    if len(data) < 10 or data[:2] != b"\x1f\x8b" or not data[3] & 0x08:
+        return None
+    position = 10
+    if data[3] & 0x04:  # FEXTRA
+        position += 2 + int.from_bytes(data[10:12], "little")
+    end = data.index(b"\x00", position)
+    name = Path(data[position:end].decode("latin-1")).name
+    return name or None
+
+
 def unpack_source(data, target_dir):
     """unpack an arXiv e-print: a gzipped tarball, a gzipped single file,
     or (rarely) a plain PDF. Returns the list of written paths."""
@@ -135,7 +213,7 @@ def unpack_source(data, target_dir):
     try:
         tar = tarfile.open(fileobj=io.BytesIO(raw))
     except tarfile.ReadError:
-        path = target_dir / "main.tex"
+        path = target_dir / (gzip_original_name(data) or "main.tex")
         path.write_bytes(raw)
         return [path]
     written = []
@@ -215,15 +293,37 @@ def main(argv=None):
     failures = 0
 
     # metadata in batches; the API accepts comma separated id lists
+    use_api = True
     for start in range(0, len(ids), 20):
         batch = ids[start:start + 20]
         try:
-            metadata.update(parse_atom(fetcher.get(
-                API_URL % (",".join(batch), len(batch)))))
+            entries = parse_atom(fetcher.get(API_URL % (",".join(batch), len(batch))))
+            for entry in entries.values():
+                entry["metadata_source"] = "api"
+            metadata.update(entries)
+        except urllib.error.HTTPError as error:
+            print("arXiv API refused the request (%s); using abstract pages instead"
+                  % error, file=sys.stderr)
+            use_api = False
+            break
         except (urllib.error.URLError, OSError) as error:
             print("metadata request failed: %s" % explain_network_error(error),
                   file=sys.stderr)
             return 2
+    if not use_api:
+        for arxiv_id in ids:
+            try:
+                entry = parse_abs_page(
+                    fetcher.get(ABS_URL % arxiv_id).decode("utf-8", "replace"), arxiv_id)
+            except urllib.error.HTTPError as error:
+                print("  abstract page %s: %s" % (arxiv_id, error), file=sys.stderr)
+                continue
+            except (urllib.error.URLError, OSError) as error:
+                print("metadata request failed: %s" % explain_network_error(error),
+                      file=sys.stderr)
+                return 2
+            if entry:
+                metadata[arxiv_id] = entry
     save_metadata(metadata)
     missing = [i for i in ids if i not in metadata]
     print("metadata: %d of %d IDs resolved -> %s"

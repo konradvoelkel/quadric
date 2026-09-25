@@ -33,6 +33,21 @@ ATOM_SAMPLE = b"""<?xml version="1.0" encoding="UTF-8"?>
 </feed>
 """
 
+ABS_SAMPLE = """<html><head>
+<meta name="citation_title" content="Chow-Witt rings of Grassmannians" />
+<meta name="citation_author" content="Wendt, Matthias" />
+<meta name="citation_date" content="2018/05/16" />
+<meta name="citation_abstract" content="We compute &amp; describe ..." />
+</head><body><table>
+<td class="tablecell jref">Algebr. Geom. Topol. 24 (2024) 1-48</td>
+<td class="tablecell doi"><a href="https://doi.org/10.2140/agt.2024.24.1">https://doi.org/10.2140/agt.2024.24.1</a></td>
+</table>
+<h2>Submission history</h2> <strong><a href="/abs/1805.06142v1">[v1]</a></strong>
+        Wed, 16 May 2018 06:04:35 UTC (35 KB)<br/>
+    <strong>[v2]</strong>
+        Mon, 23 Mar 2020 10:00:00 UTC (40 KB)<br/>
+</body></html>"""
+
 
 def load_tests(loader, tests, ignore):
     tests.addTests(doctest.DocTestSuite(fetch_arxiv))
@@ -60,6 +75,18 @@ class TestFetchArxiv(unittest.TestCase):
         self.assertEqual(entry["latest_version"], "1805.04338v2")
         self.assertEqual(entry["primary_category"], "math.AG")
         self.assertIsNone(entry["journal_ref"])
+
+    def test_parse_abs_page(self):
+        entry = fetch_arxiv.parse_abs_page(ABS_SAMPLE, "1805.06142")
+        self.assertEqual(entry["title"], "Chow-Witt rings of Grassmannians")
+        self.assertEqual(entry["authors"], ["Matthias Wendt"])
+        self.assertEqual(entry["latest_version"], "1805.06142v2")
+        self.assertEqual(entry["published"], "Wed, 16 May 2018")
+        self.assertEqual(entry["updated"], "Mon, 23 Mar 2020")
+        self.assertEqual(entry["journal_ref"], "Algebr. Geom. Topol. 24 (2024) 1-48")
+        self.assertEqual(entry["doi"], "10.2140/agt.2024.24.1")
+        self.assertEqual(entry["abstract"], "We compute & describe ...")
+        self.assertIsNone(fetch_arxiv.parse_abs_page("<html></html>", "0000.00000"))
 
     def test_literature_ids_are_well_formed(self):
         ids = fetch_arxiv.extract_arxiv_ids((ROOT / "LITERATURE.md").read_text())
