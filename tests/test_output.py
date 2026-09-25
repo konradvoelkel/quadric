@@ -60,6 +60,13 @@ class TestGolden(unittest.TestCase):
         self.assertEqual(cells["x_2"], 4)
         self.assertEqual(cells["y_2"], 0)
 
+    def test_cli_wonderful_and_examples(self):
+        code, out, err = run_cli("wonderful", "A2", "--format", "json", "--no-check")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(json.loads(out)["counts"], [1, 2, 4, 7, 8, 7, 4, 2, 1])
+        code, out, err = run_cli("example", "complete-conics", "--format", "json")
+        self.assertEqual(json.loads(out)["counts"], [1, 2, 3, 3, 2, 1])
+
     def test_cli_errors_are_reported(self):
         code, out, err = run_cli("toric", "--named", "P2", "--cocharacter", "1,1")
         self.assertEqual(code, 2)

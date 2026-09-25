@@ -170,3 +170,28 @@ def flag_variety(cartan_type, crossed=None):
     crossed = set(range(1, R.rank + 1)) if crossed is None else set(crossed)
     levi = {i - 1 for i in range(1, R.rank + 1) if i not in crossed}
     return from_degrees(R.degrees, levi_degrees(R.cartan, levi))
+
+
+def wonderful(cartan_type):
+    """|X(F_q)| for the wonderful compactification of the adjoint group, from
+    the G x G-orbit decomposition (PLAN.md 4.3):
+    sum_I |G/P_I|^2 * q^{N_I} (q - 1)^{|I|} prod_{d in deg W_I} [d]_q
+    >>> wonderful("A1")
+    IntPoly((1, 1, 1, 1))
+    """
+    import itertools
+    from bbcells.rootsystem import RootSystem
+    R = RootSystem(cartan_type)
+    nodes = list(range(R.rank))
+    total = IntPoly(())
+    for size in range(R.rank + 1):
+        for levi in itertools.combinations(nodes, size):
+            crossed = {i + 1 for i in nodes if i not in levi}
+            degrees = levi_degrees(R.cartan, set(levi))
+            levi_group = IntPoly.monomial(sum(d - 1 for d in degrees)) * \
+                IntPoly((-1, 1)) ** len(levi)
+            for d in degrees:
+                levi_group = levi_group * q_integer(d)
+            base = flag_variety(cartan_type, crossed)
+            total = total + base * base * levi_group
+    return total

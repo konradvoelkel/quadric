@@ -4,6 +4,8 @@ Command line interface.
     python3 -m bbcells toric --named P3
     python3 -m bbcells flag E6 --parabolic 1
     python3 -m bbcells quadric 4 --cocharacter=-1,-2,-3
+    python3 -m bbcells wonderful A2
+    python3 -m bbcells example complete-conics
     python3 -m bbcells toric fan.json --cocharacter 1,5,25 --format latex
     python3 -m bbcells raw fixed_points.json --format json
 """
@@ -61,6 +63,25 @@ def _data_quadric(args):
     return quadric.quadric(args.n)
 
 
+def _data_wonderful(args):
+    from bbcells.frontends import wonderful
+    return wonderful.wonderful_compactification(args.cartan_type)
+
+
+EXAMPLES = {
+    "complete-conics": ("bbcells.frontends.complete_conics", "complete_conics"),
+}
+
+
+def _data_example(args):
+    import importlib
+    if args.name not in EXAMPLES:
+        raise ValueError("unknown example %r; available: %s"
+                         % (args.name, ", ".join(sorted(EXAMPLES))))
+    module, function = EXAMPLES[args.name]
+    return getattr(importlib.import_module(module), function)()
+
+
 def _data_raw(args):
     from bbcells.frontends import raw
     return raw.load(args.file)
@@ -102,6 +123,17 @@ def build_parser():
     p.add_argument("n", type=int)
     _add_common(p)
     p.set_defaults(build=_data_quadric)
+
+    p = commands.add_parser("wonderful",
+                            help="wonderful compactification of an adjoint group")
+    p.add_argument("cartan_type")
+    _add_common(p)
+    p.set_defaults(build=_data_wonderful)
+
+    p = commands.add_parser("example", help="named examples: " + ", ".join(sorted(EXAMPLES)))
+    p.add_argument("name")
+    _add_common(p)
+    p.set_defaults(build=_data_example)
 
     p = commands.add_parser("raw", help="fixed points and tangent weights as JSON")
     p.add_argument("file")

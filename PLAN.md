@@ -263,7 +263,7 @@ prints usage.
 
 ### M4 — Wonderful compactifications of adjoint groups
 
-- [ ] **S4.1 `frontends/wonderful.py`** (M). Implements 1.4 on the torus
+- [x] **S4.1 `frontends/wonderful.py`** (M). Implements 1.4 on the torus
   $T\times T$ of rank $2r$.
   **Done when:** the point-count oracle §4.3 passes for $A_1$–$A_4$,
   $B_2$, $B_3$, $C_3$, $D_4$ and $G_2$ (at most $192^2$ fixed points; $F_4$
