@@ -116,3 +116,66 @@ def gcd_of(vector):
     for x in vector:
         g = gcd(g, x)
     return g
+
+
+def smith_invariants(matrix):
+    """the nonzero invariant factors d_1 | d_2 | ... of an integer matrix
+    (Smith normal form diagonal), by row and column operations over Z
+    >>> smith_invariants([[2, 4, 4], [-6, 6, 12], [10, -4, -16]])
+    [2, 6, 12]
+    >>> smith_invariants([[0, 0], [0, 0]]), smith_invariants([])
+    ([], [])
+    """
+    a = [list(row) for row in matrix]
+    rows = len(a)
+    cols = len(a[0]) if rows else 0
+    invariants = []
+    t = 0
+    while t < min(rows, cols):
+        # choose a pivot of smallest absolute value in the remaining block
+        entries = [(abs(a[i][j]), i, j) for i in range(t, rows) for j in range(t, cols) if a[i][j]]
+        if not entries:
+            break
+        _, i, j = min(entries)
+        a[t], a[i] = a[i], a[t]
+        for row in a:
+            row[t], row[j] = row[j], row[t]
+        done = False
+        while not done:
+            done = True
+            p = a[t][t]
+            for i in range(t + 1, rows):          # clear the column
+                if a[i][t]:
+                    q = a[i][t] // p
+                    a[i] = [x - q * y for x, y in zip(a[i], a[t])]
+                    if a[i][t]:
+                        a[t], a[i] = a[i], a[t]
+                        done = False
+                        break
+            if not done:
+                continue
+            p = a[t][t]
+            for j in range(t + 1, cols):          # clear the row
+                if a[t][j]:
+                    q = a[t][j] // p
+                    for row in a:
+                        row[j] -= q * row[t]
+                    if a[t][j]:
+                        for row in a:
+                            row[t], row[j] = row[j], row[t]
+                        done = False
+                        break
+            if not done:
+                continue
+            p = a[t][t]                            # divisibility of the rest
+            for i in range(t + 1, rows):
+                for j in range(t + 1, cols):
+                    if a[i][j] % p:
+                        a[t] = [x + y for x, y in zip(a[t], a[i])]
+                        done = False
+                        break
+                if not done:
+                    break
+        invariants.append(abs(a[t][t]))
+        t += 1
+    return invariants

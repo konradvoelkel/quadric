@@ -76,6 +76,13 @@ class TestGolden(unittest.TestCase):
         code, out, err = run_cli("two-orbit", "HP")
         self.assertEqual(code, 2)
 
+    def test_cli_real(self):
+        code, out, err = run_cli("real", "A3")
+        self.assertEqual(code, 0, err)
+        self.assertIn("H^3 = Z^2 + Z/2 + Z/2", out)
+        code, out, err = run_cli("real", "G2")
+        self.assertIn("unsigned", out)
+
     def test_cli_errors_are_reported(self):
         code, out, err = run_cli("toric", "--named", "P2", "--cocharacter", "1,1")
         self.assertEqual(code, 2)

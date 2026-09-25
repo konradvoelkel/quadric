@@ -116,7 +116,12 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   Schubert cycles*, arXiv:1910.11149. Incidence coefficients of real Schubert
   cells in type A partial flag manifolds **with signs**:
   $[\Omega_I,\Omega_J] = 0$ or $(-1)^{s(I,J)}2$ according to the parity of
-  $N_I(a,b)$. **The algorithm for PLAN S5.1.**
+  $N_I(a,b)$. **The algorithm for PLAN S5.1** (implemented in
+  `bbcells/realcells.py`). Two caveats found while implementing: the worked
+  sign example ($I = (4,5,6,1,2,3)$, $J = (4,2,6,1,5,3)$) has $N_I(a,b) = 2$,
+  so its incidence is 0, not $+2$ (Kocherlakota's rule agrees:
+  $\sigma(I)-\sigma(J) = 3e_{25}$); and the identity $m = N_I(a,b)+1$ used
+  to rederive Kocherlakota's theorem holds for complete flags only.
 - ✓ L. Rabelo, L. A. B. San Martin, *Cellular homology of real flag
   manifolds*, Indag. Math. 30 (2019), 745–772 (from the bibliography of
   arXiv:1910.11149). Signs for general real flag manifolds; PLAN S5.4. Real Bruhat cell

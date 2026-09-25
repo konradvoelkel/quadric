@@ -7,6 +7,7 @@ Command line interface.
     python3 -m bbcells wonderful A2
     python3 -m bbcells example complete-conics
     python3 -m bbcells two-orbit HP 2
+    python3 -m bbcells real A3 --parabolic 2
     python3 -m bbcells toric fan.json --cocharacter 1,5,25 --format latex
     python3 -m bbcells raw fixed_points.json --format json
 """
@@ -114,6 +115,30 @@ def _run_two_orbit(args):
     return 0
 
 
+def _run_real(args):
+    import json
+    from bbcells import realcells
+    X = realcells.real_flag_variety(args.cartan_type,
+                                    set(args.parabolic) if args.parabolic else None)
+    if not X.signed:
+        nonzero = sum(1 for v in X.incidences.values() if v)
+        print("%s: %d adjacent pairs, %d with incidence +-2 (Kocherlakota, unsigned); "
+              "signs are implemented for type A only" % (X.name, len(X.incidences), nonzero))
+        return 0
+    cohomology = X.cohomology()
+    if args.format == "json":
+        print(json.dumps({"name": X.name, "cohomology": [
+            {"degree": c, "free": free, "torsion": torsion}
+            for c, (free, torsion) in enumerate(cohomology)]}, indent=1))
+        return 0
+    print("%s: H^*(X(R); Z), from signed incidences (arXiv:1910.11149)" % X.name)
+    for c, (free, torsion) in enumerate(cohomology):
+        parts = (["Z^%d" % free if free > 1 else "Z"] if free else []) + \
+                ["Z/%d" % t for t in torsion]
+        print("  H^%d = %s" % (c, " + ".join(parts) if parts else "0"))
+    return 0
+
+
 def _data_raw(args):
     from bbcells.frontends import raw
     return raw.load(args.file)
@@ -173,6 +198,12 @@ def build_parser():
     p.add_argument("n", type=int, nargs="?")
     p.add_argument("--format", choices=("text", "json"), default="text")
     p.set_defaults(run=_run_two_orbit)
+
+    p = commands.add_parser("real", help="H^*(G/P(R); Z) from real Schubert cells (type A)")
+    p.add_argument("cartan_type")
+    p.add_argument("--parabolic", type=_parse_vector, default=None)
+    p.add_argument("--format", choices=("text", "json"), default="text")
+    p.set_defaults(run=_run_real)
 
     p = commands.add_parser("raw", help="fixed points and tangent weights as JSON")
     p.add_argument("file")

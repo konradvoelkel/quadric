@@ -195,3 +195,17 @@ def wonderful(cartan_type):
             base = flag_variety(cartan_type, crossed)
             total = total + base * base * levi_group
     return total
+
+
+def real_grassmannian_rational_poincare(k, n):
+    """rational Poincare polynomial (in t) of the real Grassmannian Gr_k(R^n),
+    Casian-Kodama, arXiv:1309.5520, Theorem B:
+      [m choose j]_{t^4}                      for (k, n) = (2j, 2m), (2j, 2m+1), (2j+1, 2m+1),
+      (t^{2m-1} + 1) [m-1 choose j]_{t^4}     for (k, n) = (2j+1, 2m)
+    >>> real_grassmannian_rational_poincare(1, 4)        # RP^3
+    IntPoly((1, 0, 0, 1))
+    """
+    j, m = k // 2, n // 2
+    if k % 2 == 1 and n % 2 == 0:
+        return (IntPoly.monomial(2 * m - 1) + 1) * gaussian_binomial(m - 1, j).substitute_power(4)
+    return gaussian_binomial(m, j).substitute_power(4)

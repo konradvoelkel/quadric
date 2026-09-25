@@ -272,7 +272,7 @@ prints usage.
 
 ### M5 — Real incidences and Level A (SPEC §3.5)
 
-- [ ] **S5.1 `realcells.py`, type A partial flags** (L). Incidence
+- [x] **S5.1 `realcells.py`, type A partial flags** (L). Incidence
   coefficients $[\Omega_I, \Omega_J] \in \{0, \pm 2\}$ from Matszangosz
   (arXiv:1910.11149, Theorems `incidencecoeffs`, `Kocherlakota`, `signs`,
   in terms of ordered set partitions, $N_I(a,b)$ and $s(I,J)$). Build the
@@ -282,6 +282,15 @@ prints usage.
   Grassmannians match Casian–Kodama (arXiv:1309.5520) for $n \le 6$; and
   for every type A flag variety with $n \le 5$ all torsion is 2-torsion
   (Hudson–Matszangosz–Wendt, arXiv:2302.11003).
+  *(Implemented, with Kocherlakota's unsigned rule for all types. Findings:
+  (1) the incidences form the cochain complex of cooriented cells, graded by
+  codimension, which only coincides with the cellular grading for orientable
+  $X(\mathbb{R})$; (2) Kocherlakota's and Matszangosz's rules agree up to
+  sign on complete flags, where $m = N_I(a,b)+1$ holds exactly, but not on
+  partial flags such as $\mathbb{RP}^2$, where they describe the cellular and
+  the cooriented complex respectively; (3) the sign example in
+  arXiv:1910.11149 has $N_I(a,b) = 2$, so its incidence is 0 although the
+  paper states $+2$. Its $c_1,\dots,c_4 = 3,2,1,2$ are reproduced.)*
 - [ ] **S5.2 Real toric oracle** (M). The rational Betti numbers of $X(\mathbb{R})$
   for smooth toric $X$ via the Suciu–Trevisan / Choi–Park formula
   (arXiv:1311.7056), used only as an oracle for later work on toric
