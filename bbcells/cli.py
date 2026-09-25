@@ -3,7 +3,7 @@ Command line interface.
 
     python3 -m bbcells toric --named P3
     python3 -m bbcells flag E6 --parabolic 1
-    python3 -m bbcells quadric 4 --cocharacter -1,-2,-3
+    python3 -m bbcells quadric 4 --cocharacter=-1,-2,-3
     python3 -m bbcells toric fan.json --cocharacter 1,5,25 --format latex
     python3 -m bbcells raw fixed_points.json --format json
 """
@@ -68,7 +68,8 @@ def _data_raw(args):
 
 def _add_common(parser):
     parser.add_argument("--cocharacter", type=_parse_vector, default=None,
-                        help="generic cocharacter, e.g. 1,2,3 (default: automatic)")
+                        help="generic cocharacter, e.g. 1,2,3; write --cocharacter=-1,2,3 "
+                             "if it starts with a minus sign (default: automatic)")
     parser.add_argument("--format", choices=("text", "latex", "json"), default="text")
     parser.add_argument("--weights", action="store_true",
                         help="show tangent weights and their signs (text format)")

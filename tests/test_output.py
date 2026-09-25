@@ -52,6 +52,14 @@ class TestGolden(unittest.TestCase):
         self.assertEqual(sum(document["counts"]), 27)
         self.assertEqual(document["cocharacter"], [1] * 6)
 
+    def test_cli_quadric_with_negative_cocharacter(self):
+        code, out, err = run_cli("quadric", "4", "--cocharacter=-1,-2,-3", "--format", "json")
+        self.assertEqual(code, 0, err)
+        cells = {c["label"]: c["dim"] for c in json.loads(out)["cells"]}
+        # the legacy example in README.md: x_2 is the open cell for (1, 2, 3)
+        self.assertEqual(cells["x_2"], 4)
+        self.assertEqual(cells["y_2"], 0)
+
     def test_cli_errors_are_reported(self):
         code, out, err = run_cli("toric", "--named", "P2", "--cocharacter", "1,1")
         self.assertEqual(code, 2)
