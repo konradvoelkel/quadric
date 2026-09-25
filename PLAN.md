@@ -296,14 +296,18 @@ prints usage.
 
 ### M6 — Spherical classes (SPEC D3)
 
-- [ ] **S6a.1 Toroidal horospherical $X = G\times_P Y$** (M). Input: Cartan
+- [x] **S6a.1 Toroidal horospherical $X = G\times_P Y$** (M). Input: Cartan
   type, $I$, a sublattice $M \subset \bigoplus_{j\notin I}\mathbb{Z}\omega_j$
   given by an integer basis, and a smooth complete fan in
   $N = M^\vee$. Fixed points $(wP, x_\sigma)$ with weights
   $w(\Phi^-\smallsetminus\Phi_I^-) \cup w(m_{\sigma,1..n})$: the torus acts on
   the fibre over $wP$ through $t \mapsto w^{-1}tw$, hence the $w$-twist.
   **Done when:** $P_X = P_{G/P}\cdot P_Y$ (Zariski-locally trivial
-  fibration) for several $(G,P,\Sigma)$.
+  fibration) for several $(G,P,\Sigma)$. *(Implemented. The fibration
+  formula cannot detect the $w$-twist, since the untwisted data is
+  $G/P\times Y$; the twist is pinned by comparing
+  $SL_3\times_{P_1}\mathbb{P}^1$ with the blow-up of $\mathbb{P}(k^3\oplus k)$
+  computed by `operations.blowup`.)*
 - [ ] **S6a.2 Batyrev–Moreau oracle** (M). Implement
   $E(X) = E(G/H)\sum_{n\in|\Sigma|\cap N}(uv)^{\omega_X(n)}$ (arXiv:1203.0671)
   straight from a colored fan, including $\omega_X$ and the weighted
