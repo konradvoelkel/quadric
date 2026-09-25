@@ -233,7 +233,7 @@ prints usage.
 
 ### M3 — GKM data and derived operations (SPEC §3.4)
 
-- [ ] **S3.1 `gkm.py`: edges** (M). Toric: one edge per wall
+- [x] **S3.1 `gkm.py`: edges** (M). Toric: one edge per wall
   $\tau = \sigma\cap\sigma'$. With $\sigma = \mathrm{cone}(u_1,\dots,u_n)$ and
   $\tau = \mathrm{cone}(u_1,\dots,u_{n-1})$, the invariant curve
   $V(\tau) \cong \mathbb{P}^1$ has weight $m_n$ (dual to $u_n$) at
@@ -241,9 +241,13 @@ prints usage.
   $\beta \in w(\Phi^-\smallsetminus\Phi_I^-)$, labelled by $\beta$. Validation
   of the GKM conditions: pairwise linear independence of the weights at
   each vertex, and matching labels at both ends up to sign.
-- [ ] **S3.2 BB order** (S). The transitive closure of $\lambda$-increasing
+- [x] **S3.2 BB order** (S). The transitive closure of $\lambda$-increasing
   edges. **Done when:** it equals the Bruhat order on $W^I$ (computed
   independently by the subword criterion) for all $G/P$ of rank $\le 3$.
+  *(Found while implementing: the relation need not go down in dimension.
+  On $dP_6$ with $\lambda = (1,3)$ an invariant curve joins two 1-cells, so
+  that BB decomposition is not a stratification. The order is still acyclic,
+  and `gkm.is_graded` reports which case applies.)*
 - [ ] **S3.3 $H_T^*(X;\mathbb{Q})$ as a GKM ring** (M). Tuples of polynomials
   with divisibility along edges; a module basis from the BB order (the
   equivariant Schubert classes are the unique flow-up classes). Poincaré

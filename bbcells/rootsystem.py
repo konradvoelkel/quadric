@@ -226,6 +226,26 @@ class RootSystem(object):
             level = nxt
         return result
 
+    def coroot_on_weight(self, beta, mu):
+        """<beta^vee, mu> for a root beta (simple-root coordinates) and a weight
+        mu (fundamental-weight coordinates): beta^vee = sum_k b_k (a_k, a_k)/(beta, beta) a_k^vee
+        >>> RootSystem("B2").coroot_on_weight((1, 1), (0, 1))
+        1
+        """
+        norm = self.inner(beta, beta)
+        value = sum(b * self._lengths[k] / norm * mu[k] for k, b in enumerate(beta))
+        if value.denominator != 1:
+            raise ValueError("non-integral pairing")
+        return int(value)
+
+    def reflect_weight_by_root(self, beta, mu):
+        """s_beta(mu) = mu - <beta^vee, mu> beta, all in fundamental-weight coordinates"""
+        c = self.coroot_on_weight(beta, mu)
+        if c == 0:
+            return tuple(mu)
+        root = self.root_to_weight(beta)
+        return tuple(m - c * r for m, r in zip(mu, root))
+
     def apply_word(self, word, beta):
         """w(beta) for w = s_{word[0]} ... s_{word[-1]}"""
         for i in reversed(word):

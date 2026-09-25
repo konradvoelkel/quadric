@@ -84,6 +84,8 @@ def quadric(n):
         points.append(coordinate_label(nu))
         weights.append(tuple(sorted(wts)))
         annotations.append(dict(data.annotation(label), line_weight=nu, word_label=label))
-    return FixedPointData(n, m, tuple(points), tuple(weights),
+    relabel = dict(zip(data.points, points))
+    edges = tuple((relabel[p], relabel[q], chi) for p, q, chi in data.edges)
+    return FixedPointData(n, m, tuple(points), tuple(weights), edges=edges,
                           preferred_cocharacter=rho_vee_epsilon(letter, m),
                           name="Q_%d" % n, annotations=tuple(annotations))

@@ -72,8 +72,24 @@ def flag_variety(cartan_type, crossed=None, name=None):
         name = "%s/B" % R.name if not levi else "%s/P_{%s}" % (
             R.name, ",".join(str(j) for j in sorted(crossed)))
     return FixedPointData(len(base_weights), R.rank, tuple(points), tuple(weights),
+                          edges=tuple(_edges(R, orbit, points, weights)),
                           preferred_cocharacter=(1,) * R.rank, name=name,
                           annotations=tuple(annotations))
+
+
+def _edges(R, orbit, points, weights):
+    """T-invariant curves: through wP with tangent weight beta, joining wP
+    and s_beta wP (GKM: the tangent weights at a point are pairwise
+    independent roots). Each curve is listed once."""
+    label_of = {mu: label for (mu, _), label in zip(orbit, points)}
+    seen = set()
+    for (mu, _), label, wts in zip(orbit, points, weights):
+        for beta in wts:
+            other = label_of[R.reflect_weight_by_root(beta, mu)]
+            key = frozenset((label, other))
+            if key not in seen:
+                seen.add(key)
+                yield (label, other, beta)
 
 
 def grassmannian(k, n):
