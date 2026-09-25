@@ -1,9 +1,8 @@
 # SPEC — BB cells, motives and stable cell data from combinatorial input
 
-Status: **draft v0.2** (2026-09-25). The open questions of v0.1 are now
-decided (§5). Nothing below is implemented yet except the legacy script
-`quadric.py`, which covers split quadrics, and the literature fetcher
-`tools/fetch_arxiv.py`.
+Status: **v0.3** (2026-09-25). The open questions of v0.1 are decided
+(§5). Implemented: M1, M2, M4, and parts of M3, M5 and M6. The status of
+each step is tracked in `PLAN.md` §3.
 
 Every item carries a maturity tag:
 
