@@ -16,3 +16,7 @@ computing cells for the type $D_{3}$ space
    2: \{y_{0}\neq 0, x_{1}=0, x_{2}=0\}
    3: \{x_{1}\neq 0, x_{2}=0\}
    4: \{x_{2}\neq 0\}
+
+## Roadmap
+
+This script is the seed of a more general tool for BB cell structures from combinatorial data; see [SPEC.md](SPEC.md) and [LITERATURE.md](LITERATURE.md).
