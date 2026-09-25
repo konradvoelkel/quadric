@@ -330,3 +330,20 @@ def batyrev_moreau(cartan_type, crossed, lattice_basis, cones):
             d = d * q_integer(e)
         numerator = numerator + term * exact_division(D, d)
     return exact_division(flag_variety(cartan_type, crossed) * numerator, D)
+
+
+def complete_quadrics_p3():
+    """[complete quadrics in P^3] by the blow-up formula along Vainsencher's
+    centres: X_1 = Bl_V P^9 (V = v_2(P^3), codim 6), X = Bl_{S~_2} X_1
+    (codim 3), [S~_2] = [S_2] - [V] + [V][P^2], and [S_2] (quadrics of rank
+    <= 2, i.e. pairs of planes) = [P^3] + L^2 (L^2 + 1)(L^2 + L + 1) from
+    counting symmetric 4 x 4 matrices of rank <= 2 over F_q
+    >>> complete_quadrics_p3()(1)
+    66
+    """
+    L = IntPoly.monomial(1)
+    P = projective_space
+    S2 = P(3) + L ** 2 * (L ** 2 + 1) * (L ** 2 + L + 1)
+    S2_tilde = S2 - P(3) + P(3) * P(2)
+    X1 = blowup(P(9), P(3), 6)
+    return blowup(X1, S2_tilde, 3)

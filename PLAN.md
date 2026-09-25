@@ -360,10 +360,14 @@ prints usage.
   The normal weights at each $x_i^2$ are pairwise distinct, so 1.6 applies.
   **Done when:** $1 + 2q + 3q^2 + 3q^3 + 2q^4 + q^5$ and exactly 12 fixed
   points.
-- [ ] **S6c.2 Complete symmetric varieties** (research). De Concini–Springer
+- [x] **S6c.2 Complete symmetric varieties** (research). De Concini–Springer
   (not on arXiv; obtain a copy) and Brion–Joshua (arXiv:0705.1035) for the
   minimal-rank case. Complete quadrics via Vainsencher's iterated blow-ups
-  as a second route through `blowup`.
+  as a second route through `blowup`. *(Implemented: complete quadrics in
+  $\mathbb{P}^3$ by two blow-ups, $1,3,6,10,13,13,10,6,3,1$ with 66 fixed points,
+  against the blow-up formula; together with complete conics, the rank-one
+  complete symmetric varieties (S6b.1) and the group case (M4). Arbitrary
+  symmetric pairs need fixed points in non-closed orbits and belong to S6d.)*
 - [ ] **S6d General toroidal spherical** (research, SPEC M6d). Requires
   $T$-fixed points in non-closed $G$-orbits, which already occur for
   $\mathbb{P}^1\times\mathbb{P}^1 \supset SL_2/T$. Plan the approach only

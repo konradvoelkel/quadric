@@ -72,6 +72,7 @@ def _data_wonderful(args):
 
 EXAMPLES = {
     "complete-conics": ("bbcells.frontends.complete_conics", "complete_conics"),
+    "complete-quadrics-p3": ("bbcells.frontends.complete_conics", "complete_quadrics_p3"),
 }
 
 

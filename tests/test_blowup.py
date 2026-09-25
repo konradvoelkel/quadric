@@ -89,5 +89,29 @@ class TestCompleteConics(unittest.TestCase):
                                         oracles.projective_space(2), 3))
 
 
+class TestCompleteQuadrics(unittest.TestCase):
+
+    def test_complete_quadrics_in_p3(self):
+        """two blow-ups of P^9 (Vainsencher) against the blow-up formula with
+        [S_2] from counting rank <= 2 symmetric matrices over F_q"""
+        X = complete_conics.complete_quadrics_p3()
+        cells = bb_cells(X)
+        self.assertTrue(cells.check().ok)
+        self.assertEqual(len(X), 66)
+        self.assertEqual(cells.counts, (1, 3, 6, 10, 13, 13, 10, 6, 3, 1))
+        self.assertEqual(IntPoly.from_counts(cells.counts), oracles.complete_quadrics_p3())
+
+    def test_rank_two_locus_counts(self):
+        """[S_2] = [P^3] + L^2 (L^2+1)(L^2+L+1): unordered pairs of planes over F_q
+        (distinct, conjugate over F_{q^2}, or double), checked for q = 3, 5, 7"""
+        L = IntPoly.monomial(1)
+        S2 = oracles.projective_space(3) + L ** 2 * (L ** 2 + 1) * (L ** 2 + L + 1)
+        for q in (3, 5, 7):
+            planes = sum(q ** i for i in range(4))
+            planes_q2 = sum(q ** (2 * i) for i in range(4))
+            pairs = planes + planes * (planes - 1) // 2 + (planes_q2 - planes) // 2
+            self.assertEqual(S2(q), pairs, q)
+
+
 if __name__ == "__main__":
     unittest.main()
