@@ -1,7 +1,9 @@
 # SPEC — BB cells, motives and stable cell data from combinatorial input
 
-Status: **draft v0.1** (2026-09). Nothing below is implemented yet except the
-legacy script `quadric.py`, which covers the case of split quadrics.
+Status: **draft v0.2** (2026-09-25). The open questions of v0.1 are now
+decided (§5). Nothing below is implemented yet except the legacy script
+`quadric.py`, which covers split quadrics, and the literature fetcher
+`tools/fetch_arxiv.py`.
 
 Every item carries a maturity tag:
 
@@ -84,7 +86,8 @@ so $\mathbb{P}^1 \simeq S^{2,1}$ and $\mathbb{A}^d/(\mathbb{A}^d\smallsetminus 0
 $\eta : \mathbb{A}^2\smallsetminus 0 \to \mathbb{P}^1$ is the Hopf map, and
 stably $\eta \in \pi_{1,1}(\mathbb{S}) \cong K^{MW}_{-1}(k) \cong W(k)$.
 
-**C7. Grothendieck–Witt.** $\langle a\rangle$ is the class of the form $ax^2$,
+**C7. Grothendieck–Witt.** Whenever $GW$ or $W$ appear, $\operatorname{char} k \neq 2$.
+$\langle a\rangle$ is the class of the form $ax^2$,
 and $\mathbb{H} = \langle 1\rangle + \langle -1\rangle$. With compact support,
 $\chi_c^{\mathbb{A}^1}(\mathbb{A}^d) = \langle -1\rangle^d$.
 
@@ -97,8 +100,12 @@ uses 0-based labels, so tests translate between them.
 ## 3. Architecture
 
 Pure Python ≥ 3.10 with the standard library only, using exact arithmetic
-through `fractions.Fraction` and `int`. Optional adapters for SageMath live in
-a separate module and are never required.
+through `fractions.Fraction` and `int` (decision D1). Tests use `unittest`
+and `doctest`, so no test dependency is needed; `pytest` can still run them.
+Optional SageMath adapters live in a separate module, are never imported by
+the core, and their tests are skipped when Sage is absent. The package
+`bbcells/` lives in this repository next to the untouched legacy script
+`quadric.py` (decision D2).
 
 ```
 bbcells/
@@ -117,6 +124,14 @@ bbcells/
     horospherical.py  smooth toroidal horospherical varieties         [L2]
     spherical.py   colored fan / spherical system (placeholder)       [R]
   cli.py
+  sage_adapter.py  optional cross-checks against SageMath (never required)
+tools/
+  fetch_arxiv.py   literature fetcher (see LITERATURE.md §8)
+literature/
+  arxiv_metadata.json   committed
+  cache/                git-ignored PDFs and TeX sources
+pyproject.toml
+quadric.py         legacy, kept as regression oracle
 tests/
 ```
 
@@ -199,6 +214,11 @@ Outputs derived from it:
 
 ### 3.5 Stable motivic attaching data [L2]/[R]
 
+By Voelkel (arXiv:1805.04338), every spherical variety is stably cellular
+and has a mixed Tate motive. The questions below are therefore well posed for
+the whole target class; the problem is to compute the attaching data, not to
+show that cells exist.
+
 The filtration $\emptyset = X_{<0} \subset X_{\le 0} \subset \dots \subset X_{\le n} = X$
 by unions of cells gives cofiber sequences
 $X_{\le d-1} \to X_{\le d} \to \bigvee_{c_d} S^{2d,d}$ in $SH(k)$. The attaching
@@ -215,6 +235,24 @@ $[S^{2d+2,d+1}, S^{2d+1,d}] = \pi_{1,1}(\mathbb{S}) \cong W(k)\cdot\eta$.
   using known real Bruhat incidences, and for toric varieties using the real
   toric cell structure. Then check whether GKM data plus orientation signs
   determine $E_d$ in general. **To verify before coding.**
+
+  *Data model (decision D4).* Every variety handled here, its torus action
+  and its BB cells are defined over $\mathbb{Z}$ (Chevalley groups, fans).
+  Hypothesis **H1 [L2]:** the $\eta$-components of the attaching maps come
+  from $SH(\mathbb{Z})$ and lie in the image of
+  $W(\mathbb{Z}) \cdot \eta$, where $W(\mathbb{Z}) \cong \mathbb{Z}$
+  ($\langle 1\rangle \mapsto 1$, $\langle -1\rangle \mapsto -1$,
+  $\mathbb{H}\eta = 0$). Under H1, one integer $e$ per pair of adjacent cells
+  determines the component over every $k$ by base change, and real
+  realization turns $e\,\eta$ into an incidence number $2e$, since
+  $\eta_{\mathbb{R}} : S^1 \to S^1$ has degree $\pm 2$ depending on
+  orientation conventions. So $E_d$ is stored as an **integer matrix**, and
+  the documented meaning of each entry is "coefficient in $W(\mathbb{Z})$".
+  Before H1 is proved or found in the literature, every output that depends
+  on it is labelled `conditional_on="H1"`. Test oracles for H1: Kocherlakota
+  (real $G/P$), Hudson–Matszangosz–Wendt (type A flags; all torsion is
+  2-torsion), Casian–Kodama (Grassmannians), Choi–Park (real toric; odd
+  torsion occurs there, which the integer model can represent).
 - **[R] Level B.** Attaching maps between cells whose dimensions differ by
   2 or more lie in higher stems $\pi_{m,m'}$. No computation is planned; the
   data model only has to allow storing them.
@@ -262,21 +300,55 @@ Minimum test cases. All must pass before a front end counts as done.
 2. **M2:** `rootsystem` (generic, from Cartan matrix), `flag`, `quadric`;
    regression against `quadric.py`.
 3. **M3:** GKM input, BB order, equivariant cohomology ring for toric and flag.
-4. **M4:** `wonderful` (adjoint group compactifications), then complete
-   symmetric varieties.
-5. **M5:** literature check for §3.5 Level A; real incidences for $G/P$ and
-   $H^*(X(\mathbb{R});\mathbb{Z})$.
-6. **M6 [R]:** horospherical and toroidal spherical varieties from Luna–Vust
-   data; strategy via the local structure theorem.
+4. **M4:** `wonderful` for adjoint group compactifications, tested against
+   De Concini–Springer.
+5. **M5:** Level A of §3.5. Real incidences for $G/P$ and
+   $H^*(X(\mathbb{R});\mathbb{Z})$; check hypothesis H1 against the oracles.
+6. **M6:** spherical classes in the order fixed by decision D3:
+   - **M6a** smooth toroidal horospherical varieties (toric bundles over
+     $G/P$);
+   - **M6b** smooth complete spherical varieties of rank one, with
+     arXiv:1805.04338 as reference;
+   - **M6c** complete symmetric varieties (De Concini–Procesi);
+   - **M6d [R]** general smooth complete toroidal spherical varieties from
+     Luna–Vust data, using Brion's GKM description and the local structure
+     theorem, with smoothness checked by Gagliardi's criterion.
 
-## 5. Open questions (for KV)
+## 5. Decisions (v0.2)
 
-- Q1: Pure Python confirmed, with Sage only as an optional adapter?
-- Q2: Should the repo be renamed or restructured (e.g. `bbcells`), keeping
-  `quadric.py` as legacy?
-- Q3: Which spherical class matters most after the wonderful compactifications:
-  complete symmetric varieties, horospherical varieties, or the smooth
-  projective spherical varieties of small rank from the classification
-  literature?
-- Q4: For §3.5, is the target $W(k)$-valued incidences, or only their real
-  realizations? This decides whether we track Witt classes or just integers.
+The four open questions of v0.1 were delegated by KV and are decided as
+follows. Each can be revisited; a change is recorded here with a date.
+
+**D1 — language and dependencies.** Pure Python ≥ 3.10, standard library
+only. Reasons: KV prefers Python; the legacy script is pure Python; the
+tool should run anywhere, including CI and teaching settings, without a
+SageMath install. Exact arithmetic uses `int` and `Fraction`; polynomials
+are small dict-based classes. SageMath is used only through the optional
+`sage_adapter.py` for cross-checks (toric Betti numbers, Weyl group lengths),
+and its tests are skipped when Sage is absent.
+
+**D2 — repository layout.** Restructure *inside* this repository: add the
+package `bbcells/`, `tests/`, `tools/`, `literature/` and a `pyproject.toml`,
+and keep `quadric.py` unchanged at the top level as a regression oracle, since
+the README examples call it directly. Renaming the GitHub repository is left
+to KV: it changes public URLs and is not needed for the work.
+
+**D3 — spherical classes after M4.** Order: horospherical, then rank one,
+then complete symmetric varieties, then general toroidal (M6a–d above).
+Reasons:
+- Smooth toroidal horospherical varieties are toric bundles over $G/P$, so
+  they reuse the flag and toric front ends. They are the cheapest class that
+  is genuinely given by Luna–Vust data.
+- Rank one is where arXiv:1805.04338 already has explicit unstable cell
+  structures, so we have answers to test against and a direct link to the
+  stable questions in §3.5.
+- Complete symmetric varieties come with classical Betti numbers
+  (De Concini–Springer) but need the symmetric-pair machinery (restricted
+  roots, the little Weyl group), which is more work to implement.
+
+**D4 — attaching data.** Track $\eta$-coefficients as integers interpreted in
+$W(\mathbb{Z}) \cong \mathbb{Z}$, conditional on hypothesis H1 (§3.5), and
+compute their real realizations ($\{0,\pm 2\}$ incidences) as the primary
+checkable quantity. Do not implement general $W(k)$ arithmetic: under H1 it
+would carry no extra information for split varieties over $\mathbb{Z}$, and it can
+be added later if a non-split front end ever appears (a non-goal for now).
