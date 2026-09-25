@@ -205,7 +205,7 @@ prints usage.
 
 ### M2 — Root systems, flag varieties, quadrics
 
-- [ ] **S2.1 `rootsystem.py`** (L). Cartan matrices for $A_n, B_n, C_n, D_n,
+- [x] **S2.1 `rootsystem.py`** (L). Cartan matrices for $A_n, B_n, C_n, D_n,
   E_{6,7,8}, F_4, G_2$ in Bourbaki numbering, and products. Positive roots
   by closure under simple reflections, with coroots. Fundamental weights in
   the adjoint realization. Orbit enumeration and lengths as in 1.8. Degrees
@@ -215,7 +215,7 @@ prints usage.
   tables for every type of rank $\le 8$ (with $|W|$ checked through the
   orbit of $\rho$ only up to rank 6), and the ambient and adjoint
   realizations agree on the pairings $\langle\alpha_i^\vee, \alpha_j\rangle$.
-- [ ] **S2.2 `frontends/flag.py`** (M). `flag_variety("B3", parabolic={1})`
+- [x] **S2.2 `frontends/flag.py`** (M). `flag_variety("B3", parabolic={1})`
   with the weights of 1.2. Named helpers: `grassmannian(k, n)`,
   `full_flags(type)`, `isotropic_grassmannian(k, 2n)`.
   **Done when:** oracles §4.2 pass, i.e. $P_{G/P}(t) = \prod[d_G]/\prod[d_L]$

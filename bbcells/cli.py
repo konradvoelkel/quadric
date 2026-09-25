@@ -2,6 +2,7 @@
 Command line interface.
 
     python3 -m bbcells toric --named P3
+    python3 -m bbcells flag E6 --parabolic 1
     python3 -m bbcells toric fan.json --cocharacter 1,5,25 --format latex
     python3 -m bbcells raw fixed_points.json --format json
 """
@@ -49,6 +50,11 @@ def _data_toric(args):
     return toric.fixed_point_data(fan)
 
 
+def _data_flag(args):
+    from bbcells.frontends import flag
+    return flag.flag_variety(args.cartan_type, set(args.parabolic) if args.parabolic else None)
+
+
 def _data_raw(args):
     from bbcells.frontends import raw
     return raw.load(args.file)
@@ -76,6 +82,14 @@ def build_parser():
     p.add_argument("--named", help="P<n>, F<a> (Hirzebruch), dP6, or products like P1xF2")
     _add_common(p)
     p.set_defaults(build=_data_toric)
+
+    p = commands.add_parser("flag", help="flag variety G/P of a split reductive group")
+    p.add_argument("cartan_type", help="A<n>, B<n>, C<n>, D<n>, E6, E7, E8, F4 or G2")
+    p.add_argument("--parabolic", type=_parse_vector, default=None,
+                   help="crossed nodes J of P_J, Bourbaki numbering, e.g. 1 for E6/P1 "
+                        "(default: all nodes, i.e. G/B)")
+    _add_common(p)
+    p.set_defaults(build=_data_flag)
 
     p = commands.add_parser("raw", help="fixed points and tangent weights as JSON")
     p.add_argument("file")

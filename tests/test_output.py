@@ -45,6 +45,13 @@ class TestGolden(unittest.TestCase):
         self.assertEqual(document["gw_euler"], {"plus": 2, "minus": 2, "rank": 4, "signature": 0})
         self.assertTrue(all(item["passed"] for item in document["checks"]))
 
+    def test_cli_flag(self):
+        code, out, err = run_cli("flag", "E6", "--parabolic", "1", "--format", "json")
+        self.assertEqual(code, 0, err)
+        document = json.loads(out)
+        self.assertEqual(sum(document["counts"]), 27)
+        self.assertEqual(document["cocharacter"], [1] * 6)
+
     def test_cli_errors_are_reported(self):
         code, out, err = run_cli("toric", "--named", "P2", "--cocharacter", "1,1")
         self.assertEqual(code, 2)
