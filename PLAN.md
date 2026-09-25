@@ -154,14 +154,14 @@ prints usage.
 
 ### M1 — Engine, invariants, toric (SPEC §3.1–3.3)
 
-- [ ] **S1.1 `algebra.py`** (S). `IntPoly`: dense integer polynomials with
+- [x] **S1.1 `algebra.py`** (S). `IntPoly`: dense integer polynomials with
   `+ - *`, evaluation, `is_palindromic`, and pretty printing in a chosen
   variable ($t$, $q$ or $\mathbb{L}$). `GWClass(a, b)` meaning
   $a\langle1\rangle + b\langle-1\rangle$: rank, signature, addition,
   multiplication ($\langle-1\rangle^2 = 1$), and $\mathbb{H} = (1,1)$.
   **Done when:** there are doctests for all operations and
   $(\mathbb{H}\cdot x = \mathrm{rank}(x)\,\mathbb{H})$ holds for random $x$.
-- [ ] **S1.2 `core.py`** (M). `FixedPointData` with the validation of
+- [x] **S1.2 `core.py`** (M). `FixedPointData` with the validation of
   SPEC §3.1. `choose_generic_cocharacter` as in SPEC §3.2 (deterministic,
   with a retry loop). `bb_cells(data, lam=None) -> CellDecomposition`, which
   stores $\lambda$, `dim_of[p]` and the counts $c_d$. `with_opposite()`
@@ -170,17 +170,17 @@ prints usage.
   and invalid data (a zero weight, the wrong number of weights, a
   non-generic $\lambda$) raises `ValueError` with a message naming the
   offending point.
-- [ ] **S1.3 `invariants.py`** (S). Every row of the SPEC §3.3 table, plus the
+- [x] **S1.3 `invariants.py`** (S). Every row of the SPEC §3.3 table, plus the
   automatic checks: a second cocharacter, Poincaré duality, $c_0 = c_n = 1$.
   Checks return a `CheckReport` rather than raising, so that inputs can be
   explored.
   **Done when:** hand-written fixed-point data for $\mathbb{P}^n$ gives every
   invariant, including $\chi^{\mathbb{A}^1}(\mathbb{P}^2) = 2\langle1\rangle+\langle-1\rangle$.
-- [ ] **S1.4 `frontends/raw.py`** (S). Load and dump the JSON format
+- [x] **S1.4 `frontends/raw.py`** (S). Load and dump the JSON format
   `{"dim", "rank", "points": [{"label", "weights": [[...]]}], "edges"?}`. A
   JSON Schema lives in `bbcells/schema/fixed_points.json`, checked by a
   small hand-written validator (no `jsonschema` dependency).
-- [ ] **S1.5 `frontends/toric.py`** (M). Input: rays and maximal cones.
+- [x] **S1.5 `frontends/toric.py`** (M). Input: rays and maximal cones.
   Checks: every maximal cone is unimodular; completeness via the
   wall-crossing test (every codimension-one face lies in exactly two
   maximal cones), which is then confirmed by Euler characteristic equals
@@ -190,13 +190,14 @@ prints usage.
   **Done when:** oracles §4.1 pass: $\mathbb{P}^n$, $F_a$ for
   $a = 0,\dots,4$, the degree-6 del Pezzo (hexagon, $1 + 4t^2 + t^4$), and
   $\mathbb{P}^1\times\mathbb{P}^1\times\mathbb{P}^1$.
-- [ ] **S1.6 `operations.py`, first part** (S). `product` (tangent weights
+- [x] **S1.6 `operations.py`, first part** (S). `product` (tangent weights
   concatenated over $T_1 \times T_2$) and `restrict(data, matrix)` with the
   check from 1.5.
   **Done when:** $P_{X\times Y} = P_X P_Y$ holds on toric examples, and
-  restricting $\mathbb{P}^1\times\mathbb{P}^1$ to the diagonal torus raises
-  (weight $0$ at $(0,\infty)$), while a generic rank-1 subtorus passes.
-- [ ] **S1.7 `output.py`, `cli.py`** (M). Text, LaTeX (the same shape as
+  restricting $\mathbb{P}^1\times\mathbb{P}^1$ to the torus of one factor
+  raises (whole fibres are fixed), while the diagonal torus and generic
+  rank-1 subtori keep 4 isolated fixed points.
+- [x] **S1.7 `output.py`, `cli.py`** (M). Text, LaTeX (the same shape as
   `quadric.py`'s output) and JSON. `python -m bbcells toric fan.json`,
   `python -m bbcells raw data.json`.
   **Done when:** there are golden-file tests for all three formats on

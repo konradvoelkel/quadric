@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "bbcells fixed-point data",
+  "description": "T-fixed points of a smooth projective variety with their tangent weights (SPEC.md 3.1). Weights are tangent weights, integer vectors of length rank.",
+  "type": "object",
+  "required": ["dim", "rank", "points"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {"type": "string"},
+    "dim": {"type": "integer", "minimum": 0},
+    "rank": {"type": "integer", "minimum": 1},
+    "preferred_cocharacter": {"type": "array", "items": {"type": "integer"}},
+    "points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "weights"],
+        "additionalProperties": false,
+        "properties": {
+          "label": {"type": "string"},
+          "weights": {"type": "array", "items": {"type": "array", "items": {"type": "integer"}}},
+          "annotation": {"type": "object"}
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "weight"],
+        "additionalProperties": false,
+        "properties": {
+          "from": {"type": "string"},
+          "to": {"type": "string"},
+          "weight": {"type": "array", "items": {"type": "integer"}}
+        }
+      }
+    }
+  }
+}

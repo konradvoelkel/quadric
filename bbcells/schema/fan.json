@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "bbcells smooth complete fan",
+  "description": "Rays are primitive integer vectors; cones are maximal cones given by ray indices.",
+  "type": "object",
+  "required": ["rays", "cones"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {"type": "string"},
+    "rays": {"type": "array", "items": {"type": "array", "items": {"type": "integer"}}},
+    "cones": {"type": "array", "items": {"type": "array", "items": {"type": "integer", "minimum": 0}}}
+  }
+}
