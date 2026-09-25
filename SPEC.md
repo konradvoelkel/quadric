@@ -252,7 +252,9 @@ $[S^{2d+2,d+1}, S^{2d+1,d}] = \pi_{1,1}(\mathbb{S}) \cong W(k)\cdot\eta$.
   orientation conventions. So $E_d$ is stored as an **integer matrix**, and
   the documented meaning of each entry is "coefficient in $W(\mathbb{Z})$".
   Before H1 is proved or found in the literature, every output that depends
-  on it is labelled `conditional_on="H1"`. Supporting evidence: the unstable
+  on it is labelled `conditional_on="H1"`. Experiments supporting a refined
+  form H1′ (the GKM form of Kocherlakota's rule) in both the real and the
+  complex realization are recorded in `docs/H1.md`. Supporting evidence: the unstable
   Thom-space cell structures of arXiv:1805.04338 (`thm:unstable-thom-cells`)
   are constructed over any base smooth over a Dedekind ring, in particular
   over $\mathbb{Z}$. Test oracles for H1: Kocherlakota

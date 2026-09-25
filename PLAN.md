@@ -298,7 +298,7 @@ prints usage.
   for smooth toric $X$ via the Suciu–Trevisan / Choi–Park formula
   (arXiv:1311.7056), used only as an oracle for later work on toric
   incidences.
-- [ ] **S5.3 H1 experiments** (research). Look for a rule giving
+- [x] **S5.3 H1 experiments** (research). Look for a rule giving
   $E_d \in W(\mathbb{Z})$ from GKM data plus orientation signs, testing it
   against S5.1 on all type A cases with $n \le 5$. Write up the results in
   `docs/H1.md`, whether positive or negative. This step never blocks M6.

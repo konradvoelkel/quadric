@@ -266,3 +266,104 @@ def type_a_signed(cartan_type, crossed=None):
     incidences = {(x, y): matszangosz_incidence(osp[x], osp[y])
                   for x, y, _ in _adjacent_pairs(data)}
     return RealCellComplex(data.name + "(R)", dims, incidences, signed=True)
+
+
+# -- the GKM form of Kocherlakota's rule (PLAN.md S5.3, docs/H1.md) ----------
+
+def positive_weight_sum(cells, p):
+    """sigma(p): the sum of the lambda-positive tangent weights at p, i.e. the
+    weight of det T_p(plus-cell). For G/P and dominant lambda it is
+    Kocherlakota's sigma(x)."""
+    from bbcells.core import pairing
+    rank = cells.data.rank
+    total = [0] * rank
+    for w in cells.data.weights_of(p):
+        if pairing(cells.cocharacter, w) > 0:
+            total = [t + c for t, c in zip(total, w)]
+    return tuple(total)
+
+
+def gkm_incidences(cells):
+    """{(x, y): (m, magnitude)} for invariant curves joining cells of adjacent
+    dimension, dim x = dim y + 1, where sigma(x) - sigma(y) = m phi with phi
+    the weight of the curve at x; magnitude 2 if m is even, 0 if odd, None if
+    sigma(x) - sigma(y) is not a multiple of phi. Conjecturally these are the
+    unsigned incidences of the cellular chain complex of X(R) (docs/H1.md)."""
+    from bbcells.core import pairing
+    data = cells.data
+    result = {}
+    for p, q, chi in data.edges:
+        dp, dq = cells.dim_of(p), cells.dim_of(q)
+        if abs(dp - dq) != 1:
+            continue
+        x, y, phi = (p, q, chi) if dp > dq else (q, p, tuple(-c for c in chi))
+        if pairing(cells.cocharacter, phi) <= 0:
+            continue            # the curve does not flow from x to y
+        diff = [a - b for a, b in zip(positive_weight_sum(cells, x), positive_weight_sum(cells, y))]
+        k = next(i for i, c in enumerate(phi) if c)
+        m, remainder = divmod(diff[k], phi[k])
+        if remainder or any(d != m * c for d, c in zip(diff, phi)):
+            result[(x, y)] = (None, None)
+        else:
+            result[(x, y)] = (m, 0 if m % 2 else 2)
+    return result
+
+
+def signed_completions(cells, incidences, limit=4096):
+    """sign choices for the nonzero unsigned incidences making a chain
+    complex (boundary o boundary = 0), up to the gauge of flipping cell
+    orientations. Yields dicts {(x, y): +-2}. Exhaustive, so only for small
+    examples."""
+    import itertools
+    nonzero = sorted(k for k, (m, mag) in incidences.items() if mag)
+    # fix a spanning forest's signs to + (gauge), enumerate the rest
+    parent = {}
+
+    def find(a):
+        while parent.get(a, a) != a:
+            a = parent[a]
+        return a
+
+    tree, rest = [], []
+    for x, y in nonzero:
+        rx, ry = find(x), find(y)
+        if rx != ry:
+            parent[rx] = ry
+            tree.append((x, y))
+        else:
+            rest.append((x, y))
+    if 2 ** len(rest) > limit:
+        raise ValueError("too many sign choices (%d free edges)" % len(rest))
+    dims = {p: cells.dim_of(p) for p in cells.data.points}
+    for signs in itertools.product((1, -1), repeat=len(rest)):
+        signed = {e: 2 for e in tree}
+        signed.update({e: 2 * s for e, s in zip(rest, signs)})
+        if _square_zero_cellular(signed, dims):
+            yield signed
+
+
+def _square_zero_cellular(signed, dims):
+    by_source = {}
+    for (x, y), v in signed.items():
+        by_source.setdefault(x, {})[y] = v
+    for x, targets in by_source.items():
+        total = {}
+        for y, v in targets.items():
+            for z, w in by_source.get(y, {}).items():
+                total[z] = total.get(z, 0) + v * w
+        if any(total.values()):
+            return False
+    return True
+
+
+def cellular_rational_betti(dims, signed):
+    """rational Betti numbers of the cellular chain complex with boundary
+    coefficients signed[(x, y)] (dim x = dim y + 1)"""
+    from bbcells.linalg import rank as matrix_rank
+    top = max(dims.values())
+    cells_of = {d: sorted((p for p, e in dims.items() if e == d), key=str) for d in range(top + 1)}
+    ranks = {}
+    for d in range(1, top + 1):
+        rows = [[signed.get((x, y), 0) for x in cells_of[d]] for y in cells_of[d - 1]]
+        ranks[d] = matrix_rank(rows) if rows and rows[0] else 0
+    return [len(cells_of[d]) - ranks.get(d, 0) - ranks.get(d + 1, 0) for d in range(top + 1)]
