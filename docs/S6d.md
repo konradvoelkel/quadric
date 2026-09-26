@@ -1,6 +1,6 @@
 # S6d — spherical varieties orbit by orbit
 
-Status (2026-09-25):
+Status (2026-09-26):
 
 - **Wonderful varieties with given satellites** (`frontends/spherical.py`).
   The first families are complete quadrics and complete skew forms in every
@@ -253,21 +253,59 @@ spanned by the centre of the Hermitian $K$:
 By the proposition, $\chi_\gamma = \mathrm{pr}(-\gamma) + c\zeta$ with
 $c\in\mathbb Z$.
 
-- **Certificate** (`spherical.certify_normal_weights`), for a single unknown.
+- **Point-count certificate** (`spherical.certify_by_point_count`).
+  - At the fixed point $wx$ of the orbit, the unknown weight is
+    $a_w + c\,b_w$ at $\lambda$, with $a_w = \langle w\,\mathrm{pr}(-\gamma),\lambda\rangle$
+    and $b_w = \langle w\zeta,\lambda\rangle$. So the BB count $P_\lambda(c)$ is
+    a step function of $c$, with steps at the thresholds $-a_w/b_w$.
+  - For the true $c$ and a $\lambda$ generic for it, $P_\lambda(c)$ is the
+    E-polynomial of the variety. Take the closure $X^J$ of an orbit $O_J$
+    with $T$-fixed points. Its E-polynomial is
+    $$E(X^J) = |G/P_{S_J}|(q)\,|L/H_L|(q) + \sum_{\emptyset\ne S\subseteq J}(-1)^{|S|+1}E(X^{J\smallsetminus S}),$$
+    by Brion–Peyre for the open orbit (§8) and inclusion–exclusion over the
+    boundary. The $X^{J\smallsetminus S}$ do not see the unknown, and their E-polynomials are
+    their BB counts.
+  - The admissible set at $\lambda$ is the union of the intervals between
+    thresholds where $P_\lambda = E(X^J)$, together with the thresholds
+    themselves, where $\lambda$ decides nothing.
+  - The threshold sets of the sampled $\lambda$ are made disjoint, so every $c$
+    is decided by some sample.
+  - $T$-weights lie in the root lattice. So in general $c\in c_0+\mathbb Z$, and
+    the code computes $c_0$ (here $c_0=0$). If only $c=0$ survives, then
+    $c=0$.
+  - Two unknowns on different orbits give
+    $P_\lambda = P_0 + F_1(c_1) + F_2(c_2)$, since every fixed point sees at
+    most one unknown. The admissible boxes are found by hashing: $F_2$ is
+    matched against $E - P_0 - F_1$.
+  - In practice the admissible set at $\lambda$ is a single interval around
+    0, of half-width below $0.1$.
+- **Induction over orbit closures** (`spherical.certify_by_closures`).
+  - An unknown $(K,\gamma)$, the normal weight of $D_\gamma$ on $O_K$, is
+    decided on the smallest closure $X^J$, $J\supseteq K\cup\{\gamma\}$, whose
+    open orbit has fixed points and whose other normal weights are proved or
+    already certified.
+  - If no single unknown can be decided this way, a pair is decided jointly.
+  - The ABBV certificate below is the last fallback.
+- **Certified** $c = 0$ (point counts; these orbits are marked
+  `symmetric.CERTIFIED`):
+  - AIII(2,3), AIII(2,4), AIII(2,5), DIII(5), EIII;
+  - AIII(3,4): $(O_3,\gamma_1)$ alone, then $(O_3,\gamma_0)$ and
+    $(O_{23},\gamma_0)$ jointly on $X$. $O_{13}$ has no $T$-fixed points, so
+    $(O_3,\gamma_0)$ has no smaller closure.
+  - DIII(7) and AIII(3,5) follow the same pattern as AIII(3,4).
+- **ABBV certificate** (`spherical.certify_normal_weights`), for a single
+  unknown.
   - Take the ABBV identity $\sum_p 1/e_p(\lambda) = 0$ at random $\lambda$. It
     is a rational function $g_\lambda(c)$.
   - For $|c| > C$, the terms that depend on $c$ are smaller than the rest,
     which is an explicit bound computed in logarithms with a margin of 1/2.
   - Every integer $|c|\le C$ is screened modulo $2^{61}-1$. A nonzero residue
     excludes $c$ over $\mathbb Q$.
-  - The true $c$ is admissible, so if only $c=0$ survives, then $c = 0$. This
-    is a proof by computation, given the proposition and the orbit data.
-  - Certified $c = 0$: AIII(2,3), AIII(2,4), AIII(2,5), DIII(5), EIII. Such
-    orbits are marked `symmetric.CERTIFIED`.
-- **Several unknowns** (two normal weights on one orbit): AIII(3,4) and
-  DIII(7). The joint search is not implemented. These orbits keep the
-  weaker mark `BEYOND_R` and are accepted only if every check passes,
-  including the orbit counts of §8, which they pass.
+  - For AIII(3,4) and DIII(7) the ABBV coefficients vanish identically at every
+    order. The moments $\int c_1^T(TX)^k$ have tiny leading coefficients, so
+    $C$ exceeds $10^5$. This degeneracy prompted the point-count certificate.
+- **Uncertified cases** keep the weaker mark `BEYOND_R`. They are accepted
+  only if every check passes, including the orbit counts of §8.
 - **Independent confirmation.** A literature search found an orbit-sum
   E-polynomial computation (De Concini–Springer's method with Brion–Peyre
   fibres). It reproduces AIII(2,3) = 1,3,8,15,23,29,32,29,23,15,8,3,1, as well
@@ -319,6 +357,8 @@ $c\in\mathbb Z$.
   | AIII(2,3) (beyond R, certified) | 12: 190 |
   | DIII(5) (beyond R, certified) | 20: 656 |
   | EIII (beyond R, certified) | 32: 2619 |
+  | AIII(3,4) (beyond R, certified jointly) | 24: 8015 |
+  | DIII(7) (beyond R, certified jointly) | 42: 55168 |
 
   For $G_2/SO_4$, the count $27 = 12+6+6+3$ can be checked by hand.
 
@@ -399,6 +439,51 @@ used.
   the BB Poincaré series.
 - Dropping the second-order condition gives too many classes.
 
+**Characteristic numbers** (`brion.degree_one_class`, `line_bundle_class`,
+`integrate_monomial`).
+- A degree-one class is determined by its values on the closed orbit.
+  Propagation along the Brion components determines the rest: across a curve
+  $f_y - f_z$ is a multiple of $\chi$, and so on. The result is then checked
+  against every condition.
+- A $G$-linearized line bundle with weight $\mu$ at the base point $z$ of the
+  closed orbit has the value $w(\mu)$ at $wz$. For complete quadrics the colours
+  $\mu_k$ are the pullbacks of $\mathcal O(1)$ from
+  $\mathbb P(\operatorname{Sym}^2\Lambda^kV)$, of weight $-2\omega_k$.
+- Monomials in these classes are integrated by ABBV at a generic cocharacter,
+  in exact arithmetic. The result must be an integer, and it must not depend on
+  the cocharacter. Both are checked.
+
+Reproduced (`tests/test_brion.py`):
+- Complete conics:
+  - $\mu^a\nu^{5-a} = 1,2,4,4,2,1$;
+  - Chasles' $(2\mu+2\nu)^5 = 3264$.
+- Complete quadric surfaces:
+  - Schubert's $\mu^a\nu^{9-a} = 1,2,4,8,16,32,56,80,92,92$;
+  - $\rho^9 = 1$;
+  - 666841088 quadrics tangent to 9 quadrics;
+  - the triangle entries $\mu^3\nu^3\rho^3 = 104$ and $\mu^2\nu^5\rho^2=128$
+    (Brysiewicz–Fevola–Sturmfels, arXiv:2010.10879).
+- Complete quadrics in $\mathbb P^4$:
+  - 48942189946470400 quadrics tangent to 14 quadrics (Sturmfels,
+    *3264 questions*, Q5);
+  - $\mu_2^{14} = 7703$.
+- ML degrees of generic linear concentration models,
+  $\varphi(n,d)=\int\mu_1^{\binom{n+1}2-d}\mu_{n-1}^{d-1}$ (MMMSV,
+  arXiv:2011.08791, Prop. 3.5):
+  - $n=4$: 1,3,9,17,21,21,17,9,3,1;
+  - $n=5$: 1,4,16,44,86,137,188,212,…;
+  - $n=6$, $d\le7$: 1,5,25,90,240,528,1016.
+
+  These match the table after Thm 2.3 of Sturmfels–Uhler (arXiv:0906.3529).
+- Complete quadrics in $\mathbb P^5$ (3690 fixed points, 28440 components,
+  96 s):
+  - quadrics tangent to 20 quadrics: 1810718299257984458113941504;
+  - $\mu_k^{20} = 1, 803128, 61520094, 803128, 1$.
+
+  An independent computation with Brion's degree formula gives the same
+  number. The value 641211464734373953791690014720 listed in *3264
+  questions* Q5 differs from both. We have not resolved this.
+
 ## 10. How to do what remains
 
 1. **General Luna data (non-symmetric satellites).** Following
@@ -426,22 +511,55 @@ used.
        (implemented for one unknown) and confirm them by §8.
    - **Oracles.** Wasserman's rank-two tables, and the non-symmetric
      reductive entries (#31–50 in arXiv:1109.6777).
-2. **Several unknowns in the certificate.** Needs a joint bound, e.g. nested
-   bounds or additional localization identities $\int c_k^T(TX) = 0$,
-   $k<n$. Also a full proof of the Hermitian case, closing the gaps listed
-   in §6.
-3. **Schubert calculus beyond GKM.** Generalize the flow-up classes and
-   structure constants of `equivariant.py` from edges to Brion components.
-   The cells are known and the ring conditions are in §9. Oracle: the
-   cohomology of complete quadrics (De Concini–Goresky–MacPherson–Procesi
-   1988).
+2. **Certificates beyond the Hermitian case.** The point-count
+   certificate of §6 decides one unknown, or two on different orbits, on a
+   closure whose open orbit has fixed points. It remains to:
+   - handle two unknowns on the same orbit (a line arrangement in the
+     $(c_1,c_2)$-plane);
+   - handle closures whose open orbit has no fixed points (it would need
+     $E(L/H_L)$ for satellites of smaller rank);
+   - give a full proof of the proposition's Hermitian case, closing the gaps
+     listed in §6.
+3. **Schubert calculus beyond GKM.** Characteristic numbers are done (§9).
+   Still open: generalizing the flow-up classes and structure constants of
+   `equivariant.py` from edges to Brion components. The cells are known and
+   the ring conditions are in §9. Oracle: the cohomology of complete quadrics
+   (De Concini–Goresky–MacPherson–Procesi 1988).
 4. **Toroidal $X$ over $G/H$ with $\Lambda\supsetneq\mathbb Z\Sigma$.** Then
    $O_\tau\to O_J$ is a finite cover times a torus. Needs the lattice
    $\Lambda$ and the component group.
 5. **Real points of non-GKM varieties** (M5, hypothesis H1). The real
    incidences need the $T$-curves and surfaces of §9 in the Kocherlakota
    rule. For the planes this is open.
-6. **Large Euler characteristics.** EV, EVI, EVIII and EIX have $10^5$ to
-   more than $10^6$ fixed points. Listing them is impractical in pure
-   Python. Counting cells orbit by orbit without listing points would be
-   the way: plus-cell dimensions depend only on coset data.
+6. **Large Euler characteristics.** Done for $E_7$ (§11). EVIII
+   ($E_8$) has more than $10^8$ fixed points and needs a compiled inner loop.
+
+## 11. Cell counts without listing fixed points
+
+`spherical.stream_cell_counts` and `symmetric.cell_counts` (command line:
+`bbcells symmetric EVI --counts-only`) count cells orbit by orbit, and never
+hold a list of fixed points.
+
+- The cosets $W/W_{\mathrm{refl}}$ of every orbit are enumerated one length
+  level at a time, by the search of §6. Each element is an inverse
+  permutation of the roots, stored as bytes.
+- Each representative $w$ contributes the number of $\lambda$-positive weights
+  among $w(\Phi\smallsetminus\Phi_H)$ and $w(N)$.
+- When $W_H$ is not a reflection group, every count is divided by
+  $|W_H:W_{\mathrm{refl}}|$, and the division must be exact.
+- Two pseudo-random $\lambda$ must give the same counts, and the counts must
+  be palindromic.
+- The small cases agree with the full fixed-point data
+  (`tests/test_symmetric.py`).
+
+Results (dimension, number of fixed points, time):
+
+| form | dim | fixed points | time |
+|---|---|---|---|
+| EII | 40 | 110916 | 4 s |
+| EI | 42 | 370170 | 14 s |
+| EVII | 54 | 23464 | 7 s |
+| EVI | 64 | 758079 | 48 s |
+
+For example, EVI has cell counts
+1, 4, 11, 26, 54, 105, 189, 321, 516, 794, 1176, …, 33607, 33805, 33607, …, 1.

@@ -637,14 +637,23 @@ def certify_normal_weights(cartan_type, orbits, trials=3, seed=0):
     data = [(o, homogeneous_fixed_points(cartan_type, o.generators, o.component_reflections,
                                          o.unipotent_roots, o.normal, o.component_elements))
             for o in orbits]
-    samples = []
+    dim = len(data[0][1][next(iter(data[0][1]))]) if data and data[0][1] else 0
+    samples, failures = [], 0
     for _ in range(6 * trials):
-        if len(samples) >= trials:
-            break
+        if len(samples) >= trials or (failures >= 2 and not samples):
+            break                                 # the degeneracy is structural
         lam = [rng.randrange(1, 10 ** 6) for _ in range(R.rank)]
         sample = _abbv_sample(R, data, orbit, zeta, lam)
+        # if 1 carries no information (e.g. pairs with e_p' = -e_p cancel for all c),
+        # use the moments c_1(TX)^k, k < dim X
+        k = 1
+        while sample is None and k < min(dim, 5):
+            sample = _moment_sample(R, data, orbit, zeta, lam, k)
+            k += 1
         if sample is not None:
             samples.append(sample)
+        else:
+            failures += 1
     if not samples:
         raise ValueError("no usable evaluation point")
     bounds = [s[0] for s in samples]
@@ -720,12 +729,41 @@ def orbit_count_check(cartan_type, orbits, X, rank):
     return result
 
 
-def _abbv_sample(R, data, orbit, zeta, lam):
-    """one evaluation point of the ABBV identity sum_p 1/e_p(lambda) = 0, as a
-    function g(c) of the unknown shift: returns (C, test) with g(c) != 0 for
-    all |c| > C, and test(c) = False only if g(c) != 0 (checked modulo a
-    prime), or None if lambda is unusable"""
+def _sum_sign(terms):
+    """the sign (-1, 0, 1) of a sum of Fractions, proved: exact zero by
+    cancelling equal and opposite terms, a nonzero sign by 150-digit decimal
+    arithmetic with an error bound; None if neither succeeds"""
+    from collections import Counter
     from decimal import Decimal, localcontext
+    counts = Counter(terms)
+    rest = []
+    for t, k in counts.items():
+        if t > 0:
+            k -= counts.get(-t, 0)
+            rest.extend([t] * max(k, 0) + [-t] * max(-k, 0))
+    if not rest:
+        return 0
+    if len(rest) <= 200:
+        total = sum(rest, Fraction(0))
+        return (total > 0) - (total < 0)
+    with localcontext() as context:
+        context.prec = 150
+        values = [Decimal(t.numerator) / Decimal(t.denominator) for t in rest]
+        total = sum(values, Decimal(0))
+        error = len(values) * max(abs(v) for v in values) * Decimal(10) ** -140
+        if abs(total) <= error:
+            return None
+        return 1 if total > 0 else -1
+
+
+def _abbv_sample(R, data, orbit, zeta, lam, max_order=4):
+    """one evaluation point of the ABBV identity sum_p 1/e_p(lambda) = 0, as a
+    function g(c) = K + sum_v 1/(A_v (a_v + b_v c)) of the unknown shift.
+    Expanding g(c) = K + sum_k (-1)^(k-1) S_k / c^k (S_k = sum a^(k-1)/(A b^k)),
+    let m be the first order with a provably nonzero coefficient; then for
+    |c| >= C, |c^m g(c)| >= |S_m| - sum |a|^m / (|A| |b|^m (|b| |c| - |a|)) > 0.
+    Returns (C, test) with test(c) = False only if g(c) != 0 (checked modulo a
+    prime), or None if lambda is unusable."""
     from math import exp, log
     P = (1 << 61) - 1
     pair = lambda w: sum(a * b for a, b in zip(w, lam))
@@ -749,25 +787,41 @@ def _abbv_sample(R, data, orbit, zeta, lam):
                 denominators.append(e)
     if not varying or any(d == 0 or d % P == 0 for d in denominators):
         return None
+    if any(A == 0 or A % P == 0 or b % P == 0 for A, a, b in varying):
+        return None
+    coefficients = [[Fraction(1, d) for d in denominators]]
+    coefficients += [[Fraction(a ** (k - 1), A * b ** k) for A, a, b in varying]
+                     for k in range(1, max_order + 1)]
+    order, leading = None, None
+    for m, terms in enumerate(coefficients):
+        sign = _sum_sign(terms)
+        if sign is None:
+            return None                       # cannot decide; try another lambda
+        if sign != 0:
+            order = m
+            break
+    if order is None:
+        return None
+    from decimal import Decimal, localcontext
+    with localcontext() as context:
+        context.prec = 150
+        leading = abs(sum((Decimal(t.numerator) / Decimal(t.denominator)
+                           for t in coefficients[order]), Decimal(0)))
+        log_leading = float(leading.ln()) - 1e-9
+    C = max(abs(Fraction(a, b)) for A, a, b in varying) + 1
+
+    def tail(C):          # bound for |c^m g(c) - (+-S_m)| / |S_m| at |c| >= C
+        return sum(exp(order * (log(abs(a)) - log(abs(b))) - log(abs(A))
+                       - log(abs(b) * C - abs(a)) - log_leading) if a else 0.0
+                   for A, a, b in varying)
+
+    while tail(C) >= 0.5:                     # the margin 1/2 absorbs rounding
+        C *= 2
+        if C > 10 ** 5:                        # too large to screen
+            return None
     constant_mod = 0
     for d in denominators:
         constant_mod = (constant_mod + pow(d % P, P - 2, P)) % P
-    with localcontext() as context:
-        context.prec = 150
-        terms = [Decimal(1) / Decimal(d) for d in denominators]
-        constant = sum(terms, Decimal(0))
-        largest = max(abs(t) for t in terms)
-        if abs(constant) <= len(terms) * largest * Decimal(10) ** -140:
-            return None                        # too much cancellation to bound
-        log_constant = float(abs(constant).ln())
-    C = max(abs(Fraction(a, b)) for A, a, b in varying) + 1
-
-    def tail(C):          # upper bound for |sum of varying terms| / |constant| at |c| >= C
-        return sum(exp(-log_constant - log(abs(A)) - log(abs(b) * C - abs(a)))
-                   for A, a, b in varying)
-
-    while tail(C) >= 0.5:                      # the margin 1/2 absorbs rounding
-        C *= 2
     terms_mod = [(A % P, a % P, b % P) for A, a, b in varying]
 
     def test(c):
@@ -780,3 +834,517 @@ def _abbv_sample(R, data, orbit, zeta, lam):
         return total == 0
 
     return int(C) + 1, test
+
+
+def _restrict(orbits, J, *unknowns):
+    """the orbits of the closure X^J with the normal weights of the directions
+    in J; for each unknown (name, gamma) the orbit is marked BEYOND_R and its
+    normal weight in the direction gamma is put last, all other notes are
+    cleared"""
+    from dataclasses import replace
+    unknown = dict(unknowns)
+    restricted = []
+    for o in orbits:
+        if not set(o.roots) <= J:
+            continue
+        keep = [k for k, g in enumerate(o.normal_roots) if g in J]
+        note = ""
+        if o.name in unknown:
+            keep.sort(key=lambda k: o.normal_roots[k] == unknown[o.name])
+            note = BEYOND_R
+        restricted.append(replace(o, normal=tuple(o.normal[k] for k in keep),
+                                  normal_roots=tuple(o.normal_roots[k] for k in keep),
+                                  note=note))
+    return restricted
+
+
+def certify_by_closures(cartan_type, orbits, trials=3, seed=0, methods=None):
+    """certify all normal weights beyond (R) one at a time, on orbit closures.
+
+    The closure X^J of O_J is a smooth wonderful variety whose orbits are the
+    O_K, K c J, with the normal weights of the D_gamma, gamma in J - K. An
+    unknown (K, gamma), i.e. the normal weight of D_gamma on the marked orbit
+    O_K, is decided on a closure X^J, J > K + gamma, in which every other
+    normal weight is proved (condition (R)) or certified before:
+      * by certify_by_point_count, if the open orbit O_J has T-fixed points
+        (the smallest such J is used);
+      * if no unknown can be decided so, pairs of unknowns on different
+        orbits are decided jointly by the point count on the smallest such
+        closure containing both;
+      * failing that, on X^{K + gamma} by certify_normal_weights (ABBV).
+    This is repeated until no unknown is left. Returns
+    {(orbit, gamma): admissible c}; `methods`, if a dict, receives
+    {(orbit, gamma): (method, J)}. Values are used as certified only if they
+    are [0], so later steps assume c = 0 for the earlier ones."""
+    names = {o.name for o in orbits}
+    marked = {o.name for o in orbits if o.note == BEYOND_R}
+    with_points = {frozenset(o.roots) for o in orbits}
+    everything = set()
+    for o in orbits:
+        everything |= set(o.roots) | set(o.normal_roots)
+    pending = sorted((o.name, g) for o in orbits if o.name in marked for g in o.normal_roots)
+    roots_of = {o.name: set(o.roots) for o in orbits}
+    result = {}
+
+    def others_known(J, unknowns):
+        return all((o.name, g) in result or (o.name, g) in unknowns
+                   for o in orbits if o.name in marked and roots_of[o.name] <= J
+                   for g in o.normal_roots if g in J)
+
+    def smallest_closure(unknowns):
+        base = set()
+        for name, gamma in unknowns:
+            base |= roots_of[name] | {gamma}
+        rest = sorted(everything - base)
+        for size in range(len(rest) + 1):
+            for extra in combinations(rest, size):
+                J = base | set(extra)
+                if frozenset(J) in with_points and others_known(J, unknowns):
+                    return J
+        return None
+
+    def record(unknowns, admissible, method, J):
+        for name, gamma in unknowns:
+            result[(name, gamma)] = admissible[name]
+            if methods is not None:
+                methods[(name, gamma)] = (method, tuple(sorted(J)))
+
+    while pending:
+        progress = []
+        for unknown in pending:
+            J = smallest_closure([unknown])
+            if J is not None:
+                admissible, _ = certify_by_point_count(
+                    cartan_type, _restrict(orbits, J, unknown), trials, seed)
+                record([unknown], admissible, "point count", J)
+                progress.append(unknown)
+        if not progress:
+            for first, second in combinations(pending, 2):
+                if first[0] == second[0]:
+                    continue
+                J = smallest_closure([first, second])
+                if J is not None:
+                    admissible, _ = certify_by_point_count(
+                        cartan_type, _restrict(orbits, J, first, second), trials, seed)
+                    record([first, second], admissible, "joint point count", J)
+                    progress = [first, second]
+                    break
+        if not progress:
+            for unknown in pending:
+                name, gamma = unknown
+                base = roots_of[name] | {gamma}
+                if not others_known(base, [unknown]):
+                    continue
+                try:
+                    admissible, _ = certify_normal_weights(
+                        cartan_type, _restrict(orbits, base, unknown), trials, seed)
+                except ValueError as error:
+                    if "no usable evaluation point" not in str(error):
+                        raise
+                else:
+                    record([unknown], admissible, "ABBV", base)
+                    progress = [unknown]
+                    break
+        if not progress:
+            raise ValueError("no usable evaluation point for %s" % pending)
+        pending = [u for u in pending if u not in progress]
+    assert names >= {name for name, _ in result}
+    return result
+
+
+def _lattice_shift(normal, zeta):
+    """c0 in [0, 1) with {c : normal + c zeta integral} = c0 + Z (zeta primitive),
+    or None if that set is empty"""
+    # u with u.zeta = 1 by the extended Euclidean algorithm on the entries
+    g, u = 0, [0] * len(zeta)
+    for i, z in enumerate(zeta):
+        if z == 0:
+            continue
+        if g == 0:
+            g, u = abs(z), [0] * len(zeta)
+            u[i] = 1 if z > 0 else -1
+            continue
+        # combine g = u.zeta with z: x g + y z = gcd(g, z)
+        a, b, x0, x1, y0, y1 = g, z, 1, 0, 0, 1
+        while b:
+            q = a // b
+            a, b, x0, x1, y0, y1 = b, a - q * b, x1, x0 - q * x1, y1, y0 - q * y1
+        if a < 0:
+            a, x0, y0 = -a, -x0, -y0
+        u = [x0 * v for v in u]
+        u[i] += y0
+        g = a
+    if g != 1:
+        raise ValueError("zeta is not primitive")
+    c0 = -sum(Fraction(a) * b for a, b in zip(normal, u))
+    c0 -= c0.numerator // c0.denominator
+    if any((Fraction(a) + c0 * b).denominator != 1 for a, b in zip(normal, zeta)):
+        return None
+    return c0
+
+
+def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
+    """certify the unknown normal weights of the orbits marked BEYOND_R (one
+    or two orbits; each unknown is the last normal weight of its orbit) by the
+    point count of the variety assembled from `orbits` (an orbit closure X^J
+    whose open orbit O_J has T-fixed points).
+
+    With chi = normal + c zeta (normal the W_L-average, as in
+    certify_normal_weights), the number of lambda-positive weights at the
+    fixed point w x of a marked orbit is d_w + [a_w + c b_w > 0], with
+    a_w = <w(normal), lambda> and b_w = <w(zeta), lambda>. So the BB count is
+    P_lambda(c) = P_0 + sum_i F_i(c_i), each F_i constant between the
+    thresholds -a_w / b_w of its orbit. For the true c and lambda generic for
+    it, P_lambda(c) is the E-polynomial of X^J: |O_J| = |G/P_{S_J}|(q)
+    |L/H_L|(q) (Brion-Peyre) plus the count of the boundary (inclusion-
+    exclusion over the X^{J - S}, which do not see the unknowns), independent
+    of c. The boxes of intervals with the right count are found by matching
+    F_1 against the target minus F_2. The thresholds of each unknown are
+    checked to be disjoint across the samples, so for the true c at most one
+    sample per unknown is not generic; with more samples than unknowns some
+    sample decides. The weights lie in the root lattice (G adjoint), so c_i
+    is in c0_i + Z. Returns ({orbit name: sorted list of the admissible c_i},
+    the admissible tuples); raises if an admissible box is unbounded.
+    """
+    import random
+    from math import ceil, floor
+    from itertools import product
+    from bbcells.oracles import from_degrees, levi_degrees
+    from bbcells.core import bb_cells
+    R = RootSystem(cartan_type)
+    rng = random.Random(seed)
+    marked = [o for o in orbits if o.note == BEYOND_R]
+    if not 1 <= len(marked) <= 2 or not all(o.normal for o in marked):
+        raise ValueError("one or two orbits with an unknown normal weight (the last) "
+                         "are required")
+    trials = max(trials, len(marked) + 1)
+    zetas, shifts = [], []
+    for o in marked:
+        basis = invariant_basis(R, o.levi, list(o.generators) + list(o.component_reflections),
+                                o.component_elements)
+        if len(basis) != 1:
+            raise ValueError("orbit %s: %d invariant directions" % (o.name, len(basis)))
+        c0 = _lattice_shift(o.normal[-1], basis[0])
+        if c0 is None:
+            raise ValueError("no c puts the normal weight of %s in the root lattice" % o.name)
+        zetas.append(basis[0])
+        shifts.append(c0)
+    J = set()
+    for o in orbits:
+        J |= set(o.roots) | set(o.normal_roots)
+    top = [o for o in orbits if set(o.roots) == J]
+    if not top:
+        raise ValueError("the open orbit of the closure has no T-fixed points")
+    flag = from_degrees(R.degrees, levi_degrees(R.cartan, set(top[0].levi)))
+    expected = flag * satellite_point_count(cartan_type, top[0])
+    X = assemble(cartan_type, orbits)
+    for size in range(1, len(J) + 1):
+        for S in combinations(sorted(J), size):
+            term = IntPoly.from_counts(bb_cells(orbit_closure(X, J - set(S))).counts)
+            expected = expected + term if size % 2 else expected - term
+    grouped = {}
+    for label, weights in zip(X.points, X.weights):
+        a = X.annotation(label)
+        grouped.setdefault(a["orbit"], {})[a["word"]] = weights
+    data = [(o, grouped.get(o.name, {})) for o in orbits]
+    length = len(X.weights[0]) + 2
+    target = list(expected.coefficients) + [0] * (length - len(expected.coefficients))
+    if len(target) > length:
+        raise ValueError("the E-polynomial has too high a degree")
+    samples, seen = [], [set() for _ in marked]
+    attempts = 0
+    while len(samples) < trials:
+        attempts += 1
+        if attempts > 20 * trials:
+            raise ValueError("no generic cocharacters found")
+        lam = [rng.randrange(1, 10 ** 9) for _ in range(R.rank)]
+        pair = lambda w: sum(a * b for a, b in zip(w, lam))
+        counts = [0] * length                  # every unknown at -infinity
+        moving = [[] for _ in marked]          # (threshold, degree below, +1 or -1)
+        generic = True
+        for o, points in data:
+            i = next((k for k, m in enumerate(marked) if m is o), None)
+            for label, weights in points.items():
+                values = [pair(w) for w in weights]
+                if i is None:
+                    fixed, a, b = values, None, 0
+                else:
+                    fixed, a = values[:-1], values[-1]
+                    b = pair(R.apply_word(_word_from_label(label), zetas[i]))
+                if any(v == 0 for v in fixed) or (a == 0 and b == 0):
+                    generic = False
+                    break
+                d = sum(v > 0 for v in fixed)
+                if a is None or b == 0:
+                    counts[d + (a is not None and a > 0)] += 1
+                else:
+                    # at c -> -infinity the weight a + c b is positive iff b < 0
+                    counts[d + (b < 0)] += 1
+                    moving[i].append((Fraction(-a, b), d, 1 if b > 0 else -1))
+            if not generic:
+                break
+        if not generic:
+            continue
+        thresholds = [{t for t, _, _ in m} for m in moving]
+        if any(t & old for t, old in zip(thresholds, seen)):
+            continue
+        # the piecewise constant F_i: intervals and their (cumulative) values
+        pieces = []
+        for m in moving:
+            m.sort()
+            delta, low, k, piece = [0] * length, None, 0, []
+            while True:
+                high = m[k][0] if k < len(m) else None
+                piece.append(((low, high), tuple(delta)))
+                if high is None:
+                    break
+                while k < len(m) and m[k][0] == high:
+                    _, d, step = m[k]
+                    delta[d] -= step
+                    delta[d + 1] += step
+                    k += 1
+                low = high
+            pieces.append(piece)
+        rest = tuple(t - c for t, c in zip(target, counts))
+        if len(marked) == 1:
+            boxes = [(interval,) for interval, value in pieces[0] if value == rest]
+        else:
+            lookup = {}
+            for interval, value in pieces[1]:
+                lookup.setdefault(value, []).append(interval)
+            boxes = [(interval, other) for interval, value in pieces[0]
+                     for other in lookup.get(tuple(r - v for r, v in zip(rest, value)), ())]
+        samples.append((thresholds, boxes))
+        for old, t in zip(seen, thresholds):
+            old |= t
+
+    def inside(c, thresholds, boxes):
+        if any(x in t for x, t in zip(c, thresholds)):
+            return True                            # lambda is not generic for c
+        return any(all((lo is None or lo < x) and (hi is None or x < hi)
+                       for x, (lo, hi) in zip(c, box)) for box in boxes)
+
+    # the true c is in a box of every sample that is generic for it, and some is
+    candidates = set()
+    for _, boxes in samples:
+        for box in boxes:
+            if any(lo is None or hi is None for lo, hi in box):
+                raise ValueError("the point count admits unbounded c")
+            ranges = [[c0 + k for k in range(ceil(lo - c0), floor(hi - c0) + 1)]
+                      for (lo, hi), c0 in zip(box, shifts)]
+            size = 1
+            for r in ranges:
+                size *= len(r)
+            if size > 10 ** 6:
+                raise ValueError("an admissible box is too large")
+            candidates.update(product(*ranges))
+    admissible = sorted(c for c in candidates if all(inside(c, t, b) for t, b in samples))
+    clean = lambda x: int(x) if x.denominator == 1 else x
+    admissible = [tuple(clean(x) for x in c) for c in admissible]
+    return ({o.name: sorted({c[i] for c in admissible}) for i, o in enumerate(marked)},
+            admissible)
+
+
+def _moment_sample(R, data, orbit, zeta, lam, k):
+    """the ABBV identity for the class c_1(TX)^k (k < dim X):
+    I(c) = sum_p (S_p + b_p c)^k / (A_p (a_p + b_p c)) + (fixed terms) = 0.
+    Division gives I(c) = P(c) + sum_v (S_v - a_v)^k / (A_v (a_v + b_v c)), with
+    P a polynomial whose coefficients are exact sums; if P is provably nonzero
+    of degree d, then for |c| >= C, |P(c)| >= |p_d| |c|^d / 2 exceeds the
+    remainder. Returns (C, test) like _abbv_sample, or None."""
+    from decimal import Decimal, localcontext
+    P_ = (1 << 61) - 1
+    pair = lambda w: sum(a * b for a, b in zip(w, lam))
+    fixed, varying = [], []
+    for o, points in data:
+        for label, weights in points.items():
+            values = [pair(w) for w in weights]
+            total = sum(values)
+            if o is orbit:
+                A = 1
+                for v in values[:-1]:
+                    A *= v
+                a, b = values[-1], pair(R.apply_word(_word_from_label(label), zeta))
+                if b == 0:
+                    fixed.append((Fraction(total) ** k, A * a))
+                else:
+                    varying.append((A, a, b, total))
+            else:
+                e = 1
+                for v in values:
+                    e *= v
+                fixed.append((Fraction(total) ** k, e))
+    if not varying or any(e == 0 or e % P_ == 0 for _, e in fixed):
+        return None
+    if any(A == 0 or A % P_ == 0 or b % P_ == 0 for A, a, b, S in varying):
+        return None
+    # (S + b c)^k = (a + b c) Q(c) + (S - a)^k: Q by synthetic division in c
+    coefficient_terms = [[] for _ in range(max(k, 1))]      # coefficient of c^j in P
+    for numerator, e in fixed:
+        coefficient_terms[0].append(Fraction(numerator) / e)
+    remainders = []
+    from math import comb
+    for A, a, b, S in varying:
+        poly = [Fraction(comb(k, j) * S ** (k - j) * b ** j) for j in range(k + 1)]
+        quotient = [Fraction(0)] * k                           # degree k - 1
+        rest = poly[:]
+        for j in range(k, 0, -1):                              # divide by (b c + a)
+            q = rest[j] / b
+            quotient[j - 1] = q
+            rest[j] -= q * b
+            rest[j - 1] -= q * a
+        for j, q in enumerate(quotient):
+            if q:
+                coefficient_terms[j].append(q / A)
+        remainders.append((A, a, b, rest[0]))                  # rest[0] = (S - a)^k
+    signs = [_sum_sign(terms) for terms in coefficient_terms]
+    if any(s is None for s in signs):
+        return None
+    nonzero = [j for j, s in enumerate(signs) if s]
+    if not nonzero:
+        return None
+    d = max(nonzero)
+    with localcontext() as context:
+        context.prec = 150
+        dec = lambda x: Decimal(x.numerator) / Decimal(x.denominator)
+        coefficients = [abs(sum((dec(t) for t in terms), Decimal(0)))
+                        for terms in coefficient_terms]
+        lead = coefficients[d]
+
+        def lower(C):              # |P(c)| >= |c|^d (lead - sum_{j<d} |p_j| / C^(d-j))
+            return C ** d * (lead - sum(coefficients[j] / C ** (d - j) for j in range(d)))
+
+        def remainder(C):
+            return sum(abs(dec(Fraction(r))) / (abs(dec(Fraction(A))) *
+                                                (abs(b) * C - abs(a)))
+                       for A, a, b, r in remainders if r)
+
+        C = Decimal(int(max(abs(Fraction(a, b)) for A, a, b, r in remainders)) + 2)
+        while lower(C) <= 2 * remainder(C) or lower(C) <= 0:
+            C *= 2
+            if C > 10 ** 5:                    # too large to screen
+                return None
+    fixed_mod = 0
+    for numerator, e in fixed:
+        n = Fraction(numerator)
+        fixed_mod = (fixed_mod + n.numerator % P_ * pow(n.denominator * e % P_, P_ - 2, P_)) % P_
+    terms_mod = [(A % P_, a % P_, b % P_, S % P_) for A, a, b, S in varying]
+
+    def test(c):
+        total = fixed_mod
+        for A, a, b, S in terms_mod:
+            den = A * ((a + b * c) % P_) % P_
+            if den == 0:
+                return True
+            total = (total + pow((S + b * c) % P_, k, P_) * pow(den, P_ - 2, P_)) % P_
+        return total == 0
+
+    return int(C) + 1, test
+
+
+def stream_cell_counts(cartan_type, orbits, lam, progress=None):
+    """the BB cell counts c_d of the variety assembled from `orbits`, for the
+    cocharacter lam, without storing fixed points: every orbit's cosets are
+    enumerated level by level (coset_representatives' search, keeping one
+    length level of inverse permutations as bytes), and each representative
+    contributes the number of lam-positive weights among w(Phi - Phi_H) and
+    w(N). Raises if lam is not generic. When W_H is not generated by
+    reflections, the search runs over cosets of the reflection part and every
+    count is divided by |W_H : W_refl|."""
+    R = RootSystem(cartan_type)
+    roots, index, simple, positive = _root_table(R)
+    n = len(roots)
+    if n > 255:
+        raise ValueError("more than 255 roots")
+    pair = lambda w: sum(a * b for a, b in zip(w, lam))
+    root_sign = [pair(b) for b in roots]
+    if any(v == 0 for v in root_sign):
+        raise ValueError("lam is orthogonal to a root")
+    root_positive = bytes(1 if v > 0 else 0 for v in root_sign)
+    simple_index = [index[_unit_vector(i, R.rank)] for i in range(R.rank)]
+    simple_bytes = [bytes(s) for s in simple]
+    counts = {}
+    for orbit in orbits:
+        orbit_counts = {}
+        phi_sym = root_subsystem(R, orbit.generators)
+        reflections = sorted(phi_sym) + [tuple(b) for b in orbit.component_reflections]
+        phi_h, frontier = set(phi_sym), [tuple(b) for b in orbit.unipotent_roots]
+        while frontier:
+            beta = frontier.pop()
+            if beta in phi_h:
+                continue
+            phi_h.add(beta)
+            frontier.extend(_reflection(R, s, beta) for s in reflections)
+        complement = [index[b] for b in roots if b not in phi_h]
+        normal = [tuple(v) for v in orbit.normal]
+        in_h = frozenset(index[b] for b in root_subsystem(R, reflections)
+                         if b in set(R.positive_roots))
+        level = {bytes(range(n))}
+        total = 0
+        while level:
+            new = set()
+            for v in level:
+                w = bytearray(n)                           # w from w^{-1}
+                for k, image in enumerate(v):
+                    w[image] = k
+                d = sum(root_positive[w[k]] for k in complement)
+                if normal:
+                    columns = [roots[w[k]] for k in simple_index]  # w(alpha_i)
+                    for nu in normal:
+                        value = sum(c * pair(col) for c, col in zip(nu, columns) if c)
+                        if value == 0:
+                            raise ValueError("lam is not generic for %s" % orbit.name)
+                        d += value > 0
+                orbit_counts[d] = orbit_counts.get(d, 0) + 1
+                total += 1
+                for i in range(R.rank):
+                    image = v[simple_index[i]]
+                    if image not in positive or image in in_h:
+                        continue
+                    new.add(bytes(v[k] for k in simple_bytes[i]))
+            level = new
+        # every fixed point w.x is met once for each coset of W_refl in W_H
+        multiplicity = 1
+        if orbit.component_elements:
+            multiplicity = _component_group_order(R, reflections, orbit.component_elements)
+        for d, k in orbit_counts.items():
+            if k % multiplicity:
+                raise AssertionError("coset counts not divisible by |W_H : W_refl|")
+            counts[d] = counts.get(d, 0) + k // multiplicity
+        if progress:
+            progress(orbit.name, total // multiplicity)
+    top = max(counts)
+    return tuple(counts.get(d, 0) for d in range(top + 1))
+
+
+def _component_group_order(R, reflections, words):
+    """|W_H : W_refl| for W_H generated by W_refl and the given elements: the
+    size of the orbit of the identity coset under right multiplication"""
+    roots, index, simple, positive = _root_table(R)
+    positive_h = [b for b in root_subsystem(R, reflections) if b in set(R.positive_roots)]
+    h_indices = [index[b] for b in positive_h]
+    reflection = {b: tuple(index[_reflection(R, b, c)] for c in roots) for b in positive_h}
+    identity = tuple(range(len(roots)))
+    glue = []
+    for word in words:
+        C = identity
+        for i in reversed(word):
+            C = tuple(simple[i][k] for k in C)
+        glue.append(C)
+
+    def reduce(u):
+        while True:
+            bad = next((b for b, k in zip(positive_h, h_indices) if u[k] not in positive), None)
+            if bad is None:
+                return u
+            u = tuple(u[k] for k in reflection[bad])
+
+    orbit, stack = {identity}, [identity]
+    while stack:
+        U = stack.pop()
+        for C in glue:
+            V = reduce(tuple(U[k] for k in C))
+            if V not in orbit:
+                orbit.add(V)
+                stack.append(V)
+    return len(orbit)

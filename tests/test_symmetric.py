@@ -125,6 +125,40 @@ class TestNewCases(unittest.TestCase):
                     D.R.name, orbits, X, len(D.spherical_roots)).items():
                 self.assertEqual(bb, expected, (case, name))
 
+    def test_certificate_by_orbit_closures(self):
+        for case, expected in [(("AIII", 2, 3), {("O2", 0): [0]}), (("EIII",), {("O1", 1): [0]})]:
+            D = symmetric.diagram(*case)
+            self.assertEqual(spherical.certify_by_closures(D.R.name, D.orbits(strict=False)),
+                             expected)
+
+    def test_point_count_certificate(self):
+        # the single unknown of AIII(2,3): only c = 0 gives the E-polynomial
+        D = symmetric.diagram("AIII", 2, 3)
+        orbits = D.orbits(strict=False)
+        admissible, tuples = spherical.certify_by_point_count(D.R.name, orbits)
+        self.assertEqual((admissible, tuples), ({"O2": [0]}, [(0,)]))
+        # a wrong normal weight (c = 1) is excluded by the same count
+        from dataclasses import replace
+        R = D.R
+        (o,) = [o for o in orbits if o.note]
+        zeta, = spherical.invariant_basis(R, o.levi, list(o.generators), o.component_elements)
+        shifted = [replace(x, normal=(tuple(a + b for a, b in zip(x.normal[0], zeta)),))
+                   if x is o else x for x in orbits]
+        self.assertEqual(spherical.certify_by_point_count(R.name, shifted)[0], {"O2": [-1]})
+
+    def test_joint_certificate(self):
+        # AIII(3,4): (O3, 1) alone, then (O3, 0) and (O23, 0) jointly on X
+        D = symmetric.diagram("AIII", 3, 4)
+        methods = {}
+        result = spherical.certify_by_closures(D.R.name, D.orbits(strict=False), methods=methods)
+        self.assertEqual(result, {("O3", 1): [0], ("O3", 0): [0], ("O23", 0): [0]})
+        self.assertEqual(methods[("O3", 0)], ("joint point count", (0, 1, 2)))
+
+    def test_streaming_counts(self):
+        for case in [("AI", 4), ("CI", 3), ("G",), ("AIII", 2, 2), ("AIII", 2, 3), ("DIII", 4)]:
+            X = symmetric.complete_symmetric_variety(*case, certify=False)
+            self.assertEqual(symmetric.cell_counts(*case), bb_cells(X).counts, case)
+
     def test_uncertified_cases_are_checked(self):
         X = symmetric.complete_symmetric_variety("EIII", certify=False)
         self.assertTrue(any(a.get("note") == spherical.BEYOND_R for a in X.annotations))

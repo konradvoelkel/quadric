@@ -98,6 +98,27 @@ def _data_spherical(args):
     return getattr(spherical, SPHERICAL[args.family])(args.n)
 
 
+def _run_symmetric_counts(args):
+    import json
+    from bbcells.frontends import symmetric
+    from bbcells.invariants import Invariants
+    counts = symmetric.cell_counts(args.kind, *args.parameters)
+    inv = Invariants(len(counts) - 1, counts)
+    if args.format == "json":
+        print(json.dumps({"name": "complete symmetric variety %s%s" % (args.kind, tuple(args.parameters)),
+                          "dim": inv.dim, "counts": list(counts),
+                          "gw_euler": {"plus": inv.gw_euler.plus, "minus": inv.gw_euler.minus}},
+                         indent=1))
+        return 0
+    print("complete symmetric variety %s %s (dimension %d, %d fixed points; counts only)"
+          % (args.kind, " ".join(map(str, args.parameters)), inv.dim, sum(counts)))
+    print("Poincare polynomial: %s" % inv.poincare.format("t"))
+    print("class in K_0(Var): %s" % inv.k0_class.format("L"))
+    gw = inv.gw_euler
+    print("chi^A1 in GW: %s  (rank %d, signature %d = chi(X(R)))" % (gw, gw.rank, gw.signature))
+    return 0
+
+
 def _data_symmetric(args):
     from bbcells.frontends import symmetric
     if args.fan is None:
@@ -244,6 +265,8 @@ def build_parser():
     p.add_argument("--fan", help="JSON {\"cones\": [...]}: a smooth fan subdividing the valuation "
                    "cone, rays in the coordinates <gamma_i, n> (all <= 0); gives the toroidal "
                    "variety over the complete symmetric variety")
+    p.add_argument("--counts-only", action="store_true",
+                   help="stream the cell counts without listing fixed points (large E7/E8 cases)")
     _add_common(p)
     p.set_defaults(build=_data_symmetric)
 
@@ -277,6 +300,8 @@ def main(argv=None):
     try:
         if hasattr(args, "run"):
             return args.run(args)
+        if getattr(args, "counts_only", False):
+            return _run_symmetric_counts(args)
         data = args.build(args)
         cells = bb_cells(data, args.cocharacter)
     except (ValueError, OSError) as error:

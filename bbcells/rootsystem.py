@@ -196,6 +196,16 @@ class RootSystem(object):
         return tuple(sum(b * self.cartan[j][i] for i, b in enumerate(beta))
                      for j in range(self.rank))
 
+    def fundamental_weight(self, i):
+        """omega_i (0-based) in simple-root coordinates, as Fractions
+        >>> RootSystem("A2").fundamental_weight(0)
+        (Fraction(2, 3), Fraction(1, 3))
+        """
+        from bbcells.linalg import inverse
+        A = [[Fraction(self.cartan[k][j]) for j in range(self.rank)] for k in range(self.rank)]
+        inv = inverse(A)                  # root coordinates -> weight coordinates is A
+        return tuple(inv[k][i] for k in range(self.rank))
+
     def orbit(self, levi, limit=None):
         """the orbit W.omega_I with omega_I = sum of the fundamental weights not
         in levi (0-based). Returns a list of (mu, word) sorted by length, where

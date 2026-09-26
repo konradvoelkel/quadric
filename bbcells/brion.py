@@ -162,3 +162,140 @@ def ring_dimension(data, components, degree):
             add_rows(coefficients, restrict)
             add_rows(coefficients, lambda f, chi=chi, j=j: _derivative(f, j).restrict_to_hyperplane(chi))
     return len(index) - (rank(rows) if rows else 0)
+
+
+def _proportional_rows(chi):
+    """rows of the linear conditions 'v is a multiple of chi'"""
+    r = len(chi)
+    rows = []
+    for i in range(r):
+        for j in range(i + 1, r):
+            v = [0] * r
+            v[i], v[j] = chi[j], -chi[i]
+            if any(v):
+                rows.append(v)
+    return rows
+
+
+def degree_one_class(data, components, prescribed):
+    """the degree-one class (f_p) of the ring (a character f_p at every fixed
+    point, as a tuple of Fractions) with f_p = prescribed[p] for the given
+    points. Conditions: f_p - f_q is a multiple of chi along every component,
+    and sum_p f_p / k_p = 0 on every surface (a linear form divisible by chi^2
+    vanishes). The values are propagated: an unknown point whose components to
+    known points determine it (a small linear system of full rank) is solved
+    first. At the end every condition is verified. Raises unless the class
+    exists and is determined by the prescribed values."""
+    from bbcells.linalg import solve
+    r = data.rank
+    weights_of = dict(zip(data.points, data.weights))
+    values = {p: tuple(Fraction(x) for x in v) for p, v in prescribed.items()}
+    at = {p: [] for p in data.points}
+    surface_coefficients = {}
+    for index, (chi, points, kind) in enumerate(components):
+        for p in points:
+            at[p].append(index)
+        if kind in ("plane", "ruled"):
+            coefficients = {}
+            for p in points:
+                along = [w for w in weights_of[p] if _multiple(w, chi) is not None]
+                coefficients[p] = Fraction(1, _multiple(along[0], chi) * _multiple(along[1], chi))
+            surface_coefficients[index] = coefficients
+    rows_of = {}
+
+    def rows(chi):
+        if chi not in rows_of:
+            rows_of[chi] = _proportional_rows(chi)
+        return rows_of[chi]
+
+    progress = True
+    while progress and len(values) < len(data.points):
+        progress = False
+        for q in data.points:
+            if q in values:
+                continue
+            A, b = [], []
+            for index in at[q]:
+                chi, points, kind = components[index]
+                for p in points:
+                    if p != q and p in values:
+                        for row in rows(chi):       # row . (f_q - f_p) = 0
+                            A.append(list(row))
+                            b.append(sum(x * y for x, y in zip(row, values[p])))
+                coefficients = surface_coefficients.get(index)
+                if coefficients and all(p in values for p in points if p != q):
+                    for i in range(r):              # sum_p c_p f_p = 0, coordinate i
+                        A.append([coefficients[q] if j == i else 0 for j in range(r)])
+                        b.append(-sum(coefficients[p] * values[p][i]
+                                      for p in points if p != q))
+            if A and rank(A) == r:
+                solution = solve(A, b)
+                if solution is None:
+                    raise ValueError("no class with these values (at %r)" % (q,))
+                values[q] = tuple(Fraction(x) for x in solution)
+                progress = True
+    if len(values) < len(data.points):
+        raise ValueError("the prescribed values do not determine the class")
+    for index, (chi, points, kind) in enumerate(components):     # verify everything
+        for q in points[1:]:
+            difference = [x - y for x, y in zip(values[q], values[points[0]])]
+            if any(sum(a * d for a, d in zip(row, difference)) for row in rows(chi)):
+                raise ValueError("no class with these values (along %r)" % (chi,))
+        coefficients = surface_coefficients.get(index)
+        if coefficients:
+            for i in range(r):
+                if sum(c * values[p][i] for p, c in coefficients.items()):
+                    raise ValueError("no class with these values (surface %r)" % (chi,))
+    return values
+
+
+def integrate_monomial(data, classes, exponents, lam):
+    """ABBV: the integral of prod_i c_i^{e_i} over X, for degree-one classes
+    c_i ({point: character}) with sum e_i = dim X, evaluated at lambda (the
+    result does not depend on lambda)"""
+    pair = lambda w: sum(Fraction(a) * b for a, b in zip(w, lam))
+    total = Fraction(0)
+    for p, weights in zip(data.points, data.weights):
+        numerator = Fraction(1)
+        for c, e in zip(classes, exponents):
+            numerator *= pair(c[p]) ** e
+        denominator = Fraction(1)
+        for w in weights:
+            denominator *= pair(w)
+        total += numerator / denominator
+    return total
+
+
+def line_bundle_class(data, components, cartan_type, weight, orbit="closed"):
+    """the equivariant first Chern class of the G-linearized line bundle whose
+    fibre at the base point z of the closed orbit (the B-fixed point, labelled
+    '<orbit>:e' by spherical.assemble) has T-weight `weight` (simple-root
+    coordinates, Fractions allowed): it is w(weight) at w.z, and is extended to
+    all fixed points by degree_one_class. For the colour of a wonderful
+    variety with B-weight omega_D the weight is -omega_D (O(1) on a projective
+    space has weight -lambda at a line of weight lambda); for complete quadrics
+    the colours are the pullbacks mu_k of O(1) from P(Sym^2 Lambda^k V), with
+    omega_D = 2 omega_k.
+    >>> from bbcells.frontends.spherical import complete_quadrics
+    >>> from bbcells.rootsystem import RootSystem
+    >>> X = complete_quadrics(3)
+    >>> components = fixed_components(X)
+    >>> R = RootSystem("A2")
+    >>> mu, nu = (line_bundle_class(X, components, "A2",
+    ...           tuple(-2 * x for x in R.fundamental_weight(k))) for k in (0, 1))
+    >>> tangency = {p: tuple(2 * a + 2 * b for a, b in zip(mu[p], nu[p])) for p in X.points}
+    >>> integrate_monomial(X, [tangency], [5], (3, 7))           # Chasles: 3264 conics
+    Fraction(3264, 1)
+    """
+    from bbcells.frontends.spherical import _word_from_label
+    from bbcells.rootsystem import RootSystem
+    R = RootSystem(cartan_type)
+    prescribed = {}
+    for p in data.points:
+        annotation = data.annotation(p)
+        if annotation.get("orbit") == orbit:
+            word = _word_from_label(annotation["word"])
+            prescribed[p] = R.apply_word(word, tuple(weight))
+    if not prescribed:
+        raise ValueError("no fixed points in the orbit %r" % (orbit,))
+    return degree_one_class(data, components, prescribed)

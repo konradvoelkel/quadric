@@ -420,15 +420,24 @@ prints usage.
 - [ ] **S7.1 General Luna data**: colour calculus, Levi-part step, a table of
   full-rank wonderful reductive subgroups; normal weights beyond (R) from
   colour coefficients or the certificate.
-- [ ] **S7.2 Joint certificate** for several unknowns, and a full proof of the
-  Hermitian case.
-- [ ] **S7.3 Schubert calculus beyond GKM**: flow-up classes and structure
-  constants on Brion components; the oracle is DGMP 1988 for complete
-  quadrics.
+- [x] **S7.2 Joint certificate** (`docs/S6d.md` §6). Point counts of orbit
+  closures against Brion–Peyre, for one unknown or two on different orbits,
+  by induction over closures. *(Done: $c=0$ is certified for every Hermitian
+  case tested, including AIII(3,4) and DIII(7) with their joint steps. Still
+  open: two unknowns on one orbit, closures whose open orbit has no fixed
+  points, and a full proof of the proposition's Hermitian case.)*
+- [ ] **S7.3 Schubert calculus beyond GKM**.
+  - [x] S7.3a Characteristic numbers: degree-one classes on Brion
+    components, colours of complete quadrics, ABBV integration
+    (`docs/S6d.md` §9). *(Done: 3264, 666841088, 48942189946470400 and the
+    ML degrees $\varphi(n,d)$ are reproduced.)*
+  - [ ] S7.3b Flow-up classes and structure constants on Brion components;
+    the oracle is DGMP 1988 for complete quadrics.
 - [ ] **S7.4 Toroidal $X$ with $\Lambda\supsetneq\mathbb Z\Sigma$** (finite covers).
 - [ ] **S7.5 Real incidences for non-GKM varieties** (M5 beyond GKM).
-- [ ] **S7.6 Cell counts without listing fixed points**, for $E_7$/$E_8$ with
-  $\chi\gtrsim10^6$.
+- [x] **S7.6 Cell counts without listing fixed points** (`docs/S6d.md` §11).
+  *(Done for $E_7$: EII, EI, EVI (758079 fixed points, 48 s) and EVII.
+  EVIII needs a compiled inner loop.)*
 
 ---
 

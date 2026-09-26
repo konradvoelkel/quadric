@@ -267,6 +267,30 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   geometry of quadrics and their degenerations*, Comment. Math. Helv. 63
   (1988). The oracle for S7.3.
 
+**Characteristic numbers of complete quadrics (oracles for S7.3a)**
+
+- ✓a B. Sturmfels, C. Uhler, *Multivariate Gaussians, semidefinite matrix
+  completion, and convex algebraic geometry*, Ann. Inst. Statist. Math.;
+  arXiv:0906.3529. The table after Thm 2.3 (§2.2) gives the ML
+  degrees $\varphi(n,d)$ of generic linear concentration models for
+  $n\le6$; the symmetry $\varphi(n,d)=\varphi(n,\binom{n+1}2+1-d)$ is Eq. (12).
+  `tests/test_brion.py` and `docs/S6d.md` §9 reproduce the rows.
+- ✓a L. Manivel, M. Michałek, L. Monin, T. Seynnaeve, M. Vodička, *Complete
+  quadrics: Schubert calculus for Gaussian models and semidefinite
+  programming*, arXiv:2011.08791. Prop. 3.5:
+  $\varphi(n,d)=\int\mu_1^{\binom{n+1}2-d}\mu_{n-1}^{d-1}$ on complete
+  quadrics.
+- ✓a T. Brysiewicz, C. Fevola, B. Sturmfels, *Tangent quadrics in real
+  3-space*, arXiv:2010.10879. Schubert's triangle of characteristic numbers
+  $\mu^a\nu^b\rho^c$ of complete quadric surfaces, e.g. 104 and 128.
+- ✓ B. Sturmfels, *3264 questions about symmetric matrices*, notes for the
+  MPI Leipzig study groups (2020). Question 5 lists 3264, 666841088,
+  48942189946470400, 641211464734373953791690014720 as the numbers of
+  quadrics in $\mathbb P^{n-1}$ tangent to $\binom{n+1}2-1$ general quadrics.
+  Our first three agree. For $n=6$ both our computation and an independent
+  evaluation of Brion's degree formula give 1810718299257984458113941504
+  (`docs/S6d.md` §9). The discrepancy is unresolved.
+
 **General smooth projective spherical varieties**
 
 - ✓a M. Brion, *Equivariant cohomology and equivariant intersection theory*,

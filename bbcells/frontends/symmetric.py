@@ -201,25 +201,29 @@ class SatakeDiagram(object):
 
     def fixed_point_data(self, strict=False, certify=True):
         """the fixed-point data. Orbits beyond condition (R) (Hermitian
-        satellites) get the W_L-average as normal weights; this is certified
-        by spherical.certify_normal_weights when there is a single unknown
-        (the orbits are then marked CERTIFIED), and otherwise accepted only if
-        the result passes all checks (cocharacter independence, holomorphic
-        Lefschetz, Poincare duality)."""
+        satellites) get the W_L-average as normal weights. This is certified
+        by spherical.certify_by_closures when the point counts (or the
+        localization identities) of orbit closures bound the unknowns (the
+        orbits are then marked CERTIFIED), and
+        otherwise accepted only if the result passes all checks (cocharacter
+        independence, holomorphic Lefschetz, Poincare duality)."""
         from dataclasses import replace
         orbits = self.orbits(strict)
         if any(orbit.note for orbit in orbits):
             certified = False
             if certify:
                 try:
-                    admissible, _ = spherical.certify_normal_weights(self.R.name, orbits)
-                    certified = all(values == [0] for values in admissible.values())
-                    if not certified:
-                        raise ValueError("the ABBV identity admits %r: the W_L-average is "
-                                         "not the normal weight" % (admissible,))
+                    admissible = spherical.certify_by_closures(self.R.name, orbits)
                 except ValueError as error:
-                    if "only a single unknown" not in str(error):
+                    if not any(text in str(error) for text in (
+                            "no usable evaluation point", "unbounded", "too large",
+                            "no generic cocharacters")):
                         raise
+                else:
+                    if any(values != [0] for values in admissible.values()):
+                        raise ValueError("the localization identities admit %r: the "
+                                         "W_L-average is not the normal weight" % (admissible,))
+                    certified = True
             if certified:
                 orbits = [replace(o, note=CERTIFIED) if o.note else o for o in orbits]
         X = spherical.assemble(self.R.name, orbits,
@@ -233,7 +237,8 @@ class SatakeDiagram(object):
         return X
 
 
-CERTIFIED = "normal weights beyond condition (R), certified by the ABBV identity"
+CERTIFIED = ("normal weights beyond condition (R), certified by point counts of orbit "
+             "closures")
 
 
 class _NotEqualRank(Exception):
@@ -413,6 +418,27 @@ def diagram(kind, *parameters):
         cartan_type, black, arrows = exceptional[kind]
         return SatakeDiagram(cartan_type, black=black, arrows=arrows, name=name)
     raise ValueError("unknown real form %r" % kind)
+
+
+def cell_counts(kind, *parameters, seed=0):
+    """the BB cell counts of the complete symmetric variety without listing
+    its fixed points (spherical.stream_cell_counts), for two pseudo-random
+    cocharacters; raises unless they agree and are palindromic. Orbits beyond
+    condition (R) use the W_L-average (not certified here).
+    >>> cell_counts("AI", 3)                            # complete conics
+    (1, 2, 3, 3, 2, 1)
+    """
+    import random
+    D = diagram(kind, *parameters)
+    orbits = D.orbits(strict=False)
+    rng = random.Random(seed)
+    results = []
+    for _ in range(2):
+        lam = [rng.randrange(1, 10 ** 9) for _ in range(D.R.rank)]
+        results.append(spherical.stream_cell_counts(D.R.name, orbits, lam))
+    if results[0] != results[1] or results[0] != results[0][::-1]:
+        raise ValueError("inconsistent cell counts: %r / %r" % tuple(results))
+    return results[0]
 
 
 def complete_symmetric_variety(kind, *parameters, strict=False, certify=True):
