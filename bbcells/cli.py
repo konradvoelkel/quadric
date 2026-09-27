@@ -212,6 +212,11 @@ def _add_common(parser):
 
 
 def build_parser():
+    """the argparse parser of the command line, one subcommand per front end
+    >>> args = build_parser().parse_args(["flag", "E6", "--parabolic", "1"])
+    >>> args.command, args.cartan_type, args.parabolic, args.format
+    ('flag', 'E6', (1,), 'text')
+    """
     parser = argparse.ArgumentParser(
         prog="bbcells",
         description="Bialynicki-Birula cells, motives and quadratic invariants "
@@ -292,6 +297,15 @@ def build_parser():
 
 
 def main(argv=None):
+    """run the command line on argv (default: sys.argv[1:]); returns the exit
+    status, 2 on invalid input. The quadric surface Q_2 = P^1 x P^1:
+    >>> main(["quadric", "2", "--no-check"])                  # doctest: +ELLIPSIS
+    Q_2 (dimension 2, torus rank 2, 4 fixed points)
+    ...
+    Poincare polynomial: 1 + 2t^2 + t^4
+    ...
+    0
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
     if args.command is None:

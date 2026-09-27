@@ -93,18 +93,33 @@ def _edges(R, orbit, points, weights):
 
 
 def grassmannian(k, n):
-    """Gr(k, n) = SL_n / P_k"""
+    """Gr(k, n) = SL_n / P_k
+    >>> from bbcells.core import bb_cells
+    >>> bb_cells(grassmannian(2, 4)).counts                  # Gaussian binomial [4 choose 2]
+    (1, 1, 2, 1, 1)
+    """
     if not 0 < k < n:
         raise ValueError("need 0 < k < n")
     return flag_variety("A%d" % (n - 1), crossed={k}, name="Gr(%d,%d)" % (k, n))
 
 
 def full_flags(cartan_type):
+    """G/B, the same as flag_variety(cartan_type)
+    >>> from bbcells.core import bb_cells
+    >>> X = full_flags("A2")                                 # complete flags in k^3
+    >>> X.name, bb_cells(X).counts
+    ('A2/B', (1, 2, 2, 1))
+    """
     return flag_variety(cartan_type)
 
 
 def isotropic_grassmannian(k, n):
-    """isotropic k-planes for a symplectic form on k^{2n}: Sp_{2n} / P_k"""
+    """isotropic k-planes for a symplectic form on k^{2n}: Sp_{2n} / P_k
+    >>> from bbcells.core import bb_cells
+    >>> X = isotropic_grassmannian(2, 2)                    # Lagrangian planes: Q_3
+    >>> X.name, bb_cells(X).counts
+    ('IG(2,4)', (1, 1, 1, 1))
+    """
     if not 0 < k <= n:
         raise ValueError("need 0 < k <= n")
     letter = "C%d" % n if n >= 2 else "A1"

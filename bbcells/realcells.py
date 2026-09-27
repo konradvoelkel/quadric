@@ -47,6 +47,12 @@ class RealCellComplex(object):
     Vassiliev's cochain complex, graded by codimension: the coboundary of a
     cell of codimension c is sum_y [x, y] y over cells y of codimension c + 1.
     Its cohomology is H^*(X(R); Z); homology follows by universal coefficients.
+    With convention="cellular", the incidences are those of the cellular
+    boundary instead, graded by dimension: here RP^2 with d e2 = 2 e1.
+    >>> RP2 = RealCellComplex("RP^2", {"e0": 0, "e1": 1, "e2": 2}, {("e2", "e1"): 2},
+    ...                       signed=True, convention="cellular")
+    >>> RP2.homology(), RP2.euler_characteristic()
+    ([(1, []), (0, [2]), (0, [])], 1)
     """
     name: str
     dims: dict
@@ -146,7 +152,12 @@ def _adjacent_pairs(data):
 
 
 def kocherlakota_incidences(cartan_type, crossed=None):
-    """{(x, y): 0 or 2} for adjacent real Schubert cells of G/P (unsigned)"""
+    """{(x, y): 0 or 2} for adjacent real Schubert cells of G/P (unsigned),
+    returned with the fixed-point data; for RP^2, d e^2 = 2 e^1 and d e^1 = 0
+    >>> data, incidences = kocherlakota_incidences("A2", {1})
+    >>> incidences
+    {('s1', 'e'): 0, ('s2.s1', 's1'): 2}
+    """
     R = RootSystem(cartan_type)
     data = flag_variety(cartan_type, crossed)
     sigma = {p: _sigma(R, data.annotation(p)["weight"]) for p in data.points}
@@ -193,7 +204,11 @@ def _permutation(word, n):
 
 def ordered_set_partition(word, n, blocks):
     """I as a function [n] -> [m]: I(w(k)) = block of k, for the coordinate flag
-    w E_. (blocks: the partial sums s_1 < ... < s_m = n)"""
+    w E_. (blocks: the partial sums s_1 < ... < s_m = n). The fixed points e
+    and s2.s1 of P^2 are the coordinate lines of e_1 and e_3:
+    >>> ordered_set_partition((), 3, [1, 3]), ordered_set_partition((2, 1), 3, [1, 3])
+    ({1: 1, 2: 2, 3: 2}, {3: 1, 1: 2, 2: 2})
+    """
     w = _permutation(word, n)
     block_of = {}
     start = 0
@@ -205,7 +220,11 @@ def ordered_set_partition(word, n, blocks):
 
 
 def osp_length(I):
-    """l(I) = #{(a, b): a > b, I(a) < I(b)}"""
+    """l(I) = #{(a, b): a > b, I(a) < I(b)}; the lines e_1 and e_3 of P^2 (see
+    ordered_set_partition) lie in the cells of dimension 0 and 2
+    >>> osp_length({1: 1, 2: 2, 3: 2}), osp_length({3: 1, 1: 2, 2: 2})
+    (0, 2)
+    """
     return sum(1 for a in I for b in I if a > b and I[a] < I[b])
 
 
@@ -264,14 +283,29 @@ def matszangosz_sign_exponent(I, J):
 
 def matszangosz_incidence(I, J):
     """[Omega_I, Omega_J] for adjacent I, J (l(J) = l(I) - 1) in type A with
-    lexicographic coorientations: 0 if N_I(a, b) is even, else (-1)^s 2"""
+    lexicographic coorientations: 0 if N_I(a, b) is even, else (-1)^s 2.
+    The two examples of matszangosz_N and matszangosz_sign_exponent:
+    >>> I = {3: 1, 6: 1, 1: 2, 4: 2, 2: 3, 5: 3}                    # [36, 14, 25]
+    >>> J = {2: 1, 6: 1, 1: 2, 4: 2, 3: 3, 5: 3}                    # [26, 14, 35]
+    >>> matszangosz_incidence(I, J)                                  # N_I(a, b) = 3
+    2
+    >>> one_line = lambda seq: {v: k for k, v in enumerate(seq, start=1)}
+    >>> I, J = one_line((4, 5, 6, 1, 2, 3)), one_line((4, 2, 6, 1, 5, 3))
+    >>> matszangosz_incidence(I, J)                                  # N_I(a, b) = 2
+    0
+    """
     if matszangosz_N(I, J) % 2 == 0:
         return 0
     return 2 * (-1) ** matszangosz_sign_exponent(I, J)
 
 
 def type_a_signed(cartan_type, crossed=None):
-    """signed real cell complex of a type A partial flag variety"""
+    """signed real cell complex of a type A partial flag variety (cooriented
+    convention); for RP^2 the 2 sits between the 1-cell and the point
+    >>> X = type_a_signed("A2", {1})
+    >>> X.incidences, X.cohomology()
+    ({('s1', 'e'): -2, ('s2.s1', 's1'): 0}, [(1, []), (0, []), (0, [2])])
+    """
     R = RootSystem(cartan_type)
     if R.letter != "A":
         raise ValueError("signed incidences are implemented for type A only")
@@ -295,7 +329,12 @@ def type_a_signed(cartan_type, crossed=None):
 def positive_weight_sum(cells, p):
     """sigma(p): the sum of the lambda-positive tangent weights at p, i.e. the
     weight of det T_p(plus-cell). For G/P and dominant lambda it is
-    Kocherlakota's sigma(x)."""
+    Kocherlakota's sigma(x): 0 for the point, 2 rho for the open cell of G/B
+    >>> from bbcells.core import bb_cells
+    >>> cells = bb_cells(flag_variety("A2"))
+    >>> [positive_weight_sum(cells, p) for p in ("e", "s1", "s1.s2.s1")]
+    [(0, 0), (1, 0), (2, 2)]
+    """
     from bbcells.core import pairing
     rank = cells.data.rank
     total = [0] * rank
@@ -310,7 +349,12 @@ def gkm_incidences(cells):
     dimension, dim x = dim y + 1, where sigma(x) - sigma(y) = m phi with phi
     the weight of the curve at x; magnitude 2 if m is even, 0 if odd, None if
     sigma(x) - sigma(y) is not a multiple of phi. Conjecturally these are the
-    unsigned incidences of the cellular chain complex of X(R) (docs/real.md)."""
+    unsigned incidences of the cellular chain complex of X(R) (docs/real.md).
+    For RP^2 they are Kocherlakota's (see kocherlakota_incidences):
+    >>> from bbcells.core import bb_cells
+    >>> gkm_incidences(bb_cells(flag_variety("A2", {1})))
+    {('s1', 'e'): (1, 0), ('s2.s1', 's1'): (2, 2)}
+    """
     from bbcells.core import pairing
     data = cells.data
     result = {}
@@ -335,7 +379,12 @@ def signed_completions(cells, incidences, limit=4096):
     """sign choices for the nonzero unsigned incidences making a chain
     complex (boundary o boundary = 0), up to the gauge of flipping cell
     orientations. Yields dicts {(x, y): +-2}. Exhaustive, so only for small
-    examples."""
+    examples.
+    >>> from bbcells.core import bb_cells
+    >>> cells = bb_cells(flag_variety("A2", {1}))                   # RP^2
+    >>> list(signed_completions(cells, gkm_incidences(cells)))
+    [{('s2.s1', 's1'): 2}]
+    """
     import itertools
     nonzero = sorted(k for k, (m, mag) in incidences.items() if mag)
     # fix a spanning forest's signs to + (gauge), enumerate the rest
@@ -380,7 +429,12 @@ def _square_zero_cellular(signed, dims):
 
 def cellular_rational_betti(dims, signed):
     """rational Betti numbers of the cellular chain complex with boundary
-    coefficients signed[(x, y)] (dim x = dim y + 1)"""
+    coefficients signed[(x, y)] (dim x = dim y + 1): RP^2, and the same
+    cells with zero boundary
+    >>> dims = {"e0": 0, "e1": 1, "e2": 2}
+    >>> cellular_rational_betti(dims, {("e2", "e1"): 2}), cellular_rational_betti(dims, {})
+    ([1, 0, 0], [1, 1, 1])
+    """
     from bbcells.linalg import rank as matrix_rank
     top = max(dims.values())
     cells_of = {d: sorted((p for p, e in dims.items() if e == d), key=str) for d in range(top + 1)}
@@ -448,7 +502,16 @@ def signs_from_square_zero(dims, magnitudes):
     with exactly two nonzero paths give linear equations over F_2 for the
     sign exponents. Returns (signed incidences, unique_up_to_reorientation).
     Raises ValueError if the conditions are inconsistent or not linear
-    (more than two paths)."""
+    (more than two paths). For Gr_2(R^4) one square of incidences needs an odd
+    number of minus signs; the rational Poincare polynomial is 1 + t^4:
+    >>> data, magnitudes = kocherlakota_incidences("A3", {2})
+    >>> dims = {p: data.annotation(p)["length"] for p in data.points}
+    >>> signed, unique = signs_from_square_zero(dims, magnitudes)
+    >>> sorted(signed.values()), unique
+    ([-2, 2, 2, 2], True)
+    >>> cellular_rational_betti(dims, signed)
+    [1, 0, 0, 0, 1]
+    """
     edges = sorted(k for k, v in magnitudes.items() if v)
     index = {e: i for i, e in enumerate(edges)}
     down = {}
@@ -491,7 +554,13 @@ def signs_from_square_zero(dims, magnitudes):
 
 def sign_choices(dims, magnitudes):
     """all sign assignments with d o d = 0, one per class modulo
-    reorientation of cells: a list of 2^k signed incidence dicts"""
+    reorientation of cells: a list of 2^k signed incidence dicts. For
+    Sp_6/B one sign is left free:
+    >>> data, magnitudes = kocherlakota_incidences("C3")
+    >>> dims = {p: data.annotation(p)["length"] for p in data.points}
+    >>> len(sign_choices(dims, magnitudes))
+    2
+    """
     edges = sorted(k for k, v in magnitudes.items() if v)
     index = {e: i for i, e in enumerate(edges)}
     signed, unique = signs_from_square_zero(dims, magnitudes)
@@ -541,7 +610,15 @@ def cellular_real_flag_variety(cartan_type, crossed=None, max_choices=256):
     magnitudes, with signs from d o d = 0. When d o d = 0 leaves k free signs
     beyond reorienting cells, all 2^k choices are tried; the result is
     returned only if their integral homology agrees (then it is the homology
-    of G/P(R), since the true signs are among the choices)."""
+    of G/P(R), since the true signs are among the choices). (B_2/B)(R) =
+    (SO(2) x SO(3))/M has the rational cohomology of SO(2) x SO(3):
+    >>> cellular_real_flag_variety("B2").rational_betti()
+    [1, 1, 0, 1, 1]
+    >>> cellular_real_flag_variety("C3")
+    Traceback (most recent call last):
+    ...
+    ValueError: the 2 sign choices allowed by d o d = 0 give different homology
+    """
     data, magnitudes = kocherlakota_incidences(cartan_type, crossed)
     dims = {p: data.annotation(p)["length"] for p in data.points}
     choices = sign_choices(dims, magnitudes)
@@ -566,7 +643,12 @@ def rabelo_san_martin(cartan_type, crossed=None, realization=None):
     where Psi_{w'} is the parametrization by the deleted word. The degree is
     the orientation of the deleted word's tangent frame at the common point
     n_{w'} b_0 relative to the frame of w's fixed word (Tits lifts satisfy the
-    braid relations, and the composite is a diffeomorphism of the open cube)."""
+    braid relations, and the composite is a diffeomorphism of the open cube).
+    >>> rabelo_san_martin("A2", {1}).homology()                     # RP^2: Z, Z/2, 0
+    [(1, []), (0, [2]), (0, [])]
+    >>> rabelo_san_martin("B2").rational_betti()                    # as SO(2) x SO(3)
+    [1, 1, 0, 1, 1]
+    """
     from bbcells.chevalley import Lifts
     from bbcells.liealgebra import ClassicalRealization
     R = RootSystem(cartan_type)

@@ -162,7 +162,12 @@ def invariant_curves(data, components=None):
 
 
 def with_invariant_curves(data):
-    """the fixed-point data with invariant_curves as its edges"""
+    """the fixed-point data with invariant_curves as its edges
+    >>> from bbcells.frontends.spherical import complete_quadrics
+    >>> X = complete_quadrics(3)                    # complete conics, not GKM
+    >>> X.edges is None, len(with_invariant_curves(X).edges)
+    (True, 24)
+    """
     from dataclasses import replace
     return replace(data, edges=tuple(invariant_curves(data)))
 
@@ -178,7 +183,18 @@ def _derivative(poly, j):
 
 def ring_dimension(data, components, degree):
     """dimension of the degree-`degree` part of the ring of tuples (f_p)
-    satisfying Brion's conditions for the given components"""
+    satisfying Brion's conditions for the given components. For complete
+    conics it is that of a free module with the BB Poincare series:
+    >>> from bbcells.core import bb_cells
+    >>> from bbcells.equivariant import expected_dimension
+    >>> from bbcells.frontends.spherical import complete_quadrics
+    >>> X = complete_quadrics(3)
+    >>> components = fixed_components(X)
+    >>> [ring_dimension(X, components, d) for d in range(3)]
+    [1, 4, 10]
+    >>> [expected_dimension(bb_cells(X).counts, X.rank, d) for d in range(3)]
+    [1, 4, 10]
+    """
     nvars = data.rank
     basis = monomials(nvars, degree)
     index = {}
@@ -241,7 +257,16 @@ def degree_one_class(data, components, prescribed):
     vanishes). The values are propagated: an unknown point whose components to
     known points determine it (a small linear system of full rank) is solved
     first. At the end every condition is verified. Raises unless the class
-    exists and is determined by the prescribed values."""
+    exists and is determined by the prescribed values. On P^2 = P(V), with
+    lines of weights 0, (1, 0), (0, 1) at a, b, c, O(1) has weight -u at the
+    line of weight u; its values at a and b determine it:
+    >>> from bbcells.core import FixedPointData
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))))
+    >>> H = degree_one_class(P2, fixed_components(P2), {"a": (0, 0), "b": (-1, 0)})
+    >>> [tuple(int(x) for x in H[p]) for p in P2.points]
+    [(0, 0), (-1, 0), (0, -1)]
+    """
     from bbcells.linalg import solve
     r = data.rank
     weights_of = dict(zip(data.points, data.weights))
@@ -308,7 +333,15 @@ def degree_one_class(data, components, prescribed):
 def integrate_monomial(data, classes, exponents, lam):
     """ABBV: the integral of prod_i c_i^{e_i} over X, for degree-one classes
     c_i ({point: character}) with sum e_i = dim X, evaluated at lambda (the
-    result does not depend on lambda)"""
+    result does not depend on lambda). The hyperplane class of P^2 (see
+    degree_one_class) has H^2 = 1:
+    >>> from bbcells.core import FixedPointData
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))))
+    >>> H = {"a": (0, 0), "b": (-1, 0), "c": (0, -1)}
+    >>> integrate_monomial(P2, [H], [2], (1, 2)), integrate_monomial(P2, [H], [2], (5, -3))
+    (Fraction(1, 1), Fraction(1, 1))
+    """
     pair = lambda w: sum(Fraction(a) * b for a, b in zip(w, lam))
     total = Fraction(0)
     for p, weights in zip(data.points, data.weights):
@@ -376,7 +409,14 @@ def morse_order(data, components, lam):
     """the fixed points in an order in which, on every component Y of some
     X^{ker chi}, a point comes after the points of Y with fewer lambda-negative
     weights along chi (the order of a Morse function of an ample class; raises
-    on a cycle)"""
+    on a cycle). On P^2 it runs from the open cell down to the point:
+    >>> from bbcells.core import FixedPointData
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))))
+    >>> components = fixed_components(P2)
+    >>> morse_order(P2, components, (1, 2)), morse_order(P2, components, (-1, -2))
+    (['a', 'b', 'c'], ['c', 'b', 'a'])
+    """
     m = _negative_multiplicities(data, components, lam)
     after = {p: set() for p in data.points}          # after[p]: points that must precede p
     for index, (chi, points, kind) in enumerate(components):
@@ -477,7 +517,21 @@ def canonical_classes(data, components, lam, points=None, verify=True):
     _interpolate. With verify, every ring condition is checked at the end.
     Such classes exist iff no plus-cell closure meets a cell of at least its
     own dimension (then they are the closures' classes); otherwise this
-    raises. For complete conics it raises for every generic lambda."""
+    raises. For complete conics it raises for every generic lambda.
+    On P^2 the class of the line (cells a > b > c) as in flow_up_class:
+    >>> from bbcells.core import FixedPointData
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))))
+    >>> classes = canonical_classes(P2, fixed_components(P2), (1, 2))
+    >>> {q: str(f) for q, f in classes["b"].items()}
+    {'a': '0', 'b': '-t1', 'c': '-t2'}
+    >>> from bbcells.frontends.spherical import complete_quadrics
+    >>> X = complete_quadrics(3)
+    >>> canonical_classes(X, fixed_components(X), (1, 5))    # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    ValueError: no canonical class for 'closed:s2.s1': the closure of its plus-cell meets ...
+    """
     nvars = data.rank
     weights_of = dict(zip(data.points, data.weights))
     pair = lambda w: sum(a * b for a, b in zip(w, lam))
@@ -563,7 +617,20 @@ def integral_cohomology(data, components, lam, point=None):
     equivariant expansion is evaluated at a rational point, where it is
     triangular in morse_order; degree-zero coefficients are the ordinary
     structure constants. Raises unless they are integers and the pairing is
-    unimodular in every degree."""
+    unimodular in every degree. For Gr(2, 4): Pieri's rule sigma_1^2 =
+    sigma_2 + sigma_11, and the two classes of codimension 2 are self-dual:
+    >>> from bbcells.core import bb_cells
+    >>> from bbcells.frontends.flag import grassmannian
+    >>> G = grassmannian(2, 4)
+    >>> order, codim, constants, pairing = integral_cohomology(
+    ...     G, fixed_components(G), bb_cells(G).cocharacter)
+    >>> (s1,) = [p for p in order if codim[p] == 1]
+    >>> a, b = [p for p in order if codim[p] == 2]
+    >>> constants[(s1, s1)] == {a: 1, b: 1}
+    True
+    >>> pairing[(a, a)], pairing[(a, b)], pairing[(b, b)]
+    (1, 0, 1)
+    """
     from bbcells.linalg import determinant
     classes = canonical_classes(data, components, lam)
     order = morse_order(data, components, lam)
@@ -617,7 +684,10 @@ def integral_cohomology(data, components, lam, point=None):
 
 
 def volume_ring(data, classes, lam):
-    """the subalgebra of H^*(X; Q) generated by degree-one classes D_1..D_k
+    """Experimental: slow exact linear algebra over Q, and it describes only
+    the subalgebra generated by divisors (docs/cohomology.md, section 5).
+
+    The subalgebra of H^*(X; Q) generated by degree-one classes D_1..D_k
     ({point: character} each), from the numbers int D^a (ABBV at lam):
     by Poincare duality a form f of degree d vanishes iff int f g = 0 for
     all g of degree dim X - d, so the algebra is Q[x_1..x_k]/Ann(V) with the

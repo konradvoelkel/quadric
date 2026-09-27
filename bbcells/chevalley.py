@@ -130,7 +130,15 @@ class SimplyLaced(object):
 
 class Lifts(object):
     """Tits lifts of the simple reflections of a (possibly folded) type acting
-    on the root vectors of the ambient simply-laced algebra"""
+    on the root vectors of the ambient simply-laced algebra. In A_2, n_1 maps
+    E_{alpha_1} to E_{-alpha_1} and E_{alpha_2} to -E_{alpha_1 + alpha_2}; G_2
+    is folded from D_4 along triality:
+    >>> L = Lifts("A2")
+    >>> L.apply(0, L.simple_vector(0)), L.apply(0, L.simple_vector(1))
+    ({(-1, 0): 1}, {(1, 1): -1})
+    >>> Lifts("G2").orbits
+    [(0, 2, 3), (1,)]
+    """
 
     def __init__(self, cartan_type):
         name = RootSystem(cartan_type).name

@@ -121,7 +121,14 @@ def identify(sub, ambient):
 
 
 def normal_weights(sub, ambient, mapping):
-    """{sub label: tuple of the normal weights} (ambient weights minus sub weights)"""
+    """{sub label: tuple of the normal weights} (ambient weights minus sub weights);
+    for a line in P^2 they differ by once the weight of the line (N = O(1))
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))))
+    >>> line = FixedPointData(1, 2, ("a", "b"), (((1, 0),), ((-1, 0),)))
+    >>> normal_weights(line, P2, identify(line, P2))
+    {'a': ((0, 1),), 'b': ((-1, 1),)}
+    """
     result = {}
     for label, wts in zip(sub.points, sub.weights):
         remaining = _counter(ambient.weights_of(mapping[label]))

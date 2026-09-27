@@ -11,7 +11,7 @@ from bbcells.frontends import flag, quadric, toric
 from bbcells.polynomial import Poly
 from tests._util import doctests_for
 
-load_tests = doctests_for(polynomial)
+load_tests = doctests_for(polynomial, eq)
 
 EXAMPLES = [
     toric.fixed_point_data(toric.projective_space(3)),

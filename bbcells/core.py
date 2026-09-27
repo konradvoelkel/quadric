@@ -118,7 +118,12 @@ class FixedPointData(object):
 
 
 def is_generic(data, lam):
-    """lam pairs nonzero with every tangent weight"""
+    """lam pairs nonzero with every tangent weight
+    >>> P2 = FixedPointData(2, 2, ("p0", "p1", "p2"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))))
+    >>> is_generic(P2, (1, 2)), is_generic(P2, (1, 1))
+    (True, False)
+    """
     return all(pairing(lam, w) != 0 for w in data.all_weights())
 
 

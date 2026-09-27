@@ -33,7 +33,13 @@ def type_of(n):
 
 
 def simple_roots_epsilon(letter, m):
-    """columns: the simple roots in epsilon-coordinates (an m x m matrix)"""
+    """columns: the simple roots in epsilon-coordinates (an m x m matrix);
+    B_2: eps_1 - eps_2, eps_2; D_3: eps_1 - eps_2, eps_2 - eps_3, eps_2 + eps_3
+    >>> simple_roots_epsilon("B", 2)
+    [[1, 0], [-1, 1]]
+    >>> simple_roots_epsilon("D", 3)
+    [[1, 0, 0], [-1, 1, 1], [0, -1, 1]]
+    """
     columns = []
     for i in range(m - 1):
         columns.append([1 if k == i else -1 if k == i + 1 else 0 for k in range(m)])

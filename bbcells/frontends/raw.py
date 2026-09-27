@@ -45,7 +45,15 @@ def from_dict(document):
 
 
 def to_dict(data):
-    """inverse of from_dict (labels are converted to strings)"""
+    """inverse of from_dict (labels are converted to strings)
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)),
+    ...                     edges=(("0", "oo", (1,)),), name="P^1")
+    >>> to_dict(P1)["edges"]
+    [{'from': '0', 'to': 'oo', 'weight': [1]}]
+    >>> from bbcells.frontends.flag import grassmannian
+    >>> from_dict(to_dict(grassmannian(2, 4))) == grassmannian(2, 4)
+    True
+    """
     document = {"name": data.name, "dim": data.dim, "rank": data.rank}
     if data.preferred_cocharacter is not None:
         document["preferred_cocharacter"] = list(data.preferred_cocharacter)
@@ -69,10 +77,26 @@ def _jsonable(value):
 
 
 def load(path):
+    """FixedPointData from a JSON file (see dump)
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)),
+    ...                     edges=(("0", "oo", (1,)),), name="P^1")
+    >>> import tempfile
+    >>> with tempfile.TemporaryDirectory() as directory:
+    ...     path = Path(directory) / "P1.json"
+    ...     _ = dump(P1, path)
+    ...     load(path) == P1
+    True
+    """
     return from_dict(json.loads(Path(path).read_text()))
 
 
 def dump(data, path=None, indent=1):
+    """the JSON text of to_dict(data), also written to `path` if given
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)), name="P^1")
+    >>> print(dump(P1, indent=None))                    # doctest: +NORMALIZE_WHITESPACE
+    {"name": "P^1", "dim": 1, "rank": 1, "points": [{"label": "0", "weights": [[1]]},
+     {"label": "oo", "weights": [[-1]]}]}
+    """
     text = json.dumps(to_dict(data), indent=indent)
     if path is not None:
         Path(path).write_text(text + "\n")

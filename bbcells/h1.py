@@ -19,7 +19,14 @@ from bbcells.core import bb_cells
 
 
 def find_graded_cocharacter(data, bound=12):
-    """a small generic cocharacter whose decomposition is graded, or None"""
+    """a small generic cocharacter whose decomposition is graded, or None
+    (on the hexagon of dP_6 two 1-cells are always joined by a curve)
+    >>> from bbcells.frontends import toric
+    >>> find_graded_cocharacter(toric.fixed_point_data(toric.projective_space(2))).counts
+    (1, 1, 1)
+    >>> print(find_graded_cocharacter(toric.fixed_point_data(toric.del_pezzo_6()), bound=8))
+    None
+    """
     import itertools
     ranges = [range(1, bound)] + [range(-bound, bound + 1)] * (data.rank - 1)
     for lam in itertools.product(*ranges):
@@ -34,7 +41,16 @@ def find_graded_cocharacter(data, bound=12):
 
 def real_prediction(cells):
     """set of rational Betti vectors of X(R) over all sign completions of the
-    predicted incidences (a singleton when the prediction is unambiguous)"""
+    predicted incidences (a singleton when the prediction is unambiguous):
+    RP^2, the torus and the Klein bottle
+    >>> from bbcells.frontends import toric
+    >>> P1, P2 = toric.projective_space(1), toric.projective_space(2)
+    >>> for fan in (P2, toric.product(P1, P1), toric.hirzebruch(1)):
+    ...     print(fan.name, real_prediction(find_graded_cocharacter(toric.fixed_point_data(fan))))
+    P^2 {(1, 0, 0)}
+    P^1 x P^1 {(1, 2, 1)}
+    F_1 {(1, 1, 0)}
+    """
     incidences = realcells.gkm_incidences(cells)
     if any(m is None for m, _ in incidences.values()):
         raise ValueError("sigma(x) - sigma(y) is not a multiple of phi for some curve")
@@ -47,7 +63,11 @@ def sq2_mismatches(cells):
     """compare (y*)^2 mod 2 with the parity rule, for all cells y of dimension
     1 and x of dimension 2. The dual cochain y* is the class of the closure of
     the minus-cell of y (flow-up class for -lambda). Returns a list of
-    (x, y, observed, predicted) disagreements."""
+    (x, y, observed, predicted) disagreements.
+    >>> from bbcells.frontends import flag
+    >>> sq2_mismatches(bb_cells(flag.grassmannian(2, 4)))
+    []
+    """
     data = cells.data
     opposite = bb_cells(data, tuple(-c for c in cells.cocharacter))
     ones = [p for p in data.points if cells.dim_of(p) == 1]
@@ -80,7 +100,15 @@ def pair_normal_weights(at_x, at_y, phi):
     chi - a phi at y. Equal weights are matched first (a = 0), the rest by
     congruence modulo phi with the smallest |a|; None if impossible. (When
     normal weights are congruent modulo phi the splitting of the normal
-    bundle is not visible in the weights; this is a choice.)"""
+    bundle is not visible in the weights; this is a choice.) For a line in
+    P^2 the normal bundle is O(1), for P^1 x pt in P^1 x P^1 it is O:
+    >>> pair_normal_weights([(0, 1)], [(-1, 1)], (1, 0))
+    [((0, 1), (-1, 1), 1)]
+    >>> pair_normal_weights([(0, 1)], [(0, 1)], (1, 0))
+    [((0, 1), (0, 1), 0)]
+    >>> print(pair_normal_weights([(0, 1)], [(1, 1)], (2, 0)))
+    None
+    """
     at_y, pairs, rest = list(at_y), [], []
     for w in at_x:
         if w in at_y:
@@ -106,7 +134,15 @@ def curve_parities(cells):
     both ends, defined when dim x = dim y + 1 and no normal direction changes
     sign (the local picture of docs/real.md, section 2), or when dim x = dim y
     and exactly one direction goes from negative at x to positive at y
-    (section 5.1). Otherwise m is None."""
+    (section 5.1). Otherwise m is None. On P^2 (cells a > b > c) the even m
+    of the curve from the 2-cell to the 1-cell is the incidence 2 of RP^2:
+    >>> from bbcells.core import FixedPointData
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))),
+    ...     edges=(("a", "b", (1, 0)), ("a", "c", (0, 1)), ("b", "c", (-1, 1))))
+    >>> curve_parities(bb_cells(P2, (1, 2)))
+    [('a', 'b', 2), ('a', 'c', None), ('b', 'c', 1)]
+    """
     from bbcells.core import pairing
     data, lam = cells.data, cells.cocharacter
     result = []
@@ -138,7 +174,21 @@ def deflection_terms(cells):
         two real arcs that add up to +-2; after a perturbation each arc from b
         reaching a continues along one ascending arc of a, so every curve
         c -> a with dim c = dim a + 1 gives a term (c, b, 2).
-    Each term has its own sign. Raises if some needed m is undefined."""
+    Each term has its own sign. Raises if some needed m is undefined.
+    On P^2 there is only the direct term of RP^2. On dP_6 with lambda =
+    (-22, 6) the curves s1,2 -> s0,1 and s3,4 -> s4,5 join 1-cells and have
+    odd m, so the 2-cell s2,3 also gets the terms at s0,1 and s4,5:
+    >>> from bbcells.core import FixedPointData
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))),
+    ...     edges=(("a", "b", (1, 0)), ("a", "c", (0, 1)), ("b", "c", (-1, 1))))
+    >>> deflection_terms(bb_cells(P2, (1, 2)))
+    [('a', 'b', 2)]
+    >>> from bbcells.frontends import toric
+    >>> dP6 = toric.fixed_point_data(toric.del_pezzo_6())
+    >>> deflection_terms(bb_cells(dP6, (-22, 6)))
+    [('s2,3', 's1,2', 2), ('s2,3', 's3,4', 2), ('s2,3', 's0,1', 2), ('s2,3', 's4,5', 2)]
+    """
     dims = {p: cells.dim_of(p) for p in cells.data.points}
     terms, adjacent, slides = [], [], []
     for x, y, m in curve_parities(cells):
@@ -158,8 +208,17 @@ def deflection_terms(cells):
 
 
 def surface_prediction(cells, limit=1 << 18):
-    """the set of rational Betti vectors of X(R) over all sign choices of
-    deflection_terms with boundary o boundary = 0 (surfaces only)"""
+    """Experimental: the deflection rule is supported by computations
+    against Choi-Park, not proved (docs/real.md, section 5.1).
+
+    The set of rational Betti vectors of X(R) over all sign choices of
+    deflection_terms with boundary o boundary = 0 (surfaces only). The real
+    points of dP_6 are RP^2 blown up in three points, i.e. #4 RP^2:
+    >>> from bbcells.frontends import toric
+    >>> dP6 = toric.fixed_point_data(toric.del_pezzo_6())
+    >>> surface_prediction(bb_cells(dP6, (-22, 6)))
+    {(1, 3, 0)}
+    """
     import itertools
     if cells.data.dim != 2:
         raise ValueError("the deflection rule is only tested for surfaces")
@@ -181,11 +240,22 @@ def surface_prediction(cells, limit=1 << 18):
 # -- beyond GKM: the curves of the Brion components (docs/real.md, section 4) ---
 
 def brion_prediction(cells):
-    """the rational Betti vectors of X(R) over all sign completions of the
+    """Experimental: the rule on the curves of the Brion components is
+    supported by computations against oracles, not proved (docs/real.md,
+    section 4).
+
+    The rational Betti vectors of X(R) over all sign completions of the
     rule of section 2 applied to the invariant curves of the Brion components
     (brion.invariant_curves; the cells must be built on
     brion.with_invariant_curves(data)). Only for graded decompositions and
-    curves whose parity is defined; raises otherwise."""
+    curves whose parity is defined; raises otherwise. For Gr(2, 6) with the
+    torus of Sp_6 (not GKM) it gives Casian-Kodama's 1 + t^4 + t^8:
+    >>> from bbcells import brion
+    >>> from bbcells.frontends.symmetric import complete_symmetric_variety
+    >>> X = brion.with_invariant_curves(complete_symmetric_variety("CII", 1, 2))
+    >>> brion_prediction(bb_cells(X, (50, 48, -53)))
+    {(1, 0, 0, 0, 1, 0, 0, 0, 1)}
+    """
     dims = {p: cells.dim_of(p) for p in cells.data.points}
     parities = curve_parities(cells)
     if any(dims[x] <= dims[y] for x, y, _ in parities):

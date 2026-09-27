@@ -69,6 +69,10 @@ def integer_inverse(matrix):
 
 
 def transpose(matrix):
+    """the transpose of a matrix (a list of rows)
+    >>> transpose([[1, 2, 3], [4, 5, 6]])
+    [[1, 4], [2, 5], [3, 6]]
+    """
     return [list(col) for col in zip(*matrix)]
 
 
@@ -81,6 +85,12 @@ def mat_vec(matrix, vector):
 
 
 def mat_mul(a, b):
+    """the matrix product a b; here the braid relation s1 s2 s1 = s2 s1 s2 of
+    the simple reflections of A_2 on the simple-root coordinates
+    >>> s1, s2 = [[-1, 1], [0, 1]], [[1, 0], [1, -1]]
+    >>> mat_mul(s1, mat_mul(s2, s1)) == mat_mul(s2, mat_mul(s1, s2))
+    True
+    """
     bt = transpose(b)
     return [[sum(x * y for x, y in zip(row, col)) for col in bt] for row in a]
 
