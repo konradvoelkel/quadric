@@ -200,12 +200,14 @@ release goes out together with the paper.
   - (d) the existence criterion for canonical classes (`cohomology.md` §4).
 
   **Done when:** each has a proof in the paper that KV has checked.
-- [ ] **P4 The $\mathbb P^5$ number** (S). A third, structurally different
-  computation of the number of quadrics in $\mathbb P^5$ tangent to 20 general
-  quadrics, e.g. Schubert-style recursion over the orbit closures or an
-  independent Bott residue implementation. Then ask the author of *3264
-  questions*. **Done when:** the discrepancy is resolved or documented with
-  three independent computations.
+- [x] **P4 The $\mathbb P^5$ number** (S). A third computation, independent
+  of the fixed points and of Brion's formula, gives the same value
+  1810718299257984458113941504: the Hilbert function
+  $h(m)=\dim H^0(X,L^m)$ from De Concini–Procesi's decomposition and Weyl's
+  dimension formula, and its 20th finite difference
+  (`oracles.complete_quadrics_degree`, `cohomology.md` §3). The value in
+  *3264 questions* Q5 differs from all three. Asking the author is left to
+  KV (no e-mail was sent).
 - [ ] **P5 Review and submission.** Check every bibliography entry marked
   `UNVERIFIED` against the published source, choose the venue (for example
   J. Softw. Algebra Geom. for the software, or arXiv math.AG), and release
@@ -358,7 +360,7 @@ $W_H$, for every orbit with $T$-fixed points (`spherical.md` §9).
 | Risk | Mitigation |
 |---|---|
 | Sign conventions ($\lambda$ vs. $-\lambda$, weights vs. coordinate characters) | §1 is normative; every front end has an oracle that detects a global sign flip. |
-| The $\mathbb P^5$ tangency number differs from the published list | Two independent computations agree; P4 adds a third before the paper states it. |
+| The $\mathbb P^5$ tangency number differs from the published list | Three independent computations agree (localization, Brion's degree formula, the Hilbert function); the paper states the value and the discrepancy. |
 | A rule for non-graded real incidences needs data beyond fixed points and curves | R1 computes a second oracle before any new rule; the notes say what is observation and what is proved. |
 | Pure Python limits (EVIII, $\mathbb P^5$ rings) | E3, and R5 through the orbit decomposition. |
 | Bibliographic data that Crossref and zbMATH do not confirm (Chasles 1864, the series of Macaulay 1916, Sturmfels's *3264 questions*, Suciu–Trevisan) | All other entries were checked against Crossref and zbMATH on 2026-09-27. These four keep their `% UNVERIFIED` marker in `paper/references.bib`; P5 checks them against the original sources. The paper cites MMMSV's Prop. 3.5 explicitly in the numbering of arXiv:2011.08791v2 (checked in the source), since the JEMS numbering could not be checked. |

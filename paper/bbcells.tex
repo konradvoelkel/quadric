@@ -796,12 +796,29 @@ quadrics tangent to $20$ general quadrics comes out as
 \begin{remark}
 The list in \cite[Question~5]{Sturmfels3264} gives
 \[641\,211\,464\,734\,373\,953\,791\,690\,014\,720\]
-for this number. A
-second computation by a different method, not yet part of the package,
-gives our value, and so does the growth of the sequence: the decimal logarithms of the four numbers
-are $3.51$, $8.82$, $16.69$ and $27.26$ (ours), with differences $5.31$,
-$7.87$, $10.57$, whereas the listed value would give $29.81$. We have not
-resolved the discrepancy; a third computation is planned.
+for this number. Two further computations, independent of the fixed points
+and of each other, give our value:
+\begin{enumerate}
+\item Brion's degree formula: the integral over the moment polytope of $L$
+of the Weyl dimension polynomial;
+\item the Hilbert function. By De Concini--Procesi \cite{DCP83},
+$H^0(X,L_\lambda)$ is the sum of the $V(\mu)^*$ over the dominant $\mu$ with
+$\lambda-\mu\in\mathbb N\{2\alpha_1,\dots,2\alpha_{n-1}\}$. For $L=\sum a_k\mu_k$
+this is $\lambda = 2\sum_k a_k\omega_k$, so
+\[
+h(m)=\dim H^0(X,L^m)=\sum_{c\in\mathbb N^{n-1},\ ma-Ac\ge0}\dim V\bigl(2(ma-Ac)\bigr),
+\]
+with $A$ the Cartan matrix of $A_{n-1}$. It is a polynomial of degree
+$N=\dim X$ in $m$ ($L$ is ample and $X$ is wonderful), and $\int L^N$ is its
+$N$-th finite difference. Exact values at $m=0,\dots,N$ and Weyl's
+dimension formula are all that is used (\code{oracles.complete\_quadrics\_degree}).
+\end{enumerate}
+The second method reproduces $3264$, $666\,841\,088$ and the value for
+$\PP^4$ from \cite{Sturmfels3264}, and gives our value for $\PP^5$. The
+decimal logarithms of the four numbers are $3.51$, $8.82$, $16.69$ and
+$27.26$, with differences $5.31$, $7.87$, $10.57$, whereas the listed value
+would give $29.81$. We therefore believe that the listed value is not the
+number of quadrics in $\PP^5$ tangent to $20$ general quadrics.
 \end{remark}
 
 \subsection{Cell classes}
@@ -1076,6 +1093,48 @@ explains this; the planes $\PP(\mathfrak{sl}_2)$ seem to need their own local
 model.
 \end{observation}
 
+\begin{proposition}\label{prop:realsurfaces}
+Let $X$ be the variety of complete quadric surfaces. Then
+$H_*(X(\RR);\QQ)$ is $\QQ$ in degrees $0$ and $5$ and zero otherwise.
+\end{proposition}
+\begin{proof}
+$X$ is the blow-up of $\PP^9=\PP(\mathrm{Sym}^2k^4)$ along the Veronese
+$\PP^3$, followed by the blow-up along the strict transform $W$ of the
+rank-$\le2$ locus \cite{Vainsencher}; both centres are smooth and defined
+over $\RR$. The real rank-one quadrics are the $\pm\ell^2$, so the first
+centre is $\RR\PP^3$, of codimension $6$. Its normal bundle $N$ has
+$w_1(N)=w_1(T\RR\PP^9)|-w_1(T\RR\PP^3)=0$, so the exceptional divisor
+$E=\PP(N)$ has $H_*(E;\QQ)=H_*(\RR\PP^3;\QQ)\otimes H_*(\RR\PP^5;\QQ)$, in
+degrees $0,3,5,8$. In the sequence of the pair $(Y,E)$ for the first
+blow-up $Y$, with $H_*(Y,E)\cong H_*(\RR\PP^9,\RR\PP^3)$ ($\QQ$ in degrees $4$
+and $9$), the boundary $H_4\to H_3(E)$ hits the class over $[\RR\PP^3]$, and
+since $Y$ is non-orientable ($w_1(Y)=5e=e\ne0$), $H_9(Y)=0$ and $H_9(Y,E)\to
+H_8(E)$ is an isomorphism. Hence $H_*(Y;\QQ)=\QQ_0\oplus\QQ_5$, the latter
+spanned by a fibre $\RR\PP^5$ of $E$. The second centre has codimension $3$;
+its exceptional divisor is an $\RR\PP^2$-bundle, rationally a copy of the
+centre, and the five lemma gives $H_*(X(\RR);\QQ)\cong H_*(Y;\QQ)$.
+\end{proof}
+For this second oracle the prediction along the invariant curves again
+admits no sign completion; the decomposition has $24$ to $26$ curves between
+cells of equal dimension, and a correction rule is open.
+
+\subsection{Chow--Witt groups}
+For a smooth cellular $X$ over $\RR$ the Chow ring has no $2$-torsion, so
+$\widetilde{CH}^q(X) = H^q(X,\mathbf I^q)\times_{\mathrm{Ch}^q(X)}CH^q(X)$
+\cite[\S2]{HMW}, and the real cycle class map \cite{HWXZ} identifies
+$H^q(X,\mathbf I^q)$ with $H^q(X(\RR);\ZZ)$, compatibly with the reduction to
+$\mathrm{Ch}^q(X)\cong H^q(X(\RR);\ZZ/2)$. Both sides have bases indexed by the
+cells; the isomorphism type of the fibre product does not depend on how they
+match modulo $2$, since $GL_c(\ZZ)\to GL_c(\mathbb F_2)$ is onto. So
+\[
+\widetilde{CH}^q(X)\cong (Z^q\oplus\ZZ^{c_q})\big/\{(\delta w,-\tfrac12\delta w)\},
+\]
+with $Z^q$ the cellular cocycles of $X(\RR)$. The package computes this from
+the exact toric Morse complexes and the signed real Schubert complexes; for
+instance $\widetilde{CH}^q(\PP^n)=\ZZ$ for $0<q<n$, the top group is
+$GW(\RR)\cong\ZZ^2$ for $n$ odd and $\ZZ$ for $n$ even, and the rank of
+$\widetilde{CH}^q$ is $\operatorname{rank}CH^q+b_q(X(\RR);\QQ)$.
+
 % ===========================================================================
 \section{Software}\label{sec:software}
 
@@ -1093,11 +1152,17 @@ python3 -m bbcells symmetric AIII 2 3
 python3 -m bbcells symmetric EVI --counts-only
 python3 -m bbcells real A3
 \end{verbatim}
-The test suite has more than $300$ tests, including doctests, and runs in
-about a minute; it contains the oracle tests of
-Table~\ref{tab:frontends} and every computation of this paper that takes
-less than a few seconds. The larger computations are reproduced by
-\code{paper/reproduce.py}.
+Characteristic numbers, the certificates, the exact real homology of toric
+varieties and the Chow--Witt groups are also available from the command
+line. Ranks over $\QQ$ of large matrices are computed modulo primes and
+certified by lifting a kernel of the complementary dimension (Chinese
+remaindering, rational reconstruction and an exact check), and the cell
+counts of Section~\ref{sec:large} run in parallel over orbits and
+cocharacters. The test suite has more than $450$ tests, including a
+doctest for every public function, and runs in about a minute and a half;
+it contains the oracle tests of Table~\ref{tab:frontends} and every
+computation of this paper that takes less than a few seconds. The larger
+computations are reproduced by \code{paper/reproduce.py}.
 
 % ===========================================================================
 \section{Open problems}\label{sec:open}

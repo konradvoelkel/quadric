@@ -83,9 +83,22 @@ Reproduced (`tests/test_brion.py`):
   - quadrics tangent to 20 quadrics: 1810718299257984458113941504;
   - $\mu_k^{20} = 1, 803128, 61520094, 803128, 1$.
 
-  An independent computation with Brion's degree formula gives the same
-  number. The value 641211464734373953791690014720 listed in *3264
-  questions* Q5 differs from both. We have not resolved this.
+  Two computations independent of the fixed points give the same number
+  (PLAN P4):
+  - Brion's degree formula (the moment polytope with the Weyl dimension
+    polynomial);
+  - the Hilbert function (`oracles.complete_quadrics_degree`, command line
+    `characteristic 6 --tangency --method sections`). By De Concini–Procesi,
+    $H^0(X,L_\lambda)=\bigoplus V(\mu)^*$ over the dominant $\mu$ with
+    $\lambda-\mu\in\mathbb N\{2\alpha_i\}$. For $L=\sum a_k\mu_k$ this is
+    $h(m)=\sum_{c\in\mathbb N^{n-1},\,ma-Ac\ge0}\dim V(2(ma-Ac))$, a polynomial of
+    degree $N$. $\int L^N$ is its $N$-th finite difference at $m=0,\dots,N$.
+    It reproduces 3264,
+    666841088 and the $\mathbb P^4$ value above.
+
+  The value 641211464734373953791690014720 listed in *3264 questions* Q5
+  differs from all three. The growth of the sequence (decimal logarithms
+  3.51, 8.82, 16.69, 27.26) also fits ours. Asking the author is left to KV.
 
 ## 4. Cell classes
 
