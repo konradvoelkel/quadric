@@ -76,3 +76,58 @@ class TestComplexRealization(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestBeyondGKM(unittest.TestCase):
+    """the rule on the curves of the Brion components (docs/H1.md, section 8)"""
+
+    def prediction(self, X, lam):
+        from bbcells import brion
+        return h1.brion_prediction(bb_cells(brion.with_invariant_curves(X), lam))
+
+    def test_grassmannian_with_symplectic_torus(self):
+        from bbcells.frontends import symmetric
+        X = symmetric.complete_symmetric_variety("CII", 1, 2)          # Gr(2, 6), Sp_6-torus
+        expected = tuple(oracles.real_grassmannian_rational_poincare(2, 6).coefficients)
+        for lam in [(50, 48, -53), (-5, 21, -10)]:
+            self.assertEqual(self.prediction(X, lam), {expected + (0,) * (9 - len(expected))})
+
+    def test_product_of_projective_spaces(self):
+        from bbcells.frontends import symmetric
+        X = symmetric.complete_symmetric_variety("AIII", 1, 3)         # P^3 x P^3*
+        for lam in [(50, 48, -53), (14, 27, -40)]:
+            self.assertEqual(self.prediction(X, lam), {(1, 0, 0, 2, 0, 0, 1)})
+
+    def test_cayley_plane_with_f4_torus(self):
+        from bbcells.frontends import symmetric
+        X = symmetric.complete_symmetric_variety("FII")                # E6/P1, F4-torus
+        F = flag.flag_variety("E6", {1})
+        cells = bb_cells(F)
+        dims = {p: cells.dim_of(p) for p in F.points}
+        magnitudes = {k: v[1] for k, v in realcells.gkm_incidences(cells).items()}
+        expected = {tuple(realcells.cellular_rational_betti(dims, s))
+                    for s in realcells.sign_choices(dims, magnitudes)}
+        self.assertEqual(len(expected), 1)
+        self.assertEqual(self.prediction(X, (79, -15, 11, 55)), expected)
+
+    def test_complete_conics_need_one_correction(self):
+        # no graded cocharacter; the direct rule admits no sign completion, and
+        # removing the one term from the top of the even equal-dimension curve to
+        # the bottom of the odd one gives H^*(X(R); Q) = H^*(RP^5; Q)
+        from bbcells import brion
+        from bbcells.frontends import spherical
+        X = brion.with_invariant_curves(spherical.complete_quadrics(3))
+        cells = bb_cells(X, (1, 5))
+        dims = {p: cells.dim_of(p) for p in X.points}
+        parities = h1.curve_parities(cells)
+        equal = [(x, y, m) for x, y, m in parities if dims[x] == dims[y]]
+        (top,) = [x for x, y, m in equal if m % 2 == 0]
+        (bottom,) = [y for x, y, m in equal if m % 2]
+        magnitudes = {(x, y): 2 for x, y, m in parities
+                      if dims[x] == dims[y] + 1 and m % 2 == 0}
+        with self.assertRaises(ValueError):
+            realcells.sign_choices(dims, magnitudes)
+        del magnitudes[(top, bottom)]
+        self.assertEqual({tuple(realcells.cellular_rational_betti(dims, s))
+                          for s in realcells.sign_choices(dims, magnitudes)},
+                         {(1, 0, 0, 0, 0, 1)})

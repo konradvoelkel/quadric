@@ -447,8 +447,14 @@ prints usage.
   - Exact real BB incidences for toric varieties by discrete Morse theory
     (`realtoric.py`) confirm H1′ entry by entry on 96 graded decompositions
     of dimension 2–4.
-  - Non-graded decompositions in dimension $\ge3$ are open, including
-    complete conics, whose oracle is $1,0,0,0,0,1$.)*
+  - The rule applied to the curves of the Brion components
+    (`brion.invariant_curves`) is correct on graded non-GKM decompositions:
+    $\mathbb P^q\times\check{\mathbb P}^q$, $\mathrm{Gr}(2,6)$ and
+    $\mathrm{Gr}(2,8)$ with symplectic tori, and $E_6/P_1$ with the
+    $F_4$-torus (§8).
+  - Open: non-graded decompositions in dimension $\ge3$. Every rank-two
+    complete symmetric variety is non-graded. For complete conics (oracle
+    $1,0,0,0,0,1$) one unique term must be removed in each chamber.)*
 - [x] **S7.6 Cell counts without listing fixed points** (`docs/S6d.md` §11).
   *(Done for $E_7$: EII, EI, EVI (758079 fixed points, 48 s), EVII and EV
   (28373976 fixed points, 30 min), and for EIX (7445880). EVIII has more

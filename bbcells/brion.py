@@ -111,6 +111,62 @@ def fixed_components(data):
     return components
 
 
+
+def invariant_curves(data, components=None):
+    """the T-invariant curves joining fixed points that the components of
+    the X^{ker chi} provide, as edges (p, q, weight at p):
+      * every P^1 component;
+      * the two lines of a P(sl_2) plane, from the points with weights
+        {a, 2a} and {-a, -2a} to the point with {a, -a}, of weight +-a (the
+        conics of weight 2a joining the two ends are left out);
+      * the four boundary curves of a ruled surface {+-a, +-b}, joining
+        points that differ in one sign.
+    For GKM data these are the GKM edges. (The surfaces contain infinitely
+    many further T-curves, all joining the source and the sink of the
+    surface.)
+    >>> from bbcells.frontends.spherical import complete_quadrics
+    >>> len(invariant_curves(complete_quadrics(3)))      # 12 curves + 6 planes x 2 lines
+    24
+    """
+    components = fixed_components(data) if components is None else components
+    weights_of = dict(zip(data.points, data.weights))
+    edges = []
+    for chi, points, kind in components:
+        along = {p: sorted((_multiple(w, chi), w) for w in weights_of[p]
+                           if _multiple(w, chi) is not None) for p in points}
+        if kind == "curve":
+            p, q = points
+            (_, w), = along[p]
+            edges.append((p, q, w))
+        elif kind == "plane":
+            pattern = {tuple(k for k, _ in along[p]): p for p in points}
+            a = min(abs(k) for p in points for k, _ in along[p])
+            middle = pattern[(-a, a)]
+            for sign in (1, -1):
+                end = pattern[tuple(sorted((sign * a, 2 * sign * a)))]
+                edges.append((end, middle, next(w for k, w in along[end] if k == sign * a)))
+        else:
+            # extremes {a, b}, {-a, -b} (one sign) and saddles {a, -b}, {-a, b}; the
+            # boundary curves join each extreme to each saddle (also when a = b)
+            same = lambda p: len({k > 0 for k, _ in along[p]}) == 1
+            for p in points:
+                if not same(p):
+                    continue
+                for q in points:
+                    if same(q):
+                        continue
+                    kq = [k for k, _ in along[q]]
+                    k, w = next((k, w) for k, w in along[p] if -k in kq)
+                    edges.append((p, q, w))
+    return edges
+
+
+def with_invariant_curves(data):
+    """the fixed-point data with invariant_curves as its edges"""
+    from dataclasses import replace
+    return replace(data, edges=tuple(invariant_curves(data)))
+
+
 def _derivative(poly, j):
     terms = {}
     for e, c in poly.terms.items():

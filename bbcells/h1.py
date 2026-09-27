@@ -69,13 +69,44 @@ def sq2_mismatches(cells):
 
 # -- non-graded decompositions of surfaces (docs/H1.md, section 5) ------------
 
+def _multiple_of(d, phi):
+    k = next(i for i, c in enumerate(phi) if c)
+    q, r = divmod(d[k], phi[k])
+    return q if not r and all(e == q * c for e, c in zip(d, phi)) else None
+
+
+def pair_normal_weights(at_x, at_y, phi):
+    """match the normal weights of a curve at its two ends: chi at x with
+    chi - a phi at y. Equal weights are matched first (a = 0), the rest by
+    congruence modulo phi with the smallest |a|; None if impossible. (When
+    normal weights are congruent modulo phi the splitting of the normal
+    bundle is not visible in the weights; this is a choice.)"""
+    at_y, pairs, rest = list(at_y), [], []
+    for w in at_x:
+        if w in at_y:
+            at_y.remove(w)
+            pairs.append((w, w, 0))
+        else:
+            rest.append(w)
+    for w in rest:
+        options = [(abs(a), v, a) for v in at_y
+                   for a in [_multiple_of([p - q for p, q in zip(w, v)], phi)] if a is not None]
+        if not options:
+            return None
+        _, v, a = min(options)
+        at_y.remove(v)
+        pairs.append((w, v, a))
+    return pairs
+
+
 def curve_parities(cells):
     """(x, y, m) for every invariant curve flowing from x down to y (phi, the
-    weight at x, is lambda-positive): m = (sigma(x) - sigma(y)) / phi if
-    dim x = dim y + 1; if dim x = dim y, one normal direction psi is negative
-    at x and positive at y, and m = (sigma(x) - sigma(y) + psi_y) / phi. m is
-    None if the quotient is not an integer; curves two or more steps down
-    get m = None too (their flow lines come in families)."""
+    weight at x, is lambda-positive). With the normal weights paired
+    (pair_normal_weights), m = 1 + sum of a over the directions positive at
+    both ends, defined when dim x = dim y + 1 and no normal direction changes
+    sign (the local picture of docs/H1.md, section 2), or when dim x = dim y
+    and exactly one direction goes from negative at x to positive at y
+    (section 6). Otherwise m is None."""
     from bbcells.core import pairing
     data, lam = cells.data, cells.cocharacter
     result = []
@@ -84,29 +115,17 @@ def curve_parities(cells):
             x, y, phi = p, q, chi
         else:
             x, y, phi = q, p, tuple(-c for c in chi)
-        dx, dy = cells.dim_of(x), cells.dim_of(y)
-        diff = [a - b for a, b in zip(realcells.positive_weight_sum(cells, x),
-                                      realcells.positive_weight_sum(cells, y))]
+        at_x, at_y = list(data.weights_of(x)), list(data.weights_of(y))
+        at_x.remove(phi)
+        at_y.remove(tuple(-c for c in phi))
+        pairs = pair_normal_weights(at_x, at_y, phi)
         m = None
-        if dx == dy:
-            k = next(i for i, c in enumerate(phi) if c)
-            flipped = []
-            for w in data.weights_of(x):
-                if w == phi or pairing(lam, w) >= 0:
-                    continue
-                for v in data.weights_of(y):
-                    d = [a - b for a, b in zip(w, v)]
-                    if d[k] % phi[k] == 0 and all(e == d[k] // phi[k] * c for e, c in zip(d, phi)) \
-                            and pairing(lam, v) > 0 and v != tuple(-c for c in phi):
-                        flipped.append(v)
-            if len(flipped) == 1:
-                diff = [a + b for a, b in zip(diff, flipped[0])]
-                dx += 1                      # now handled like an adjacent pair
-        if dx == dy + 1:
-            k = next(i for i, c in enumerate(phi) if c)
-            q, r = divmod(diff[k], phi[k])
-            if not r and all(d == q * c for d, c in zip(diff, phi)):
-                m = q
+        if pairs is not None:
+            up = [1 for w, v, a in pairs if pairing(lam, w) < 0 < pairing(lam, v)]
+            down = [1 for w, v, a in pairs if pairing(lam, v) < 0 < pairing(lam, w)]
+            gap = cells.dim_of(x) - cells.dim_of(y)
+            if (gap == 1 and not up and not down) or (gap == 0 and len(up) == 1 and not down):
+                m = 1 + sum(a for w, v, a in pairs if pairing(lam, w) > 0 and pairing(lam, v) > 0)
         result.append((x, y, m))
     return result
 
@@ -157,3 +176,25 @@ def surface_prediction(cells, limit=1 << 18):
         if realcells._square_zero_cellular(boundary, dims):
             result.add(tuple(realcells.cellular_rational_betti(dims, boundary)))
     return result
+
+
+# -- beyond GKM: the curves of the Brion components (docs/H1.md, section 8) ----
+
+def brion_prediction(cells):
+    """the rational Betti vectors of X(R) over all sign completions of the
+    rule of section 2 applied to the invariant curves of the Brion components
+    (brion.invariant_curves; the cells must be built on
+    brion.with_invariant_curves(data)). Only for graded decompositions and
+    curves whose parity is defined; raises otherwise."""
+    dims = {p: cells.dim_of(p) for p in cells.data.points}
+    parities = curve_parities(cells)
+    if any(dims[x] <= dims[y] for x, y, _ in parities):
+        raise ValueError("the decomposition is not graded along the invariant curves")
+    magnitudes = {}
+    for x, y, m in parities:
+        if dims[x] == dims[y] + 1:
+            if m is None:
+                raise ValueError("undetermined parity for the curve %r -> %r" % (x, y))
+            magnitudes[(x, y)] = 0 if m % 2 else 2
+    return {tuple(realcells.cellular_rational_betti(dims, signed))
+            for signed in realcells.sign_choices(dims, magnitudes)}
