@@ -185,7 +185,7 @@ release goes out together with the paper.
   reproduction script (P2).
 - [x] **P2 Reproduction script** (S). `paper/reproduce.py` recomputes every
   number of the paper; the fast claims run in `tests/test_paper.py`, and the
-  full run (100 claims, all `ok`, about 70 min on 4 cores) is logged in
+  full run (123 claims, all `ok`, about 3 h on 4 cores) is logged in
   `paper/reproduce.log` with the commit it ran on.
 - [ ] **P3 Proofs** (research). Write out in full:
   - (a) the normal-weight proposition (`spherical.md` §3);
