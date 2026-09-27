@@ -156,18 +156,18 @@ tools/fetch_arxiv.py            literature download
 | engine and invariants | `core`, `invariants`, `algebra` | cells, motive, Hodge, $K_0$, point counts, $\chi^{\mathbb A^1}$; checks by cocharacter independence, Poincaré duality and holomorphic Lefschetz | — |
 | toric, flag, quadrics, group compactifications | `frontends/*` | all smooth complete fans, $G/P$ of all types, $Q_n$, wonderful $\overline{G_{\mathrm{ad}}}$ | `history.md` M1–M4 |
 | horospherical, rank one | `horospherical`, `two_orbit` | toroidal horospherical (Batyrev–Moreau oracle), Knop's rank-one table | `history.md` S6a, S6b |
-| wonderful and symmetric | `spherical`, `symmetric` | orbit-by-orbit assembly; all Satake diagrams; normal weights beyond (R) certified | `spherical.md` §§3, 6, 7 |
+| wonderful and symmetric | `spherical`, `symmetric` | orbit-by-orbit assembly; all Satake diagrams; normal weights beyond (R) proved by the opposition symmetry (inner Hermitian cases) and certified by point counts of open orbits | `spherical.md` §§3, 6, 7 |
 | toroidal | `toroidal` | smooth fans in the valuation cone, $\Lambda = \mathbb Z\Sigma$ | `spherical.md` §8 |
-| large cases | `spherical.stream_cell_counts` | all of $E_7$ and EIX; EV has 28373976 fixed points | `spherical.md` §10 |
-| equivariant cohomology | `equivariant`, `brion` | GKM rings; Brion's description beyond GKM; characteristic numbers; canonical classes; divisor rings | `cohomology.md` |
-| real points | `realcells`, `realtoric`, `h1` | real flag varieties over $\mathbb Z$; exact toric incidences; the H1 rule for graded decompositions, GKM or not | `real.md` |
+| large cases | `spherical.stream_cell_counts`, `symmetric.split_cell_counts` | all of $E_7$ and EIX by streaming (in parallel); split forms from the orbit decomposition, EVIII with 9297296775 cells | `spherical.md` §10 |
+| equivariant cohomology | `equivariant`, `brion`, `oracles` | GKM rings; Brion's description beyond GKM; characteristic numbers by localization and from the Hilbert function; canonical classes; subalgebras generated in any degree | `cohomology.md` |
+| real points | `realcells`, `realtoric`, `h1`, `chowwitt` | real flag varieties over $\mathbb Z$; exact toric incidences; the H1 rule for graded decompositions, GKM or not; Chow–Witt groups without twist | `real.md` |
 
 Open research items (details in the notes): general Luna data; certificates
 for two unknowns on one orbit; a canonical integral basis beyond GKM;
-toroidal varieties with $\Lambda\supsetneq\mathbb Z\Sigma$; real incidences
-of non-graded decompositions in dimension $\ge3$; EVIII; the value 1810718299257984458113941504
-for quadrics tangent to 20 quadrics in $\mathbb P^5$, which differs from
-Sturmfels' list.
+generators for complete quadrics beyond $\mathbb P^4$; toroidal varieties with
+$\Lambda\supsetneq\mathbb Z\Sigma$; real incidences of non-graded decompositions
+in dimension $\ge3$; twisted Chow–Witt groups; the combinatorial hypotheses of
+the opposition symmetry for all AIII and DIII.
 
 ---
 
@@ -199,6 +199,11 @@ release goes out together with the paper.
   - (d) the existence criterion for canonical classes (`cohomology.md` §4).
 
   **Done when:** each has a proof in the paper that KV has checked.
+  *(Written: (a) Proposition 3.2, (b) Lemma "open orbits" and Theorem 4.1
+  (which fixed a gap: the old target used c = 0 inside boundary closures),
+  (c) Theorem "opposition" for inner involutions, with its combinatorial
+  hypothesis checked up to AIII(p,q), p+q <= 12, and DIII(11), (d)
+  Proposition 6.4. KV's check is pending.)*
 - [x] **P4 The $\mathbb P^5$ number** (S). A third computation, independent
   of the fixed points and of Brion's formula, gives the same value
   1810718299257984458113941504: the Hilbert function
@@ -207,7 +212,8 @@ release goes out together with the paper.
   (`oracles.complete_quadrics_degree`, `cohomology.md` §3). The value in
   *3264 questions* Q5 differs from all three. Asking the author is left to
   KV (no e-mail was sent).
-- [ ] **P5 Review and submission.** Check every bibliography entry marked
+- [ ] **P5 Review and submission.** *(Bibliography checked against Crossref
+  and zbMATH; four entries remain, see §6.)* Check every bibliography entry marked
   `UNVERIFIED` against the published source, choose the venue (for example
   J. Softw. Algebra Geom. for the software, or arXiv math.AG), and release
   the matching version (E4).
@@ -280,10 +286,9 @@ release goes out together with the paper.
 ### 4.5 Order
 
 ```
-now:    P1 (draft)  +  documentation clean-up (done with P1)
-next:   P2, P3 (a, b, d)  ||  E1
-then:   P4, R1  ||  E2, E3
-later:  P3 (c), P5 + E4 (submission and release together); R2–R6
+done:   P1, P2, P4; P3 (a-d) written; P5 bibliography; E1-E3; R5; R6 without twist
+next:   KV checks the proofs (P3) and decides 4.4; R1 (a rule for the planes)
+later:  P5 + E4 (submission and release together); R2, R3 beyond P^4, R4
 ```
 
 ---
