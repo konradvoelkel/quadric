@@ -43,6 +43,19 @@ class TestRealRealization(unittest.TestCase):
         self.assertIsNone(h1.find_graded_cocharacter(toric.fixed_point_data(toric.del_pezzo_6()),
                                                      bound=8))
 
+    def test_non_graded_surfaces_by_deflection(self):
+        """the deflection rule (docs/H1.md, section 5) against Choi-Park"""
+        dp6 = toric.del_pezzo_6()
+        fans = [dp6, toric.star_subdivision(dp6, (0, 1)),
+                toric.star_subdivision(toric.hirzebruch(1), (0, 1)),
+                toric.star_subdivision(toric.hirzebruch(3), (1, 2))]
+        for fan in fans:
+            data = toric.fixed_point_data(fan)
+            oracle = tuple(oracles.real_toric_rational_betti(fan.rays, fan.cones))
+            for lam in [(-22, 6), (24, 21), (11, -6), (-14, -23)]:
+                cells = bb_cells(data, lam)
+                self.assertEqual(h1.surface_prediction(cells), {oracle}, (fan.name, lam))
+
 
 class TestComplexRealization(unittest.TestCase):
 

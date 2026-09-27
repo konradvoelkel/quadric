@@ -441,6 +441,10 @@ prints usage.
     of cells; the oracle is DGMP 1988 for complete quadrics.
 - [ ] **S7.4 Toroidal $X$ with $\Lambda\supsetneq\mathbb Z\Sigma$** (finite covers).
 - [ ] **S7.5 Real incidences for non-GKM varieties** (M5 beyond GKM).
+  *(In progress, `docs/H1.md` §6. Non-graded toric surfaces are solved by a
+  deflection rule, checked against Choi–Park on 164 decompositions.
+  Threefolds are open. The oracle for complete conics is
+  $1,0,0,0,0,1$.)*
 - [x] **S7.6 Cell counts without listing fixed points** (`docs/S6d.md` §11).
   *(Done for $E_7$: EII, EI, EVI (758079 fixed points, 48 s), EVII and EV
   (28373976 fixed points, 30 min), and for EIX (7445880). EVIII has more
