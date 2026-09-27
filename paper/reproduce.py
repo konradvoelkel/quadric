@@ -329,6 +329,28 @@ def _():
     return ring["hilbert"][:8]
 
 
+@claim("comp:generators/P4", ([1, 4, 10, 21, 36, 53, 65, 70, 65, 53, 36, 21, 10, 4, 1],
+                               {4: 3, 5: 1, 6: 6}), slow=True)
+def _():
+    # the colours and c_3(T_X) generate H^*(X; Q) for complete quadrics in P^4
+    from fractions import Fraction
+    X = spherical.complete_quadrics(5)
+    classes = colours(X, "A4")
+    lam = tuple(7 ** k + 3 * k for k in range(4))
+    pair = lambda w: sum(Fraction(a) * b for a, b in zip(w, lam))
+
+    def e3(xs):
+        e = [Fraction(1), Fraction(0), Fraction(0), Fraction(0)]
+        for x in xs:
+            for j in (3, 2, 1):
+                e[j] += e[j - 1] * x
+        return e[3]
+    values = {p: [pair(c[p]) for c in classes] + [e3([pair(w) for w in ws])]
+              for p, ws in zip(X.points, X.weights)}
+    ring = brion.subalgebra(X, values, [1, 1, 1, 1, 3], lam)
+    return (ring["hilbert"], ring["generators"])
+
+
 # -- Section 7: real points ---------------------------------------------------------
 
 def random_fan(rng, dim, steps):

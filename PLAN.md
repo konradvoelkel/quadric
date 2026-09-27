@@ -228,10 +228,11 @@ release goes out together with the paper.
   (Wasserman's list): satellites by parabolic induction from the rank-one
   data, normal weights by the certificates, Brion–Peyre orbit counts as the
   oracle. Then primitive spherical systems (Bravi–Pezzini).
-- [ ] **R3 The ring of complete quadrics** (S7.3c, `cohomology.md` §6).
-  Compare the divisor subalgebra with De Concini–Goresky–MacPherson–Procesi,
-  find the extra generator in degree 3 for $\mathbb P^4$, and an integral basis
-  when cell closures are not unions of cells.
+- [ ] **R3 The ring of complete quadrics** (S7.3c, `cohomology.md` §§5–6).
+  Done: for $\mathbb P^4$ the colours and $c_3(T_X)$ generate $H^*(X;\mathbb Q)$
+  (`brion.subalgebra`). Open: $\mathbb P^5$ and beyond, the comparison with
+  De Concini–Goresky–MacPherson–Procesi, and an integral basis when cell
+  closures are not unions of cells.
 - [ ] **R4 Toroidal varieties with $\Lambda\supsetneq\mathbb Z\Sigma$** (S7.4),
   e.g. $SL_n/SO_n$: fixed points over the wonderful model with the
   multiplicities of the finite covers. Oracle: point counts of the
