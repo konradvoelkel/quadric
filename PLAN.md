@@ -220,12 +220,13 @@ release goes out together with the paper.
 ### 4.2 Track R — research, in order of expected payoff
 
 - [ ] **R1 Non-graded real incidences** (S7.5, `real.md` §5).
-  - First a second non-graded oracle: $H^*(X(\mathbb R);\mathbb Q)$ for real
-    complete quadric surfaces, from the two real blow-ups (the Veronese
-    $\mathbb{RP}^3$, then the strict transform of the rank-$\le2$ locus),
-    with the orientation local systems of the exceptional divisors.
-  - Then a local model for the $\mathbb P(\mathfrak{sl}_2)$ planes that
-    explains the one-term correction for complete conics, tested on both.
+  - Done: the second non-graded oracle, $H_*(X(\mathbb R);\mathbb Q)=\mathbb Q_0\oplus\mathbb Q_5$
+    for real complete quadric surfaces (`real.md` §5.4, paper Prop.
+    realsurfaces). The literal generalization of the conic correction fails
+    there (no sign completion in 10 of 10 chambers, `real.md` §5.4).
+  - Next: a local model for the $\mathbb P(\mathfrak{sl}_2)$ planes that
+    explains the one-term correction for complete conics and uses the curves
+    going up and those of undefined parity, tested on both.
   - Dimension 3 toric: compare rules with the exact Morse complexes up to
     filtered change of basis, not entrywise.
 - [ ] **R2 General Luna data** (S7.1, `spherical.md` §11). Rank two first

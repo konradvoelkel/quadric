@@ -287,8 +287,18 @@ the direct rule of §2 on the Brion curves admits no sign completion, as for
 conics. But the data are much richer: 66 cells, 24 to 26 curves between cells
 of equal dimension, a few curves between adjacent dimensions whose parity is
 undefined (normal weights that do not pair), and curves that go up in
-dimension. A correction rule would have to be found on this example; it
-is not attempted yet.
+dimension. A correction rule would have to be found on this example.
+
+First attempt (negative): for complete conics the removed term joins the
+top of the even equal-dimension curve to the bottom of the odd one; the two
+curves lie in different $\mathbb P(\mathfrak{sl}_2)$ planes, and the removed
+term runs along a curve of the closed orbit between them. The literal
+generalization, removing every direct term from the top of an even
+equal-dimension curve to the bottom of an odd one, reproduces the conics in
+11 of 11 chambers, but for the surfaces (2 to 4 such terms) it admits no
+sign completion in any of 10 chambers. The curves that go up in dimension
+and the adjacent curves of undefined parity are not used by it, so a rule
+will have to account for them.
 
 ## 6. Conjecture H1′ and open points
 
