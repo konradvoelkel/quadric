@@ -367,33 +367,58 @@ class OrbitDatum(object):
     roots: tuple = ()               # wonderful case: the spherical roots I of O_I
     normal_roots: tuple = ()        # the spherical roots of the normal weights, in order
     levi: tuple = ()                # wonderful case: S^p + supp(I)
+    multiplicity: int = 1           # fixed points over each point of W/W_H (finite covers)
 
 
-def assemble(cartan_type, orbits, name=""):
+def assemble(cartan_type, orbits, name="", coordinates="roots"):
     """FixedPointData of the union of the given orbits (all orbits of X that
-    contain T-fixed points), in simple-root coordinates
+    contain T-fixed points), in simple-root coordinates, or with
+    coordinates="weights" in fundamental-weight coordinates (needed when
+    normal weights leave the root lattice). An orbit with multiplicity d has
+    d fixed points over each point of W/W_H, labelled #1, ..., #d
     >>> X = assemble("A1", [OrbitDatum("open"),
     ...                     OrbitDatum("closed", unipotent_roots=[(1,)], normal=[(-1,)])])
     >>> X.points, X.weights_of("closed:e")                  # P^1 x P^1 > SL_2/T
     (('open:e', 'open:s1', 'closed:e', 'closed:s1'), ((-1,), (-1,)))
+    >>> X = assemble("A1", [OrbitDatum("open", component_reflections=[(1,)], multiplicity=2),
+    ...                     OrbitDatum("closed", unipotent_roots=[(1,)], normal=[(-1,)])],
+    ...              coordinates="weights")                 # the same, over P^2 > SL_2/N(T)
+    >>> X.points, X.weights_of("open:e#2")
+    (('open:e#1', 'open:e#2', 'closed:e', 'closed:s1'), ((-2,), (2,)))
     """
-    rank = RootSystem(cartan_type).rank
+    R = RootSystem(cartan_type)
+    rank = R.rank
+    if coordinates not in ("roots", "weights"):
+        raise ValueError("coordinates must be 'roots' or 'weights'")
+
+    def convert(w):
+        if coordinates == "weights":
+            w = R.root_to_weight(w)
+        if any(Fraction(c).denominator != 1 for c in w):
+            raise ValueError("the weight %r is not integral in %s coordinates" % (w, coordinates))
+        return tuple(int(c) for c in w)
+
     labels, weights, annotations, dims = [], [], [], set()
     for orbit in orbits:
         points = homogeneous_fixed_points(cartan_type, orbit.generators,
                                           orbit.component_reflections,
                                           orbit.unipotent_roots, orbit.normal,
                                           orbit.component_elements)
+        d = orbit.multiplicity
         for word, wts in points.items():
-            labels.append("%s:%s" % (orbit.name, word))
-            weights.append(wts)
-            annotation = {"orbit": orbit.name, "word": word}
-            if orbit.note:
-                annotation["note"] = orbit.note
-            if orbit.roots or orbit.normal_roots:
-                annotation["roots"] = orbit.roots
-                annotation["normal_roots"] = orbit.normal_roots
-            annotations.append(annotation)
+            wts = tuple(convert(w) for w in wts)
+            for sheet in range(1, d + 1):
+                labels.append("%s:%s" % (orbit.name, word) + ("#%d" % sheet if d > 1 else ""))
+                weights.append(wts)
+                annotation = {"orbit": orbit.name, "word": word, "normal": len(orbit.normal)}
+                if d > 1:
+                    annotation["sheet"] = sheet
+                if orbit.note:
+                    annotation["note"] = orbit.note
+                if orbit.roots or orbit.normal_roots:
+                    annotation["roots"] = orbit.roots
+                    annotation["normal_roots"] = orbit.normal_roots
+                annotations.append(annotation)
             dims.add(len(wts))
     if len(dims) != 1:
         raise ValueError("the orbits give tangent spaces of dimensions %s" % sorted(dims))
@@ -567,7 +592,8 @@ def orbit_closure(X, roots):
                 if j in roots]
         points.append(label)
         weights.append(tuple(tangent) + tuple(kept))
-        annotations.append(dict(a, normal_roots=tuple(j for j in normal_roots if j in roots)))
+        annotations.append(dict(a, normal_roots=tuple(j for j in normal_roots if j in roots),
+                                normal=len(kept)))
     dims = {len(w) for w in weights}
     (dim,) = dims
     return FixedPointData(dim, X.rank, tuple(points), tuple(weights),
@@ -869,7 +895,8 @@ def open_orbit_count(X, cocharacter):
         values = [sum(a * b for a, b in zip(w, cocharacter)) for w in weights]
         if 0 in values:
             raise ValueError("the cocharacter is not generic at %s" % label)
-        m = len(X.annotation(label)["normal_roots"])
+        a = X.annotation(label)
+        m = a["normal"] if "normal" in a else len(a["normal_roots"])
         tangent, normal = values[:len(values) - m], values[len(values) - m:]
         if all(v > 0 for v in normal):
             term = _open_term(sum(v > 0 for v in tangent), m)
@@ -1631,7 +1658,9 @@ def _stream_orbit(cartan_type, orbit, lam):
     for d, k in orbit_counts.items():
         if k % multiplicity:
             raise AssertionError("coset counts not divisible by |W_H : W_refl|")
-    return {d: k // multiplicity for d, k in orbit_counts.items()}, total // multiplicity
+    sheets = orbit.multiplicity
+    return ({d: k // multiplicity * sheets for d, k in orbit_counts.items()},
+            total // multiplicity * sheets)
 
 
 def _component_group_order(R, reflections, words):

@@ -157,16 +157,16 @@ tools/fetch_arxiv.py            literature download
 | toric, flag, quadrics, group compactifications | `frontends/*` | all smooth complete fans, $G/P$ of all types, $Q_n$, wonderful $\overline{G_{\mathrm{ad}}}$ | `history.md` M1–M4 |
 | horospherical, rank one | `horospherical`, `two_orbit` | toroidal horospherical (Batyrev–Moreau oracle), Knop's rank-one table | `history.md` S6a, S6b |
 | wonderful and symmetric | `spherical`, `symmetric` | orbit-by-orbit assembly; all Satake diagrams; normal weights beyond (R) proved by the opposition symmetry (inner Hermitian cases) and certified by point counts of open orbits | `spherical.md` §§3, 6, 7 |
-| toroidal | `toroidal` | smooth fans in the valuation cone, $\Lambda = \mathbb Z\Sigma$ | `spherical.md` §8 |
+| toroidal | `toroidal` | smooth fans in the valuation cone, $\Lambda = \mathbb Z\Sigma$, and the finite covers $G/G^\theta$ with Helgason's lattice (fans resolved automatically) | `spherical.md` §8 |
 | large cases | `spherical.stream_cell_counts`, `symmetric.split_cell_counts` | all of $E_7$ and EIX by streaming (in parallel); split forms from the orbit decomposition, EVIII with 9297296775 cells | `spherical.md` §10 |
 | equivariant cohomology | `equivariant`, `brion`, `oracles` | GKM rings; Brion's description beyond GKM; characteristic numbers by localization and from the Hilbert function; canonical classes; subalgebras generated in any degree | `cohomology.md` |
 | real points | `realcells`, `realtoric`, `h1`, `chowwitt` | real flag varieties over $\mathbb Z$; exact toric incidences; the H1 rule for graded decompositions, GKM or not; Chow–Witt groups without twist | `real.md` |
 
 Open research items (details in the notes): general Luna data; certificates
 for two unknowns on one orbit; a canonical integral basis beyond GKM;
-generators for complete quadrics beyond $\mathbb P^4$; toroidal varieties with
-$\Lambda\supsetneq\mathbb Z\Sigma$; real incidences of non-graded decompositions
-in dimension $\ge3$; twisted Chow–Witt groups.
+generators for complete quadrics beyond $\mathbb P^4$; finite covers of
+wonderful varieties that are not symmetric; real incidences of non-graded
+decompositions in dimension $\ge3$; twisted Chow–Witt groups.
 
 ---
 
@@ -237,10 +237,16 @@ release goes out together with the paper.
   (`brion.subalgebra`). Open: $\mathbb P^5$ and beyond, the comparison with
   De Concini–Goresky–MacPherson–Procesi, and an integral basis when cell
   closures are not unions of cells.
-- [ ] **R4 Toroidal varieties with $\Lambda\supsetneq\mathbb Z\Sigma$** (S7.4),
-  e.g. $SL_n/SO_n$: fixed points over the wonderful model with the
-  multiplicities of the finite covers. Oracle: point counts of the
-  homogeneous spaces and branched-cover Euler characteristics.
+- [x] **R4 Toroidal varieties with $\Lambda\supsetneq\mathbb Z\Sigma$** (S7.4).
+  Done for $G/G^\theta$, $G$ simply connected (`spherical.md` §8, paper
+  Prop. covers): $\Lambda$ by Helgason's theorem (`SatakeDiagram.lattice`),
+  $d_J=[\Lambda\cap\mathbb QJ:\mathbb ZJ]$ fixed points over each fixed point of the
+  wonderful model, normal weights $\varphi_J$ of the dual basis in $\Lambda$,
+  fans resolved in $\operatorname{Hom}(\Lambda,\mathbb Z)$ (`toroidal.resolve`),
+  `--cover` on the command line. Oracles: $|G(\mathbb F_q)|/|K(\mathbb F_q)|$
+  against the open-orbit lemma for thirteen covers up to EVII, the quadrics
+  $Q^n$ ($c_1^n = 2n^n$), and Riemann–Hurwitz for a triple cover of blown-up
+  complete conics. Open: non-symmetric wonderful varieties (with R2).
 - [x] **R5 EVIII.** The cell counts from the orbit decomposition
   (`symmetric.split_cell_counts`, `spherical.md` §10): 9297296775 cells in
   dimension 128, palindromic, $\chi$ checked against $\sum|W|/|W_H|$; the
@@ -288,9 +294,9 @@ release goes out together with the paper.
 ### 4.5 Order
 
 ```
-done:   P1, P2, P4; P3 (a-d) written; P5 bibliography; E1-E3; R5; R6 without twist
-next:   R1 (a rule for the planes), R3 beyond P^4, R4, R2
-later:  P5 + E4 (submission and release together); R2, R3 beyond P^4, R4
+done:   P1, P2, P4; P3 (a-d) written; P5 bibliography; E1-E3; R4; R5; R6 without twist
+next:   R3 beyond P^4, R1 (a rule for the planes), R2
+later:  E4 (release); R2 beyond rank two
 ```
 
 ---

@@ -132,16 +132,24 @@ def _run_symmetric_counts(args):
 
 def _data_symmetric(args):
     from bbcells.frontends import symmetric
-    if args.fan is None:
+    if args.fan is None and not args.cover:
         return symmetric.complete_symmetric_variety(args.kind, *args.parameters)
     import json
     from bbcells.frontends import toroidal
-    with open(args.fan) as handle:
-        cones = json.load(handle)["cones"]
     D = symmetric.diagram(args.kind, *args.parameters)
+    lattice = D.lattice() if args.cover else None
+    if args.fan is not None:
+        with open(args.fan) as handle:
+            cones = json.load(handle)["cones"]
+    else:
+        rows = toroidal.lattice_in_sigma(D.R.name, D.spherical_roots, lattice)
+        cones = toroidal.resolve(toroidal.orthant(len(D.spherical_roots), rows), rows)
+    name = "toroidal %s%s" % ("G/G^theta, " if args.cover else "", D.name)
+    if args.cover:
+        name += " (fan %s)" % json.dumps([[list(v) for v in cone] for cone in cones])
     return toroidal.toroidal_variety(D.R.name, D.spherical_roots, D.satellite, cones,
                                      parabolic=tuple(sorted(D.black)), strict=False,
-                                     name="toroidal %s" % D.name)
+                                     name=name, lattice=lattice)
 
 
 def _two_orbit_case(args):
@@ -398,6 +406,11 @@ def build_parser():
     p.add_argument("--fan", help="JSON {\"cones\": [...]}: a smooth fan subdividing the valuation "
                    "cone, rays in the coordinates <gamma_i, n> (all <= 0); gives the toroidal "
                    "variety over the complete symmetric variety")
+    p.add_argument("--cover", action="store_true",
+                   help="G/G^theta with G simply connected instead of G/N(G^theta): its "
+                   "weight lattice (Helgason) is finer than Z Sigma; the fan (rays in "
+                   "Hom(Lambda, Z)) defaults to the orthant, resolved; weights in "
+                   "fundamental-weight coordinates")
     p.add_argument("--certify", choices=("symmetry", "points"), default=None,
                    help="show how the normal weights beyond condition (R) are decided: by the "
                         "opposition symmetry, or by point counts of orbit closures")

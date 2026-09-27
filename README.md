@@ -34,6 +34,7 @@ the real cell complexes of X(R).
     python3 -m bbcells spherical complete-quadrics 5   # assembled orbit by orbit, 450 cells
     python3 -m bbcells symmetric AIII 2 3           # complete symmetric varieties from Satake diagrams
     python3 -m bbcells symmetric CI 2 --fan fan.json   # toroidal variety over it (blow-ups etc.)
+    python3 -m bbcells symmetric AI 3 --cover       # SL_3/SO_3 itself: a finer lattice, 3:1 over it
     python3 -m bbcells symmetric EVI --counts-only  # cell counts without listing 758079 fixed points
     python3 -m bbcells symmetric EVIII --counts-only --method orbits   # 9297296775 cells, from the orbits
     python3 -m bbcells symmetric AIII 2 5 --certify symmetry   # how normal weights beyond (R) are proved

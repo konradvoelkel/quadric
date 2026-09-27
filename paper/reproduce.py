@@ -207,6 +207,59 @@ def _():
     return list(cell_counts("EVII")[:28])
 
 
+# -- Section 5: finite covers G/G^theta ----------------------------------------------
+
+def split_order(N, degrees):
+    """|G(F_q)| = q^N prod (q^d - 1) of a split connected reductive group"""
+    from bbcells.algebra import IntPoly
+    result = IntPoly((0, 1)) ** N
+    for d in degrees:
+        result = result * (IntPoly((0, 1)) ** d - IntPoly((1,)))
+    return result
+
+
+def cover(kind, *parameters):
+    """(index, maximal cones, chi, open orbit count) of the toroidal G/G^theta-embedding
+    with the refined orthant"""
+    from bbcells.frontends import toroidal
+    D = symmetric.diagram(kind, *parameters)
+    L = D.lattice()
+    rows = toroidal.lattice_in_sigma(D.R.name, D.spherical_roots, L)
+    r = len(D.spherical_roots)
+    fan = toroidal.resolve(toroidal.orthant(r, rows), rows)
+    X = toroidal.toroidal_variety(D.R.name, D.spherical_roots, D.satellite, fan,
+                                  parabolic=tuple(sorted(D.black)), lattice=L)
+    cells = bb_cells(X)
+    if not cells.check().ok:
+        raise AssertionError("the checks fail")
+    return (toroidal.lattice_index(rows, range(r)), len(fan), len(X),
+            spherical.open_orbit_count(X, cells.cocharacter))
+
+
+_SL = lambda n: split_order(n * (n - 1) // 2, range(2, n + 1))
+_GL = lambda n: split_order(n * (n - 1) // 2, range(1, n + 1))
+_SP = lambda n: split_order(n * n, range(2, 2 * n + 1, 2))
+_E6 = split_order(36, [2, 5, 6, 8, 9, 12])
+for _case, _G, _K, _index, _cones, _chi, _slow in [
+        (("AI", 3), _SL(3), _SP(1), 3, 2, 18, False),
+        (("AI", 4), _SL(4), split_order(2, [2, 2]), 4, 4, 180, False),
+        (("AI", 5), _SL(5), _SP(2), 5, 12, 3120, False),
+        (("AII", 2), _SL(4), _SP(2), 2, 1, 6, False),
+        (("AIII", 2, 2), _SL(4), split_order(2, [1, 2, 2]), 2, 1, 54, False),
+        (("CI", 2), _SP(2), _GL(2), 2, 1, 24, False),
+        (("CI", 3), _SP(3), _GL(3), 2, 1, 200, False),
+        (("CII", 2, 2), _SP(4), _SP(2) * _SP(2), 2, 1, 150, False),
+        (("DIII", 4), split_order(12, [2, 4, 4, 6]), _GL(4), 2, 1, 104, False),
+        (("EIV",), _E6, split_order(24, [2, 6, 8, 12]), 3, 2, 540, False),
+        (("EVII",), split_order(63, [2, 6, 8, 10, 12, 14, 18]), _E6 * _GL(1), 2, 1, 31808,
+         True)]:
+    def _check(case=_case, G=_G, K=_K):
+        index, cones, chi, count = cover(*case)
+        return index, cones, chi, count * K == G
+    claim("comp:covers/" + "".join(map(str, _case)), (_index, _cones, _chi, True),
+          slow=_slow)(_check)
+
+
 # -- Section 6: equivariant cohomology beyond GKM ------------------------------------
 
 @claim("lem:components/conics", (12, 6))

@@ -229,6 +229,7 @@ toroidal horospherical varieties & Batyrev--Moreau \cite{BatyrevMoreau} \\
 rank-one two-orbit completions (Knop's table) & $[X]=[\overline X]-[D]$, e.g.\ $[\mathbb{OP}^2]=\LL^8+\LL^{12}+\LL^{16}$ \\
 blow-ups along $T$-stable centres & blow-up formula; complete conics $=\Bl_{v_2(\PP^2)}\PP^5$ \\
 wonderful and symmetric varieties & Brion--Peyre orbit counts (Section~\ref{subsec:orbitcounts}) \\
+toroidal embeddings of $G/G^\theta$ & $|G(\mathbb F_q)|/|G^\theta(\mathbb F_q)|$; quadrics; Riemann--Hurwitz (Section~\ref{subsec:covers}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -450,6 +451,90 @@ of the normal slice, on which $T$ acts through $-\gamma\mapsto\chi_\gamma$.
 So the tangent weights at $(w x_J,\tau)$ are $w(\Phi\smallsetminus\Phi_H)$ and
 $w(\pr_J(\tau^\vee))$, with $\tau^\vee$ the dual basis. Star subdivisions agree
 exactly with the blow-up front end.
+
+\subsection{Finite covers}\label{subsec:covers}
+Let $G$ be simply connected and $K=G^\theta$, which is connected
+\cite[Thm.~8.1]{Steinberg68}, and let $H=N_G(K)$, so that $G/H$ has the
+wonderful compactification with lattice $\ZZ\Sigma$ \cite{DCP83}. By
+Helgason's theorem \cite[Ch.~V, Thm.~4.1]{Helgason} the weight lattice of
+$G/K$ is
+\[
+\Lambda=\{\lambda\in\QQ\Sigma : \langle\lambda,\beta^\vee\rangle\in2\ZZ
+\text{ for every restricted root }\beta\}.
+\]
+Its index over $\ZZ\Sigma$ is $n$ for AI$(n)$, where $\Lambda=2P$, and for
+AII$(n)$; $3$ for EI and EIV; $2$ for AIII$(p,p)$, CI, CII$(p,p)$, DIII$(2k)$,
+EV and EVII; and $1$ for the non-tube Hermitian forms, EVIII, EIX, FI, FII
+and G. Isomorphic pairs such as AI$(4)$ and DI$(3,3)$ give the same cells. A
+smooth complete toroidal $G/K$-embedding $X'$ is given by a fan with support
+the orthant that is smooth for $N'=\operatorname{Hom}(\Lambda,\ZZ)\subseteq N$. The
+orthant itself is in general not: for $SL_3/SO_3$ its multiplicity is $3$. The
+package refines it by star subdivisions at lattice points of fundamental
+parallelepipeds, as in the toric resolution of singularities.
+
+\begin{proposition}\label{prop:covers}
+Let $X$ be the toroidal $G/H$-embedding with the same fan and $(x,\tau)$ a
+fixed point of $X$, $x\in O_J^T$. Exactly $d_J=[\Lambda\cap\QQ J:\ZZ J]$
+fixed points of $X'$ lie over it. Their tangent weights are those of $O_J$ at
+$x$ together with $\varphi_J(m)$ for the dual basis $m$ of $\tau$ in $\Lambda$.
+\end{proposition}
+
+\begin{proof}
+The morphism $G/K\to G/H$ extends to a toroidal morphism $\pi\colon X'\to X$
+\cite{Knop91}, which maps $O'_\tau$ onto $O_\tau$. The two orbits have the
+same dimension, so $O'_\tau\to O_\tau$ is finite \'etale, and a finite
+$T$-stable fibre over a fixed point consists of fixed points. Over the
+complement of the colours, the local structure theorem writes $\pi$ as the
+identity of $P_u$ times the toric morphism $Z'\to Z$ given by
+$N'\subseteq N$. So the degree is that of the map of torus orbits
+$T_{N'/N'_\tau}\to T_{N/N_\tau}$ ($N_\tau=N\cap\QQ\tau$), which is
+\[
+[N:N']/[N_\tau:N'_\tau]
+=[\Lambda:\ZZ\Sigma]/[\pr_{\Sigma\smallsetminus J}\Lambda:\ZZ(\Sigma\smallsetminus J)]
+=d_J .
+\]
+The weights along the orbit are those of $O_\tau=O_J$ at $x$. The normal slice
+of $O'_\tau$ is the affine toric variety of $\tau$ in $N'$. $T$ acts on it
+through a homomorphism $\Lambda/(\Lambda\cap\QQ J)\to X(T)$ which restricts
+to $\varphi_J$ on the subgroup $\ZZ\Sigma/\ZZ J$ of finite index. As $X(T)$ is
+torsion-free, the homomorphism is $\varphi_J\otimes\QQ$.
+\end{proof}
+
+The normal weights leave the root lattice (for $SL_3/SO_3$ the normal weight
+of $D_{\gamma_2}$ at $x_{\{1\}}$ is $-\omega_2$ instead of $-3\omega_2$), so
+these fixed-point data are written in fundamental-weight coordinates.
+
+\begin{computation}\label{comp:covers}
+For the covers of Table~\ref{tab:covers}, with the orthant refined as above,
+the open-orbit lemma applied to the fixed points gives
+$|G/K|(q)=|G(\mathbb F_q)|/|K(\mathbb F_q)|$ (Lang's theorem \cite{Lang},
+$K$ connected and split), and the $\chi_y$ check passes. In rank one,
+$Spin_{n+1}/Spin_n$ gives the quadric $Q^n$, the double cover of $\PP^n$
+branched along the closed orbit, with the Betti numbers of $Q^n$ and
+$c_1^n=2n^n$ for $n=4,\dots,7$. The embedding of $SL_3/SO_3$ with rays
+$(-3,0),(-1,-1),(0,-3)$ is a triple cover of complete conics blown up along
+$G/B$, branched along the boundary divisors $D$ of the rays $(-1,0),(0,-1)$;
+it satisfies $c_1^5=3\,(c_1-\tfrac23 D)^5$, as the Riemann--Hurwitz
+formula $K_{X'}=\pi^*(K_X+\tfrac23 D)$ requires.
+\end{computation}
+
+\begin{table}[ht]
+\caption{Toroidal embeddings of $G/G^\theta$: the index of $\ZZ\Sigma$ in
+$\Lambda$, the maximal cones of the refined orthant and the Euler
+characteristic.}\label{tab:covers}
+\begin{tabular}{lrrr@{\qquad}lrrr}
+\toprule
+case & index & cones & $\chi$ & case & index & cones & $\chi$ \\
+\midrule
+AI$(3)$ & 3 & 2 & 18 & CI$(2)$ & 2 & 1 & 24 \\
+AI$(4)$ & 4 & 4 & 180 & CI$(3)$ & 2 & 1 & 200 \\
+AI$(5)$ & 5 & 12 & 3120 & CII$(2,2)$ & 2 & 1 & 150 \\
+AII$(2)$ & 2 & 1 & 6 & DIII$(4)$ & 2 & 1 & 104 \\
+AIII$(2,2)$ & 2 & 1 & 54 & EIV & 3 & 2 & 540 \\
+ & & & & EVII & 2 & 1 & 31\,808 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Orbit counts}\label{subsec:orbitcounts}
 Brion and Peyre \cite{BrionPeyre} express the virtual Poincar\'e polynomial
@@ -1264,13 +1349,15 @@ Computation~\ref{comp:opposition}.
 \item \emph{An integral basis} of $H^*(X;\ZZ)$ adapted to the cells when
 canonical classes do not exist, as for complete conics; and the generators
 beyond the divisors for complete quadrics in $\PP^4$.
-\item \emph{Toroidal varieties with $\Lambda\supsetneq\ZZ\Sigma$}, which are
-finite covers of toroidal varieties over wonderful models.
+\item \emph{Finite covers beyond the symmetric case}: toroidal varieties with
+$\Lambda\supsetneq\ZZ\Sigma$ over wonderful varieties that are not symmetric
+(Section~\ref{subsec:covers} treats $G/G^\theta$).
 \item \emph{Non-graded real incidences} in dimension $\ge3$
 (Observations~\ref{obs:deflection} and~\ref{obs:conics}), and a proof of
 Conjecture~\ref{conj:h1} in $SH(\ZZ)$, for instance through the Thom-space cell
 structures of \cite{VoelkelSpherical} restricted to invariant curves.
-\item \emph{EVIII}, via the orbit decomposition rather than the fixed points.
+\item \emph{Non-split forms by orbit decomposition}: the cell counts of
+Computation~\ref{comp:eviii} for Satake diagrams with black nodes or arrows.
 \end{enumerate}
 
 \subsection*{Authorship and acknowledgements}

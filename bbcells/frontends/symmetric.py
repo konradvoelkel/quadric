@@ -24,9 +24,11 @@ Every recognition is cross-checked: dim K computed from the Satake diagram
 must equal rank + #{roots fixed by t_j}.
 """
 
+from fractions import Fraction
 from itertools import combinations, permutations
 
 from bbcells.frontends import spherical
+from bbcells.linalg import inverse, lattice_basis
 from bbcells.oracles import _classify_component
 from bbcells.rootsystem import RootSystem
 
@@ -202,6 +204,40 @@ class SatakeDiagram(object):
                                         fixed + component_reflections)
         return {"generators": fixed, "component_reflections": component_reflections,
                 "component_elements": elements}
+
+    def lattice(self):
+        """generators (fundamental-weight coordinates) of the weight lattice
+        of G/G^theta, G simply connected, by Helgason's theorem:
+        lambda in Q Sigma with <lambda, beta^vee> in 2Z for every restricted
+        root beta = (b - theta b)/2. It contains Z Sigma, the lattice of
+        G/N(G^theta), with index |N(G^theta)/G^theta|
+        >>> diagram("AI", 3).lattice()                       # SL_3/SO_3
+        [(2, 0), (0, 2)]
+        >>> diagram("AII", 3).lattice()                      # SL_6/Sp_6
+        [(0, 1, 0, 0, 0), (0, 0, 0, 1, 0)]
+        """
+        R, sigma = self.R, self.spherical_roots
+        r = len(sigma)
+        restricted = set()
+        for b in R.positive_roots:
+            t = self.theta(b)
+            if t != b:
+                restricted.add(tuple(Fraction(x - y, 2) for x, y in zip(b, t)))
+        # rows: the functionals c -> <sum c_j gamma_j, beta^vee> / 2
+        rows = [[Fraction(R.inner(g, beta)) / R.inner(beta, beta) for g in sigma]
+                for beta in sorted(restricted)]
+        basis = lattice_basis(rows)
+        if len(basis) != r:
+            raise AssertionError("the restricted coroots do not span")
+        dual = inverse(basis)                   # columns: a basis of the dual lattice
+        result = []
+        for k in range(r):
+            v = tuple(sum(dual[j][k] * g[i] for j, g in enumerate(sigma)) for i in range(R.rank))
+            w = R.root_to_weight(v)
+            if any(Fraction(x).denominator != 1 for x in w):
+                raise AssertionError("a spherical weight outside the weight lattice")
+            result.append(tuple(int(x) for x in w))
+        return [tuple(int(x) for x in row) for row in lattice_basis(result)]
 
     def orbits(self, strict=False):
         return spherical.wonderful_orbits(self.R.name, self.spherical_roots, self.satellite,

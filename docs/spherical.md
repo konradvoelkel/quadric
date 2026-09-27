@@ -451,6 +451,53 @@ dimension $\dim F_J - \dim\tau$.
     $\sum_\tau |O_{J(\tau)}|\,(q-1)^{\dim F_J - \dim\tau}$;
   - the command line takes a fan: `bbcells symmetric CI 2 --fan fan.json`.
 
+### Finer lattices: $G/G^\theta$ over $G/N(G^\theta)$
+
+Let $G$ be simply connected, $K=G^\theta$ (connected by Steinberg) and
+$H=N_G(K)$. By Helgason's theorem the weight lattice of $G/K$ is
+$$\Lambda=\{\lambda\in\mathbb Q\Sigma : \langle\lambda,\beta^\vee\rangle\in2\mathbb Z\ \text{for every restricted root}\ \beta\},$$
+with $[\Lambda:\mathbb Z\Sigma]=|H/K|$ (`SatakeDiagram.lattice`): $2P$ for AI$(n)$ with index
+$n$, $\langle\omega_2,\omega_4,\dots\rangle$ for AII$(n)$ with index $n$, index 2 for CI, AIII$(p,p)$,
+CII$(p,p)$, DIII$(2k)$, EV and EVII, index 3 for EI and EIV, index 1 for the
+non-tube Hermitian forms, EVIII, EIX, FI, FII and G. Isomorphic pairs agree
+(AI(4) = DI(3,3), CI(2) = BI(2,3), AII(2) = DI(1,5), AIII(2,2) = DI(2,4)).
+
+A toroidal $G/K$-embedding $X'$ is given by a fan in $N'=\operatorname{Hom}(\Lambda,\mathbb Z)\subseteq N$
+with support the orthant, smooth for $N'$; the rays are still written in
+the coordinates $\langle\gamma_i,n\rangle$. The orthant itself is singular in $N'$ in
+general (index 3 for $SL_3/SO_3$); `toroidal.resolve` refines it by star
+subdivisions at lattice points of fundamental parallelepipeds. The group
+$A=H/K$ acts on $X'$, and $X'/A$ is the toroidal $G/H$-embedding $X$ with the
+same rational fan.
+
+- **Fixed points.** Over each fixed point $(x,\tau)$ of $X$ lie
+  $d_J=[\Lambda\cap\mathbb QJ:\mathbb ZJ]$ fixed points of $X'$: $O'_\tau\to O_\tau$ is finite étale of
+  degree $[N:N']/[N_\tau:N'_\tau] = [\Lambda:\mathbb Z\Sigma]/[\mathrm{pr}_{\Sigma-J}\Lambda:\mathbb Z(\Sigma-J)] = d_J$
+  (the kernel of the map of torus orbits), and a finite $T$-stable fibre over
+  a fixed point is fixed pointwise.
+- **Weights.** Along the orbit: those of $O_J$ at $x$ (the cover is étale).
+  Normal: the slice of $X'$ is the affine toric variety of $\tau$ in $N'$,
+  mapping to that of $X$; $T$ acts on it through a map $\Lambda/(\Lambda\cap\mathbb QJ)\to X(T)$
+  that extends $\varphi_J$ on $\mathbb Z\Sigma/\mathbb ZJ$, a subgroup of finite index, and $X(T)$ is
+  torsion-free, so it is $\varphi_J\otimes\mathbb Q$. So the normal weights are $\varphi_J(m)$ for the dual
+  basis $m$ of $\tau$ in $\Lambda$. They leave the root lattice (for $SL_3/SO_3$ the
+  normal weight of $D_{\gamma_2}$ at $x_{\{1\}}$ is $-\omega_2$ instead of $-3\omega_2$), so
+  these data are in fundamental-weight coordinates.
+- **Verification** (`tests/test_toroidal.py`, `TestFinerLattices`):
+  - the open-orbit lemma of §7 applied to the fixed points gives
+    $|G(\mathbb F_q)|/|K(\mathbb F_q)|$ (Lang's theorem, $K$ connected and split) for AI(2)–AI(5),
+    AII(2), AIII(2,2), CI(2), CI(3), DI(3,3), DIII(4), CII(2,2), EIV and EVII
+    (the last with 31 808 fixed points), and the $\chi_y$ check passes;
+  - $Spin_{n+1}/Spin_n$ gives the quadric $Q^n$, the double cover of $\mathbb P^n$
+    branched along $Q^{n-1}$: the Betti numbers of the quadric front end and
+    $c_1^n = 2n^n$ for $n=4,\dots,7$;
+  - $SL_3/SO_3$ with rays $(-3,0),(-1,-1),(0,-3)$ is a triple cover of complete
+    conics blown up along $G/B$, branched along the two boundary divisors of
+    rays $(-1,0),(0,-1)$: $c_1(X')^5 = 3\,(c_1(X)-\tfrac23 D)^5$ (Riemann–Hurwitz);
+  - the isomorphic pairs above give the same cells;
+  - the command line: `bbcells symmetric AI 3 --cover` (orthant resolved, or
+    `--fan` with rays in $N'$).
+
 ## 9. Orbit counts (Brion–Peyre)
 
 Brion–Peyre (Compositio 2002, Thm 1(a); arXiv:math/0102052) give
@@ -560,9 +607,10 @@ $$E(X)=\sum_{I\subseteq S}|G/P_I|(q)\;e(I),\qquad e(I)=\prod_{\text{factors }F\t
      $(c_1,c_2)$-plane), or three unknowns that meet only on one closure;
    - prove that unknowns beyond (R) occur only for AIII$(p,q)$, $p\ne q$,
      DIII$(n)$, $n$ odd, and EIII (checked for all forms up to rank 9).
-3. **Toroidal $X$ over $G/H$ with $\Lambda\supsetneq\mathbb Z\Sigma$.** Then
-   $O_\tau\to O_J$ is a finite cover times a torus. Needs the lattice
-   $\Lambda$ and the component group.
+3. **Toroidal $X$ over $G/H$ with $\Lambda\supsetneq\mathbb Z\Sigma$.** Done for the
+   covers $G/G^\theta\to G/N(G^\theta)$ (§8). Open: finite covers of wonderful
+   varieties that are not symmetric (with R2), and intermediate subgroups
+   $K\subset H'\subset N(K)$, which only need their lattice.
 4. **Large Euler characteristics.** Done for $E_7$ and EIX by streaming, and
    for all split forms, EVIII included, by the orbit decomposition (§10).
    Open: the orbit decomposition for non-split forms (black nodes and

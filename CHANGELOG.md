@@ -24,7 +24,9 @@ First release, to accompany the companion paper (`paper/`).
 - Blow-ups along $T$-stable centres, products, restriction to subtori.
 - Spherical varieties assembled orbit by orbit; complete symmetric varieties
   of every real form from Satake diagrams, including $E_6$–$E_8$; toroidal
-  varieties over a wonderful model.
+  varieties over a wonderful model, and over the finite covers $G/G^\theta$
+  ($G$ simply connected) with the weight lattice from Helgason's theorem and
+  fans resolved automatically (`symmetric ... --cover`).
 - Point-count certificates for normal weights beyond condition (R), with the
   point count of an open orbit read off the fixed points; the opposition
   symmetry, which proves them in the inner Hermitian cases.

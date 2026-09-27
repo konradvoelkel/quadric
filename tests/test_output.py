@@ -112,6 +112,15 @@ class TestGolden(unittest.TestCase):
         self.assertEqual(code, 0, err)
         self.assertEqual(sum(json.loads(out)["counts"]), 18 + 8)
 
+    def test_cli_cover(self):
+        # SL_3/SO_3 (lattice <2 omega_1, 2 omega_2>): the orthant resolved in N'
+        code, out, err = run_cli("symmetric", "AI", "3", "--cover", "--format", "json")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(json.loads(out)["counts"], [1, 3, 5, 5, 3, 1])
+        code, out, err = run_cli("symmetric", "BI", "1", "4", "--cover")   # the quadric Q^4
+        self.assertEqual(code, 0, err)
+        self.assertIn("1 + t^2 + 2t^4 + t^6 + t^8", out.replace("*", ""))
+
     def test_cli_real(self):
         code, out, err = run_cli("real", "A3")
         self.assertEqual(code, 0, err)

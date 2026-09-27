@@ -128,6 +128,39 @@ def gcd_of(vector):
     return g
 
 
+def lattice_basis(rows):
+    """the Hermite normal form basis of the lattice spanned by rational rows:
+    echelon, positive pivots, entries above a pivot reduced modulo it
+    >>> lattice_basis([(2, 0), (-4, 2), (6, 6)])
+    [[Fraction(2, 1), Fraction(0, 1)], [Fraction(0, 1), Fraction(2, 1)]]
+    >>> lattice_basis([(Fraction(1, 2), 1), (1, 0)])
+    [[Fraction(1, 2), Fraction(1, 1)], [Fraction(0, 1), Fraction(2, 1)]]
+    """
+    from math import lcm
+    rows = [[Fraction(x) for x in row] for row in rows]
+    if not rows:
+        return []
+    D = lcm(*(x.denominator for row in rows for x in row))
+    a = [[int(x * D) for x in row] for row in rows]
+    basis = []
+    for col in range(len(a[0])):
+        while True:
+            live = [row for row in a if row[col]]
+            if len(live) <= 1:
+                break
+            pivot = min(live, key=lambda row: abs(row[col]))
+            a = [row if row is pivot or not row[col] else
+                 [x - (row[col] // pivot[col]) * y for x, y in zip(row, pivot)] for row in a]
+        live = [row for row in a if row[col]]
+        if live:
+            pivot = live[0] if live[0][col] > 0 else [-x for x in live[0]]
+            basis = [[x - (row[col] // pivot[col]) * y for x, y in zip(row, pivot)]
+                     for row in basis]
+            basis.append(pivot)
+            a = [row for row in a if row is not live[0]]
+    return [[Fraction(x, D) for x in row] for row in basis]
+
+
 def smith_invariants(matrix):
     """the nonzero invariant factors d_1 | d_2 | ... of an integer matrix
     (Smith normal form diagonal), by row and column operations over Z
