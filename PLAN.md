@@ -243,9 +243,11 @@ release goes out together with the paper.
   Done: for $\mathbb P^4$ the colours and $c_3(T_X)$ generate $H^*(X;\mathbb Q)$
   (`brion.subalgebra`), as do the colours and the boundary class $\beta_3$;
   for $\mathbb P^5$ at least two generators are needed in degree 3, and the
-  colours, $\beta_3$, $\beta_4$ and $c_5(T_X)$ generate
-  (`brion.boundary_class`, `brion.subalgebra_hilbert`, `cohomology.md` §5).
-  Open: whether degree 5 needs a generator, $\mathbb P^6$ and beyond, the
+  colours, $\beta_3$, $\beta_4$ and $c_5(T_X)$ (or the boundary class
+  $i_*\pi^*c_4(S)$) generate (`brion.boundary_class`,
+  `brion.subalgebra_hilbert`, `cohomology.md` §5); a generator of degree 5
+  is needed by the modular ranks at two primes.
+  Open: a proof of the latter (exact rank), $\mathbb P^6$ and beyond, the
   comparison with De Concini–Goresky–MacPherson–Procesi, and an integral
   basis when cell closures are not unions of cells.
 - [x] **R4 Toroidal varieties with $\Lambda\supsetneq\mathbb Z\Sigma$** (S7.4).

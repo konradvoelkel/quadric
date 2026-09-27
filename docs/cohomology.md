@@ -181,12 +181,19 @@ Reproduced (`tests/test_brion.py`):
     decomposables in degree 3 are the 35 colour monomials, while $b_6=37$:
     **at least two generators are needed in degree 3** (proved).
   - The colours with $c_3(T_X)$ reach 36 in degree 3; with $\beta_3$, $\beta_4$
-    (or $\beta_2,\beta_3$) they reach every Betti number except
-    $b_{10}=137$, where the Hilbert function is 136.
-  - **The colours, $\beta_3$, $\beta_4$ and $c_5(T_X)$ generate** $H^*(X;\mathbb Q)$: the
-    Hilbert function equals the Betti numbers
-    $1,5,15,37,76,137,216,303,383,441,462,\dots$ Whether a generator in degree
-    5 is necessary is open: the deficit of 1 is a modular lower bound.
+    they reach every Betti number except $b_{10}=137$, where the Hilbert
+    function is 136.
+  - Since then $H^{\le8}$ lies in the subalgebra, its degree-5 part is exactly
+    the space $D_5$ of decomposable classes, whatever the degree-3 classes.
+    Indeed $c_3+\beta_3$, $\beta_2+\beta_3$, $\beta_3+\beta_4$ and $\beta_2+\beta_3+\beta_4$ all give
+    136, and so does a second prime ($2^{31}-1$). So $\dim D_5\in\{136,137\}$,
+    and 136 at two primes: **one generator of degree 5 is necessary**
+    (observed; a proof needs the exact rank).
+  - **The colours, $\beta_3$, $\beta_4$ and one class of degree 5 generate**
+    $H^*(X;\mathbb Q)$: the Hilbert function equals the Betti numbers
+    $1,5,15,37,76,137,216,303,383,441,462,\dots$, both with $c_5(T_X)$ and with
+    the boundary class $i_*\pi^*c_4(S)$ along $D_4\to Gr(4,6)$. So colours and
+    boundary classes suffice.
 
 ## 6. Open problems
 
@@ -197,9 +204,9 @@ Reproduced (`tests/test_brion.py`):
      cells, as for complete quadrics;
    - generators for complete quadrics in $\mathbb P^{n-1}$, $n\ge7$ (for
      $\mathbb P^4$: the colours and $c_3(T_X)$ or $\beta_3$; for $\mathbb P^5$: the
-     colours, $\beta_3$, $\beta_4$ and $c_5(T_X)$, §5), the minimal number of
-     generators in degree 5 for $\mathbb P^5$, and a comparison with DGMP's
-     description.
+     colours, $\beta_3$, $\beta_4$ and $c_5(T_X)$ or $i_*\pi^*c_4(S)$, §5), a proof
+     that $\mathbb P^5$ needs a generator of degree 5, and a comparison with
+     DGMP's description.
 
    Oracle: De Concini–Goresky–MacPherson–Procesi 1988.
 2. **Real points.** The invariant curves of the Brion components
