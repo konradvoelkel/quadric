@@ -157,7 +157,7 @@ _COUNTS = {}
 
 def cell_counts(kind):
     if kind not in _COUNTS:
-        _COUNTS[kind] = symmetric.cell_counts(kind)
+        _COUNTS[kind] = symmetric.cell_counts(kind, processes=os.cpu_count() or 1)
     return _COUNTS[kind]
 
 
@@ -263,7 +263,7 @@ def _():
 
 @claim("comp:characteristic/P5-sections", 1810718299257984458113941504, slow=True)
 def _():
-    return oracles.complete_quadrics_degree(6, (2,) * 5)
+    return oracles.complete_quadrics_degree(6, (2,) * 5, processes=os.cpu_count() or 1)
 
 
 @claim("comp:nocanonical/conics", (12, {2}))

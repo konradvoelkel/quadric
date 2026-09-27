@@ -596,20 +596,28 @@ def complete_quadrics_sections(n, coefficients, m):
     return total
 
 
-def complete_quadrics_degree(n, coefficients):
+def complete_quadrics_degree(n, coefficients, processes=1):
     """int_X L^N for complete quadrics X in P^{n-1} (N = dim X) and L = sum_k
     a_k mu_k, with the a_k >= 0: the N-th finite difference of the Hilbert
     function m -> dim H^0(X, L^m) at m = 0..N (complete_quadrics_sections),
     which is a polynomial of degree at most N in m. Independent of fixed
     points: De Concini-Procesi, Weyl's dimension formula and exact
     interpolation only (a third computation of the P^5 number, PLAN P4).
+    With processes > 1 the values h(m) are computed in parallel.
     >>> complete_quadrics_degree(3, (2, 2))            # Chasles: 3264 conics
     3264
     >>> complete_quadrics_degree(4, (2, 2, 2))         # Schubert: quadric surfaces
     666841088
     """
     N = n * (n + 1) // 2 - 1
-    values = [complete_quadrics_sections(n, coefficients, m) for m in range(N + 1)]
+    jobs = [(n, tuple(coefficients), m) for m in range(N + 1)]
+    if processes > 1:
+        import multiprocessing
+        with multiprocessing.Pool(processes) as pool:
+            # the largest m first, so that the slowest jobs start early
+            values = pool.starmap(complete_quadrics_sections, jobs[::-1], chunksize=1)[::-1]
+    else:
+        values = [complete_quadrics_sections(*job) for job in jobs]
     for _ in range(N):
         values = [y - x for x, y in zip(values, values[1:])]
     return values[0]
