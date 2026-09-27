@@ -3,6 +3,8 @@ message: "If you use this software, please cite it as below."
 title: "bbcells: Białynicki-Birula cell structures, motives and quadratic invariants from combinatorial data"
 type: software
 authors:
+  - name: "Claude Code (Anthropic)"
+contact:
   - family-names: Voelkel
     given-names: Konrad
 version: 0.1.0.dev0

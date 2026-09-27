@@ -194,6 +194,23 @@
     "abstract": "Survey article on the geometry of spherical varieties. Invited survey for Transformation Groups.",
     "metadata_source": "abs-page"
   },
+  "1302.2342": {
+    "id": "1302.2342",
+    "latest_version": "1302.2342v1",
+    "title": "The rational homology of real toric manifolds",
+    "authors": [
+      "Alexander I. Suciu"
+    ],
+    "published": "Sun, 10 Feb 2013",
+    "updated": "Sun, 10 Feb 2013",
+    "journal_ref": "Oberwolfach Reports 9 (2012), no. 4, 2972-2976",
+    "doi": "10.4171/OWR/2012/49",
+    "primary_category": null,
+    "msc_classes": null,
+    "comments": "4 pages, to appear in Oberwolfach Reports",
+    "abstract": "This is an extended abstract for a talk given at the mini-workshop \"Cohomology rings and fundamental groups of hyperplane arrangements, wonderful compactifications, and real toric varieties\", held in Oberwolfach, September 30-October 6, 2012. We describe a formula (obtained in joint work with Alvise Trevisan) for computing the Betti numbers of real toric manifolds, based on a study of cohomology with coefficients in rank one local systems for various polyhedral products. Applying this formula, we recover Henderson's computation of the Betti numbers of real Hessenberg varieties. We conclude with a discussion of the formality question in this context.",
+    "metadata_source": "abs-page"
+  },
   "1303.2466": {
     "id": "1303.2466",
     "latest_version": "1303.2466v3",

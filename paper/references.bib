@@ -8,9 +8,11 @@
 % given agree with those records. Where the two disagree on an issue number,
 % the issue is omitted. Preprints are cited as such only if neither service
 % lists a journal version.
-% A line "% UNVERIFIED: ..." directly above an entry says which data could not
-% be confirmed by Crossref or zbMATH. Fields that could not be confirmed are
-% omitted unless such a line names them.
+% Four entries are in neither service: Chasles (checked against secondary
+% citations), Macaulay's series (checked on the scanned title page), Sturmfels'
+% living document (checked against the document) and the unpublished preprint
+% of Suciu-Trevisan (whose formula is cited through SuciuOWR). A comment above
+% each of them says so.
 % Entries are ordered alphabetically by key (ignoring case).
 
 @article{Akhiezer,
@@ -212,7 +214,10 @@
   note          = {Preprint, arXiv:1309.5520},
 }
 
-% UNVERIFIED: not in Crossref, and zbMATH has no Chasles record before 1869; volume, year and pages from memory
+% Checked against secondary sources (not in Crossref or zbMATH): the references of
+% Wikipedia's "Steiner's conic problem" and the literature citing it give the same
+% journal, volume, year and pages; the volume is on Gallica (ark:/12148/bpt6k3015d),
+% which could not be opened from here.
 @article{Chasles,
   author  = {Chasles, Michel},
   title   = {Construction des coniques qui satisfont \`{a} cinq conditions},
@@ -220,6 +225,7 @@
   volume  = {58},
   year    = {1864},
   pages   = {297--308},
+  url     = {https://gallica.bnf.fr/ark:/12148/bpt6k3015d},
 }
 
 @article{ChoiPark,
@@ -495,7 +501,9 @@
   doi     = {10.1007/BF02564633},
 }
 
-% UNVERIFIED: series and number from memory; zbMATH (JFM 46.0167.01) and Crossref confirm only author, title, publisher and year
+% Series and number checked on the title page of the scan at the Internet Archive
+% (archive.org/details/algebraictheoryo00macauoft); JFM 46.0167.01 and Crossref
+% confirm author, title, publisher and year.
 @book{Macaulay,
   author    = {Macaulay, F. S.},
   title     = {The algebraic theory of modular systems},
@@ -620,12 +628,16 @@
   doi     = {10.1016/0001-8708(86)90102-7},
 }
 
-% UNVERIFIED: not in Crossref or zbMATH; data from LITERATURE.md (web search result)
+% Checked against the document itself (not in Crossref or zbMATH): title, author,
+% and its purpose as a living document for the MPI Leipzig study groups of 2020;
+% Question 5 lists 641211464734373953791690014720 for P^5.
 @misc{Sturmfels3264,
   author       = {Sturmfels, Bernd},
   title        = {3264 questions about symmetric matrices},
-  howpublished = {Notes for the study groups at the Max Planck Institute for Mathematics in the Sciences, Leipzig},
+  howpublished = {Living document for the study groups on linear spaces of symmetric
+                  matrices, Max Planck Institute for Mathematics in the Sciences, Leipzig},
   year         = {2020},
+  url          = {https://orlandomarigliano.com/3264questions.pdf},
 }
 
 @article{SturmfelsUhler,
@@ -641,8 +653,24 @@
   archivePrefix = {arXiv},
 }
 
-% UNVERIFIED: not in Crossref or zbMATH; data from LITERATURE.md (web search result)
-@misc{SuciuTrevisan,
+% The DOI is that of the whole workshop report (pp. 2939-2983, Crossref); the
+% pages of this abstract are from the journal reference of its arXiv record.
+@article{SuciuOWR,
+  author        = {Suciu, Alexander I.},
+  title         = {The rational homology of real toric manifolds},
+  journal       = {Oberwolfach Rep.},
+  volume        = {9},
+  number        = {4},
+  year          = {2012},
+  pages         = {2972--2976},
+  doi           = {10.4171/OWR/2012/49},
+  eprint        = {1302.2342},
+  archivePrefix = {arXiv},
+}
+
+% An unpublished preprint (not in Crossref or zbMATH); its formula is described in
+% SuciuOWR, which is checked (arXiv record, DOI of the report).
+@unpublished{SuciuTrevisan,
   author = {Suciu, Alexander I. and Trevisan, Alvise},
   title  = {Real toric varieties and abelian covers of generalized {D}avis--{J}anuszkiewicz spaces},
   year   = {2012},

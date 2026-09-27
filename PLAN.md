@@ -278,16 +278,19 @@ release goes out together with the paper.
 ### 4.4 Decisions for KV
 
 - **License:** decided, GPL-3.0-only (`LICENSE`, `pyproject.toml`).
+- **Authorship:** decided, the AI (Claude Code) is the author, no human
+  (paper, `CITATION.cff`, `pyproject.toml`); KV is the maintainer.
+- **Venue:** decided, none. The paper stays in the repository; P5 is reduced
+  to the bibliography (done).
 - **Paper scope.** One paper (methods, software and results), or a software
   paper plus a separate research note on the real incidences (Track R1).
-- **Authorship and venue** of the paper (P5).
 - **Repository name** (SPEC D2, still open).
 
 ### 4.5 Order
 
 ```
 done:   P1, P2, P4; P3 (a-d) written; P5 bibliography; E1-E3; R5; R6 without twist
-next:   KV checks the proofs (P3) and decides 4.4; R1 (a rule for the planes)
+next:   R1 (a rule for the planes), R3 beyond P^4, R4, R2; the opposition hypotheses in general
 later:  P5 + E4 (submission and release together); R2, R3 beyond P^4, R4
 ```
 
@@ -370,8 +373,8 @@ $W_H$, for every orbit with $T$-fixed points (`spherical.md` §9).
 | The $\mathbb P^5$ tangency number differs from the published list | Three independent computations agree (localization, Brion's degree formula, the Hilbert function); the paper states the value and the discrepancy. |
 | A rule for non-graded real incidences needs data beyond fixed points and curves | R1 computes a second oracle before any new rule; the notes say what is observation and what is proved. |
 | Pure Python limits (EVIII, $\mathbb P^5$ rings) | E3, and R5 through the orbit decomposition. |
-| Bibliographic data that Crossref and zbMATH do not confirm (Chasles 1864, the series of Macaulay 1916, Sturmfels's *3264 questions*, Suciu–Trevisan) | All other entries were checked against Crossref and zbMATH on 2026-09-27. These four keep their `% UNVERIFIED` marker in `paper/references.bib`; P5 checks them against the original sources. The paper cites MMMSV's Prop. 3.5 explicitly in the numbering of arXiv:2011.08791v2 (checked in the source), since the JEMS numbering could not be checked. |
+| Bibliographic data | Every entry was checked on 2026-09-27: against Crossref and zbMATH, and for the four entries outside them (Chasles 1864, the series of Macaulay 1916, Sturmfels' *3264 questions*, the Suciu–Trevisan preprint) against secondary citations, the scanned title page, the document itself, and Suciu's Oberwolfach report. The paper cites MMMSV's Prop. 3.5 in the numbering of arXiv:2011.08791v2. |
 | H1 fails | Outputs that depend on it are labelled `conditional_on=("H1",)`; real incidences of flag varieties do not depend on it. |
-| Wording in arXiv:1805.04338, Example `hpn` | The boundary of $\mathbb{HP}^n$ in $\mathrm{Gr}(2,2n+2)$ must be the *isotropic* Grassmannian (dimension $4n-1$), while the text says "symplectic planes". `two_orbit.py` uses the isotropic one; KV to confirm the wording. |
+| Errors in arXiv:1805.04338 (an unpublished preprint), e.g. Example `hpn` | Nothing in the package relies on it unchecked. In `hpn` the boundary of $\mathbb{HP}^n$ in $\mathrm{Gr}(2,2n+2)$ is the *isotropic* Grassmannian (dimension $4n-1$), not the "symplectic planes" of the text; `two_orbit.py` uses the isotropic one, and the oracles confirm it. |
 | Gaps in the general Hermitian argument | The certificates are computational proofs case by case; the general statement stays a conjecture until P3(c). |
 

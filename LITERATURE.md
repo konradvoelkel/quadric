@@ -12,8 +12,12 @@ list a publication the data here agree with those records (marker ✓c).
 Other entries without an arXiv ID are checked against web search results
 only.
 
-`paper/references.bib` marks the entries whose data neither Crossref nor
-zbMATH confirms with a comment `% UNVERIFIED` (PLAN P5).
+Four entries of `paper/references.bib` are in neither service; they were
+checked otherwise (a comment above each says how): Chasles 1864 against
+secondary citations, the series of Macaulay 1916 on the scanned title page,
+Sturmfels' *3264 questions* against the document, and the Suciu–Trevisan
+preprint through Suciu's Oberwolfach report (arXiv:1302.2342,
+doi:10.4171/OWR/2012/49).
 
 Markers:
 
@@ -152,7 +156,9 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   only $\mathbb{F}_2$.
 - ✓ A. Suciu, A. Trevisan, *Real toric varieties and abelian covers of
   generalized Davis–Januszkiewicz spaces* (preprint, 2012; not in Crossref or
-  zbMATH). Rational Betti numbers of real toric varieties.
+  zbMATH). Rational Betti numbers of real toric varieties. The formula is
+  described in ✓a A. Suciu, *The rational homology of real toric manifolds*,
+  Oberwolfach Rep. 9 (2012), no. 4, 2972–2976; arXiv:1302.2342.
 - ✓a M. Franz, *The cohomology rings of real toric spaces and smooth real toric
   varieties*, Proc. Roy. Soc. Edinburgh Sect. A 152 (2022), 720–737;
   arXiv:2008.08961.
@@ -302,14 +308,16 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   3-space*, Matematiche 76 (2021), 355–367; arXiv:2010.10879. Schubert's
   triangle of characteristic numbers $\mu^a\nu^b\rho^c$ of complete quadric
   surfaces, e.g. 104 and 128.
-- ✓ B. Sturmfels, *3264 questions about symmetric matrices*, notes for the
-  MPI Leipzig study groups (2020; not in Crossref or zbMATH). Question 5
+- ✓ B. Sturmfels, *3264 questions about symmetric matrices*, living document
+  for the MPI Leipzig study groups (2020; not in Crossref or zbMATH; checked
+  against the PDF at orlandomarigliano.com/3264questions.pdf). Question 5
   lists 3264, 666841088, 48942189946470400,
   641211464734373953791690014720 as the numbers of
   quadrics in $\mathbb P^{n-1}$ tangent to $\binom{n+1}2-1$ general quadrics.
-  Our first three agree. For $n=6$ both our computation and an independent
-  evaluation of Brion's degree formula give 1810718299257984458113941504
-  (`docs/cohomology.md` §3). The discrepancy is unresolved.
+  Our first three agree. For $n=6$ three independent computations
+  (localization, Brion's degree formula, the Hilbert function) give
+  1810718299257984458113941504 (`docs/cohomology.md` §3), so the listed
+  value is very likely wrong.
 
 **General smooth projective spherical varieties**
 

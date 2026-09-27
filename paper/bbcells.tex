@@ -50,9 +50,10 @@
 cells of spherical varieties from combinatorial data:\\ a companion to the
 \bbcells\ package}
 
-% Authorship to be decided (PLAN.md 4.4).
-\author{Konrad Voelkel}
-\date{Draft, \today}
+\author{Claude Code}
+\address{Written by Claude Code, an AI coding agent made by Anthropic, in the
+repository \url{https://github.com/konradvoelkel/quadric}.}
+\date{\today}
 
 \begin{document}
 
@@ -996,7 +997,7 @@ $A_2,A_3,B_2,B_3,C_3,G_2,D_4$. For toric varieties the predicted
 incidences, completed by the unique signs (up to reorientation) with
 $\partial^2=0$, give the rational Betti numbers of $X(\RR)$ computed
 independently by the formula of Choi--Park and Suciu--Trevisan
-\cite{ChoiPark,SuciuTrevisan}. In the complex realization, the parity rule
+\cite{ChoiPark,SuciuTrevisan,SuciuOWR}. In the complex realization, the parity rule
 agrees with $(y^*)^2\bmod2$ computed in the GKM ring for all examples tested.
 
 \subsection{Exact incidences for toric varieties}
@@ -1225,12 +1226,14 @@ structures of \cite{VoelkelSpherical} restricted to invariant curves.
 \item \emph{EVIII}, via the orbit decomposition rather than the fixed points.
 \end{enumerate}
 
-\subsection*{Acknowledgements}
-\emph{[To be written by the author; see the comment in the source.]}
-% To be decided by the author (PLAN.md 4.4): acknowledgement of tool use.
-% Parts of the software and a first draft of this text were written with
-% the help of an AI coding assistant (Claude Code); all statements are to be
-% checked by the author before submission.
+\subsection*{Authorship and acknowledgements}
+The software and this text were written by an AI coding agent, without code
+or text written by hand; no human is an author. Correctness rests on the
+oracle tests and on the reproduction script, and the statements are labelled
+as proved, computed, observed or conjectured accordingly. The project grew
+out of the script \code{quadric.py} (2014) of Konrad Voelkel and the
+preprint \cite{VoelkelSpherical}, and it was directed by him through
+prompts.
 
 \bibliographystyle{amsplain}
 \bibliography{references}

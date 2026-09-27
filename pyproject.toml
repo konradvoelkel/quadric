@@ -10,7 +10,8 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "GPL-3.0-only" }
 dependencies = []
-authors = [{ name = "Konrad Voelkel" }]
+authors = [{ name = "Claude Code (Anthropic)" }]
+maintainers = [{ name = "Konrad Voelkel" }]
 classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3",
