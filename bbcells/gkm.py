@@ -14,7 +14,18 @@ from bbcells.core import pairing
 def check_gkm(data):
     """list of problems (empty if the GKM conditions hold): edges present, the
     tangent weights at each point pairwise linearly independent, and one
-    edge per tangent weight"""
+    edge per tangent weight. P^2 is GKM for its 2-torus, not for a C^*
+    >>> from bbcells.frontends.toric import fixed_point_data, projective_space
+    >>> from bbcells.operations import restrict
+    >>> P2 = fixed_point_data(projective_space(2))
+    >>> check_gkm(P2)
+    []
+    >>> for problem in check_gkm(restrict(P2, [[1, 2]])):
+    ...     print(problem)
+    weights (1,) and (2,) at 's0,1' are proportional
+    weights (-1,) and (-2,) at 's0,2' are proportional
+    weights (1,) and (-1,) at 's1,2' are proportional
+    """
     problems = []
     if data.edges is None:
         return ["no edges"]
@@ -36,7 +47,14 @@ def check_gkm(data):
 
 def cell_relations(cells):
     """pairs (q, p): q lies in the closure of the plus-cell of p, one pair
-    per invariant curve"""
+    per invariant curve
+    >>> from bbcells.core import FixedPointData, bb_cells
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))),
+    ...     edges=(("a", "b", (1, 0)), ("a", "c", (0, 1)), ("b", "c", (-1, 1))))
+    >>> cell_relations(bb_cells(P2, (1, 2)))
+    [('b', 'a'), ('c', 'a'), ('c', 'b')]
+    """
     data = cells.data
     if data.edges is None:
         raise ValueError("the fixed-point data has no GKM edges")
@@ -92,12 +110,28 @@ def bb_order(cells):
 
 def is_graded(cells):
     """whether every invariant curve goes down in cell dimension (a necessary
-    condition for the decomposition to be a stratification)"""
+    condition for the decomposition to be a stratification). On dP_6 with
+    lambda = (1, 3) a curve joins two 1-cells (tests/test_gkm.py)
+    >>> from bbcells.core import bb_cells
+    >>> from bbcells.frontends.toric import del_pezzo_6, fixed_point_data, projective_space
+    >>> is_graded(bb_cells(fixed_point_data(projective_space(2))))
+    True
+    >>> is_graded(bb_cells(fixed_point_data(del_pezzo_6()), (1, 3)))
+    False
+    """
     return all(cells.dim_of(q) < cells.dim_of(p) for q, p in cell_relations(cells))
 
 
 def covering_relations(cells):
-    """the Hasse diagram of the BB order: pairs (q, p) with q < p and nothing between"""
+    """the Hasse diagram of the BB order: pairs (q, p) with q < p and nothing
+    between. For Gr(2, 4) it is the Bruhat order, with one diamond in the
+    middle (cell dimensions shown)
+    >>> from bbcells.core import bb_cells
+    >>> from bbcells.frontends.flag import grassmannian
+    >>> cells = bb_cells(grassmannian(2, 4))
+    >>> [(cells.dim_of(q), cells.dim_of(p)) for q, p in covering_relations(cells)]
+    [(0, 1), (1, 2), (1, 2), (2, 3), (2, 3), (3, 4)]
+    """
     below = bb_order(cells)
     result = []
     for p, lower in below.items():

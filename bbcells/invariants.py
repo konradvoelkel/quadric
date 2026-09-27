@@ -122,12 +122,25 @@ class Invariants(object):
 
 
 def compute(cells):
-    """the Invariants of a CellDecomposition"""
+    """the Invariants of a CellDecomposition
+    >>> from bbcells.core import FixedPointData
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)))
+    >>> inv = compute(bb_cells(P1))
+    >>> inv.counts, inv.point_count(5)                  # |P^1(F_5)| = 6
+    ((1, 1), 6)
+    """
     return Invariants(cells.data.dim, cells.counts)
 
 
 @dataclass(frozen=True)
 class CheckItem(object):
+    """one consistency check: its name, whether it passed, and a detail line
+    >>> from bbcells.core import FixedPointData
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)))
+    >>> item = bb_cells(P1).check().items[-1]
+    >>> item.name, item.passed, item.detail
+    ('connected', True, 'c_0 = 1, c_n = 1 (expected 1 and 1)')
+    """
     name: str
     passed: bool
     detail: str
@@ -135,6 +148,13 @@ class CheckItem(object):
 
 @dataclass(frozen=True)
 class CheckReport(object):
+    """the CheckItems of check(); ok if all of them passed
+    >>> from bbcells.core import FixedPointData
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)))
+    >>> report = bb_cells(P1).check()
+    >>> report.ok, [item.name for item in report.items]
+    (True, ['cocharacter independence', 'holomorphic Lefschetz', 'Poincare duality', 'connected'])
+    """
     items: tuple
 
     @property

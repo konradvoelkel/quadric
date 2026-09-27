@@ -24,29 +24,61 @@ def _unit(n, i, j):
 
 
 def mat_mul(a, b):
+    """the matrix product a b (matrices as lists of rows); e f for sl_2
+    >>> e, f = [[0, 1], [0, 0]], [[0, 0], [1, 0]]
+    >>> mat_mul(e, f)
+    [[1, 0], [0, 0]]
+    """
     n = len(a)
     bt = list(zip(*b))
     return [[sum(x * y for x, y in zip(row, col)) for col in bt] for row in a]
 
 
 def mat_add(a, b, scale=1):
+    """a + scale b
+    >>> e, f = [[0, 1], [0, 0]], [[0, 0], [1, 0]]
+    >>> mat_add(e, f, -1)                           # e - f, a rotation generator
+    [[0, 1], [-1, 0]]
+    """
     return [[x + scale * y for x, y in zip(ra, rb)] for ra, rb in zip(a, b)]
 
 
 def mat_scale(a, c):
+    """the matrix c a
+    >>> mat_scale([[0, 1], [0, 0]], 3)
+    [[0, 3], [0, 0]]
+    """
     return [[c * x for x in row] for row in a]
 
 
 def bracket(a, b):
+    """the commutator [a, b] = a b - b a; for sl_2, [e, f] = h and [h, e] = 2e
+    >>> e, f = [[0, 1], [0, 0]], [[0, 0], [1, 0]]
+    >>> h = bracket(e, f)
+    >>> h, bracket(h, e)
+    ([[1, 0], [0, -1]], [[0, 2], [0, 0]])
+    """
     return mat_add(mat_mul(a, b), mat_mul(b, a), -1)
 
 
 def identity(n):
+    """the n x n identity matrix with Fraction entries
+    >>> identity(2) == [[1, 0], [0, 1]]
+    True
+    """
     return [[Fraction(int(i == j)) for j in range(n)] for i in range(n)]
 
 
 def exp_nilpotent(x):
-    """exp of a nilpotent matrix (finite sum)"""
+    """exp of a nilpotent matrix (finite sum); the Tits lift of the simple
+    reflection of SL_2 is exp(e) exp(-f) exp(e)
+    >>> e, f = [[0, 1], [0, 0]], [[0, 0], [1, 0]]
+    >>> exp_nilpotent(e) == [[1, 1], [0, 1]]
+    True
+    >>> n = mat_mul(exp_nilpotent(e), mat_mul(exp_nilpotent(mat_scale(f, -1)), exp_nilpotent(e)))
+    >>> n == [[0, 1], [-1, 0]]
+    True
+    """
     n = len(x)
     result, term = identity(n), identity(n)
     for k in range(1, n + 1):
@@ -58,6 +90,10 @@ def exp_nilpotent(x):
 
 
 def transpose(a):
+    """the transpose of a matrix
+    >>> transpose([[0, 1], [0, 0]])                 # e -> f in sl_2
+    [[0, 0], [1, 0]]
+    """
     return [list(col) for col in zip(*a)]
 
 

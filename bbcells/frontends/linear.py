@@ -32,7 +32,14 @@ def projectivization(weights, labels=None, name="P(V)"):
 
 def grassmannian_of(weights, k, labels=None, name=None):
     """Gr(k, V) for a basis of weight vectors; labels of the fixed points are
-    the labels of the spanning basis vectors joined by '+'"""
+    the labels of the spanning basis vectors joined by '+'
+    >>> from bbcells.core import bb_cells
+    >>> G = grassmannian_of([(1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)], 2)
+    >>> G.points
+    ('e1+e2', 'e1+e3', 'e1+e4', 'e2+e3', 'e2+e4', 'e3+e4')
+    >>> bb_cells(G).counts
+    (1, 1, 2, 1, 1)
+    """
     weights = [_vec(w) for w in weights]
     rank = len(weights[0])
     labels = list(labels) if labels is not None else ["e%d" % (i + 1) for i in range(len(weights))]
@@ -55,7 +62,10 @@ def grassmannian_of(weights, k, labels=None, name=None):
 
 def symplectic_weights(m):
     """weights eps_1, ..., eps_m, -eps_1, ..., -eps_m of the standard
-    representation of Sp_{2m}, with labels e1..em, f1..fm"""
+    representation of Sp_{2m}, with labels e1..em, f1..fm
+    >>> symplectic_weights(2)
+    ([(1, 0), (0, 1), (-1, 0), (0, -1)], ['e1', 'e2', 'f1', 'f2'])
+    """
     unit = lambda i, s: tuple(s if j == i else 0 for j in range(m))
     weights = [unit(i, 1) for i in range(m)] + [unit(i, -1) for i in range(m)]
     labels = ["e%d" % (i + 1) for i in range(m)] + ["f%d" % (i + 1) for i in range(m)]

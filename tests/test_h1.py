@@ -6,6 +6,9 @@ import unittest
 from bbcells import gkm, h1, oracles, realcells
 from bbcells.core import bb_cells
 from bbcells.frontends import flag, quadric, toric
+from tests._util import doctests_for
+
+load_tests = doctests_for(h1)
 
 
 class TestGKMKocherlakota(unittest.TestCase):

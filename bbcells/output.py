@@ -90,6 +90,13 @@ def to_latex(cells):
 
 
 def to_json_dict(cells, checks=True):
+    """the JSON document of to_json as a dict
+    >>> from bbcells.core import FixedPointData, bb_cells
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)), name="P^1")
+    >>> document = to_json_dict(bb_cells(P1), checks=False)
+    >>> document["counts"], document["poincare_t"], document["gw_euler"]
+    ([1, 1], [1, 0, 1], {'plus': 1, 'minus': 1, 'rank': 2, 'signature': 0})
+    """
     inv = cells.invariants()
     document = {
         "name": cells.data.name,
@@ -112,10 +119,26 @@ def to_json_dict(cells, checks=True):
 
 
 def to_json(cells, checks=True, indent=1):
+    """JSON report (see to_json_dict), with the checks unless checks=False
+    >>> from bbcells.core import FixedPointData, bb_cells
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)), name="P^1")
+    >>> json.loads(to_json(bb_cells(P1), checks=False))["k0_class_L"]     # [P^1] = 1 + L
+    [1, 1]
+    """
     return json.dumps(to_json_dict(cells, checks), indent=indent)
 
 
 def render(cells, fmt="text", show_weights=False, checks=True):
+    """the report in the format "text", "latex" or "json"
+    >>> from bbcells.core import FixedPointData, bb_cells
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)), name="P^1")
+    >>> print(render(bb_cells(P1), "text", checks=False).splitlines()[6])
+    Poincare polynomial: 1 + t^2
+    >>> render(bb_cells(P1), "xml")
+    Traceback (most recent call last):
+    ...
+    ValueError: unknown format 'xml'
+    """
     if fmt == "text":
         return to_text(cells, show_weights=show_weights, checks=checks)
     if fmt == "latex":

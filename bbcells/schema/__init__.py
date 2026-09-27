@@ -15,7 +15,12 @@ _TYPES = {
 
 
 def load_schema(name):
-    """the schema bbcells/schema/<name>.json as a dict"""
+    """the schema bbcells/schema/<name>.json as a dict; here the fan of P^1
+    >>> fan = load_schema("fan")
+    >>> fan["required"]
+    ['rays', 'cones']
+    >>> validate({"name": "P^1", "rays": [[1], [-1]], "cones": [[0], [1]]}, fan)
+    """
     return json.loads((_HERE / (name + ".json")).read_text())
 
 

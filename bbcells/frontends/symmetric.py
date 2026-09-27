@@ -59,7 +59,15 @@ def longest_word(R, nodes):
 
 
 def opposition(R, nodes):
-    """the involution i -> j of nodes with w_0(alpha_i) = -alpha_j"""
+    """the involution i -> j of nodes with w_0(alpha_i) = -alpha_j (0-based):
+    the diagram flip for A_3 and E_6, the identity for D_4
+    >>> opposition(RootSystem("A3"), range(3))
+    {0: 2, 1: 1, 2: 0}
+    >>> opposition(RootSystem("E6"), range(6))
+    {0: 5, 1: 1, 2: 4, 3: 3, 4: 2, 5: 0}
+    >>> opposition(RootSystem("D4"), range(4))
+    {0: 0, 1: 1, 2: 2, 3: 3}
+    """
     word = longest_word(R, nodes)
     result = {}
     for i in nodes:

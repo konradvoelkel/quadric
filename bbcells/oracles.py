@@ -18,6 +18,10 @@ def q_integer(n):
 
 
 def q_factorial(n):
+    """[n]_q! = [1]_q [2]_q ... [n]_q, the point count of the complete flags in F_q^n
+    >>> q_factorial(3)
+    IntPoly((1, 2, 2, 1))
+    """
     result = IntPoly((1,))
     for k in range(1, n + 1):
         result = result * q_integer(k)
@@ -59,6 +63,10 @@ def gaussian_binomial(n, k):
 
 
 def projective_space(n):
+    """[P^n] = 1 + q + ... + q^n
+    >>> projective_space(2)
+    IntPoly((1, 1, 1))
+    """
     return q_integer(n + 1)
 
 
@@ -215,7 +223,14 @@ def reduced_rational_betti(faces, top):
     """reduced rational Betti numbers b~_0..b~_top of a simplicial complex
     given by its faces (frozensets, closed under subsets, containing the
     empty face); b~_{-1} = 1 for the empty complex is reported at index -1
-    via the returned dict"""
+    via the returned dict. The boundary of a triangle is a circle:
+    >>> from itertools import combinations
+    >>> circle = [frozenset(f) for k in range(3) for f in combinations(range(3), k)]
+    >>> reduced_rational_betti(circle, 1)
+    {-1: 0, 0: 0, 1: 1}
+    >>> reduced_rational_betti([frozenset()], 0)
+    {-1: 1, 0: 0}
+    """
     from bbcells.linalg import rank as matrix_rank
     by_dim = {}
     for f in faces:
@@ -363,7 +378,12 @@ def compositions(n):
 
 
 def gaussian_multinomial(parts):
-    """|GL_n/P| for the parabolic P of block sizes `parts`"""
+    """|GL_n/P| for the parabolic P of block sizes `parts`
+    >>> gaussian_multinomial((2, 2)) == gaussian_binomial(4, 2)     # Gr(2, 4)
+    True
+    >>> gaussian_multinomial((1, 1, 1)) == q_factorial(3)           # complete flags in k^3
+    True
+    """
     result = q_factorial(sum(parts))
     for k in parts:
         result = exact_division(result, q_factorial(k))
@@ -426,7 +446,10 @@ def complete_skew_forms(n):
 
 
 def complete_conics():
-    """[P^5] - [P^2] + [P^2][P^2] (PLAN.md 5.5)"""
+    """[P^5] - [P^2] + [P^2][P^2] (PLAN.md 5.5)
+    >>> complete_conics()
+    IntPoly((1, 2, 3, 3, 2, 1))
+    """
     return blowup(projective_space(5), projective_space(2), 3)
 
 

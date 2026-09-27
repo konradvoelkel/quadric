@@ -1,10 +1,10 @@
 import unittest
 
-from bbcells import chevalley
+from bbcells import chevalley, liealgebra
 from bbcells.rootsystem import RootSystem
 from tests._util import doctests_for
 
-load_tests = doctests_for(chevalley)
+load_tests = doctests_for(chevalley, liealgebra)
 
 
 class TestChevalley(unittest.TestCase):

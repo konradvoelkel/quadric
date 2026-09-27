@@ -31,7 +31,10 @@ from bbcells.rootsystem import RootSystem
 
 
 def orthant(r):
-    """the fan of the wonderful variety itself: the negative orthant"""
+    """the fan of the wonderful variety itself: the negative orthant
+    >>> orthant(2)
+    [((-1, 0), (0, -1))]
+    """
     return [tuple(tuple(-int(i == j) for i in range(r)) for j in range(r))]
 
 
@@ -66,7 +69,15 @@ def _faces(cones):
 
 
 def check_fan(cones, r):
-    """validate a smooth fan with support the negative orthant in Z^r"""
+    """validate a smooth fan with support the negative orthant in Z^r; returns
+    its maximal cones as tuples of tuples
+    >>> check_fan(star_subdivision(orthant(2), orthant(2)[0]), 2)
+    [((-1, -1), (0, -1)), ((-1, 0), (-1, -1))]
+    >>> check_fan([((-1, 0), (-1, -1))], 2)            # only half of the orthant
+    Traceback (most recent call last):
+    ...
+    ValueError: facet ((-1, -1),) lies in 1 cones
+    """
     cones = [tuple(tuple(v) for v in cone) for cone in cones]
     for cone in cones:
         if len(cone) != r:
@@ -98,7 +109,18 @@ def check_fan(cones, r):
 
 def toroidal_orbits(cartan_type, spherical_roots, satellite, cones, parabolic=(), strict=True):
     """OrbitData of the toroidal variety with the given fan (maximal cones) over
-    the wonderful variety of (spherical_roots, parabolic, satellite)"""
+    the wonderful variety of (spherical_roots, parabolic, satellite). For
+    complete conics blown up along the closed orbit G/B, that orbit is
+    replaced by two orbits, one for each new cone:
+    >>> sigma = [(2, 0), (0, 2)]                       # complete conics
+    >>> reflections = {(0,): [(1, 0)], (1,): [(0, 1)]}
+    >>> sat = lambda I: {"component_reflections": reflections[I]} if len(I) == 1 else None
+    >>> [o.name for o in toroidal_orbits("A2", sigma, sat, orthant(2))]
+    ['closed|-1,0;0,-1', 'O1|0,-1', 'O2|-1,0']
+    >>> fan = star_subdivision(orthant(2), orthant(2)[0])
+    >>> [o.name for o in toroidal_orbits("A2", sigma, sat, fan)]
+    ['closed|-1,-1;-1,0', 'closed|-1,-1;0,-1', 'O1|0,-1', 'O2|-1,0']
+    """
     R = RootSystem(cartan_type)
     r = len(spherical_roots)
     cones = check_fan(cones, r)

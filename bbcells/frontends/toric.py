@@ -155,7 +155,11 @@ def orbit_closure(fan, face):
 # -- constructions ---------------------------------------------------------
 
 def projective_space(n):
-    """P^n: rays e_1, ..., e_n, -(e_1 + ... + e_n)"""
+    """P^n: rays e_1, ..., e_n, -(e_1 + ... + e_n)
+    >>> P3 = projective_space(3)
+    >>> P3.rays[-1], bb_cells(fixed_point_data(P3)).counts
+    ((-1, -1, -1), (1, 1, 1, 1))
+    """
     rays = [tuple(1 if k == i else 0 for k in range(n)) for i in range(n)]
     rays.append(tuple(-1 for _ in range(n)))
     return Fan(tuple(rays), tuple(itertools.combinations(range(n + 1), n)),
@@ -163,19 +167,31 @@ def projective_space(n):
 
 
 def hirzebruch(a):
-    """the Hirzebruch surface F_a = P(O + O(a)) over P^1"""
+    """the Hirzebruch surface F_a = P(O + O(a)) over P^1; F_1 is P^2 blown up
+    in a point
+    >>> F1 = hirzebruch(1)
+    >>> F1.rays, bb_cells(fixed_point_data(F1)).counts
+    (((1, 0), (0, 1), (-1, 1), (0, -1)), (1, 2, 1))
+    """
     return Fan(((1, 0), (0, 1), (-1, a), (0, -1)), ((0, 1), (1, 2), (2, 3), (0, 3)),
                name="F_%d" % a)
 
 
 def del_pezzo_6():
-    """the toric del Pezzo surface of degree 6 (P^2 blown up in 3 points)"""
+    """the toric del Pezzo surface of degree 6 (P^2 blown up in 3 points)
+    >>> bb_cells(fixed_point_data(del_pezzo_6())).counts
+    (1, 4, 1)
+    """
     rays = ((1, 0), (1, 1), (0, 1), (-1, 0), (-1, -1), (0, -1))
     return Fan(rays, tuple((i, (i + 1) % 6) for i in range(6)), name="dP_6")
 
 
 def product(fan1, fan2):
-    """the fan of the product variety"""
+    """the fan of the product variety
+    >>> P1xP1 = product(projective_space(1), projective_space(1))
+    >>> P1xP1.name, P1xP1.cones, bb_cells(fixed_point_data(P1xP1)).counts
+    ('P^1 x P^1', ((0, 2), (0, 3), (1, 2), (1, 3)), (1, 2, 1))
+    """
     n1, n2 = fan1.dim, fan2.dim
     rays = [r + (0,) * n2 for r in fan1.rays] + [(0,) * n1 + r for r in fan2.rays]
     shift = len(fan1.rays)
@@ -212,15 +228,36 @@ def star_subdivision(fan, face, name=None):
 # -- JSON --------------------------------------------------------------------
 
 def from_dict(document):
+    """a Fan from a JSON-like dict, validated against the schema
+    >>> document = {"name": "P^1", "rays": [[1], [-1]], "cones": [[0], [1]]}
+    >>> from_dict(document) == projective_space(1)
+    True
+    >>> from_dict({"rays": [[1], [-1]]})
+    Traceback (most recent call last):
+    ...
+    ValueError: $: missing required key 'cones'
+    """
     validate(document, load_schema("fan"))
     return Fan(tuple(tuple(r) for r in document["rays"]),
                tuple(tuple(c) for c in document["cones"]), name=document.get("name", ""))
 
 
 def to_dict(fan):
+    """inverse of from_dict
+    >>> to_dict(projective_space(1))
+    {'name': 'P^1', 'rays': [[1], [-1]], 'cones': [[0], [1]]}
+    """
     return {"name": fan.name, "rays": [list(r) for r in fan.rays],
             "cones": [list(c) for c in fan.cones]}
 
 
 def load(path):
+    """a Fan from a JSON file {"name": ..., "rays": [[...]], "cones": [[...]]}
+    >>> import tempfile
+    >>> with tempfile.TemporaryDirectory() as directory:
+    ...     path = Path(directory) / "F1.json"
+    ...     _ = path.write_text(json.dumps(to_dict(hirzebruch(1))))
+    ...     load(path) == hirzebruch(1)
+    True
+    """
     return from_dict(json.loads(Path(path).read_text()))

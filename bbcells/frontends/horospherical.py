@@ -86,7 +86,13 @@ def _orbit_under_levi(R, levi, mu):
 
 def color_vectors(R, colors, basis):
     """{alpha (1-based): rho_alpha in N}: rho_alpha(m_k) = <m_k, alpha^vee>, the
-    omega_alpha-coordinate of the k-th basis vector of M"""
+    omega_alpha-coordinate of the k-th basis vector of M. For SL_2/U in
+    P(k^2 + k) (see colored_horospherical) the colour is the ray (1,):
+    >>> color_vectors(RootSystem("A1"), {1}, [(1,)])
+    {1: (1,)}
+    >>> color_vectors(RootSystem("A2"), (1, 2), [(1, 1), (0, 1)])
+    {1: (1, 0), 2: (1, 1)}
+    """
     return {a: tuple(v[a - 1] for v in basis) for a in colors}
 
 

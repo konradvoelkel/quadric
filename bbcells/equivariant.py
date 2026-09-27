@@ -68,7 +68,15 @@ def _edge_constraints(data, degree, unknown_index, fixed=None):
 
 
 def gkm_ring_dimension(data, degree):
-    """dimension over Q of the degree-`degree` part of the GKM ring"""
+    """dimension over Q of the degree-`degree` part of the GKM ring; for P^2
+    and its 2-torus, H_T^*(P^2) is free over Q[t1, t2] on 1, H, H^2
+    >>> from bbcells.core import FixedPointData, bb_cells
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))),
+    ...     edges=(("a", "b", (1, 0)), ("a", "c", (0, 1)), ("b", "c", (-1, 1))))
+    >>> [gkm_ring_dimension(P2, d) for d in range(3)]
+    [1, 3, 6]
+    """
     if data.edges is None:
         raise ValueError("GKM data (edges) required")
     basis = monomials(data.rank, degree)
@@ -81,7 +89,12 @@ def gkm_ring_dimension(data, degree):
 
 
 def expected_dimension(counts, rank_of_torus, degree):
-    """coefficient of t^{2 degree} in P_X(t) / (1 - t^2)^r"""
+    """coefficient of t^{2 degree} in P_X(t) / (1 - t^2)^r
+    >>> [expected_dimension((1, 1, 1), 2, d) for d in range(3)]        # P^2, T^2
+    [1, 3, 6]
+    >>> [expected_dimension((1, 1, 2, 1, 1), 3, d) for d in range(3)]  # Gr(2, 4), T^3
+    [1, 4, 11]
+    """
     return sum(c * comb(degree - j + rank_of_torus - 1, rank_of_torus - 1)
                for j, c in enumerate(counts) if j <= degree)
 
@@ -108,7 +121,16 @@ def flow_up_class(cells, p, order=None):
     """{q: Poly}: tau_p supported on {q <= p}, tau_p(p) = product of the
     lambda-negative tangent weights at p, homogeneous of degree n - dim(cell).
     Cost grows with (points below p) x (monomials of degree codim in r
-    variables); divisors are cheap, top-codimension classes in large rank are not."""
+    variables); divisors are cheap, top-codimension classes in large rank are not.
+    Here the class of the line b of P^2 (cells a > b > c):
+    >>> from bbcells.core import FixedPointData, bb_cells
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))),
+    ...     edges=(("a", "b", (1, 0)), ("a", "c", (0, 1)), ("b", "c", (-1, 1))))
+    >>> tau = flow_up_class(bb_cells(P2, (1, 2)), "b")
+    >>> {q: str(f) for q, f in sorted(tau.items())}
+    {'b': '-t1', 'c': '-t2'}
+    """
     data = cells.data
     order = bb_order(cells) if order is None else order
     nvars = data.rank
@@ -142,18 +164,47 @@ def flow_up_class(cells, p, order=None):
 
 
 def flow_up_classes(cells, points=None):
-    """{p: flow_up_class(cells, p)} for the given points (default: all)"""
+    """{p: flow_up_class(cells, p)} for the given points (default: all); the
+    class of the point c of P^2 is the product of its two weights
+    >>> from bbcells.core import FixedPointData, bb_cells
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))),
+    ...     edges=(("a", "b", (1, 0)), ("a", "c", (0, 1)), ("b", "c", (-1, 1))))
+    >>> classes = flow_up_classes(bb_cells(P2, (1, 2)))
+    >>> str(classes["a"]["c"]), str(classes["c"]["c"])
+    ('1', '-t1*t2 + t2^2')
+    """
     order = bb_order(cells)
     points = cells.data.points if points is None else points
     return {p: flow_up_class(cells, p, order) for p in points}
 
 
 def value(classes, p, q, nvars):
+    """tau_p(q), the zero polynomial outside the support of tau_p
+    >>> from bbcells.core import FixedPointData, bb_cells
+    >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
+    ...     (((1, 0), (0, 1)), ((-1, 0), (-1, 1)), ((0, -1), (1, -1))),
+    ...     edges=(("a", "b", (1, 0)), ("a", "c", (0, 1)), ("b", "c", (-1, 1))))
+    >>> classes = flow_up_classes(bb_cells(P2, (1, 2)))
+    >>> str(value(classes, "b", "a", 2)), str(value(classes, "b", "c", 2))
+    ('0', '-t2')
+    """
     return classes[p].get(q, Poly(nvars))
 
 
 def structure_constants(cells, classes, a, b):
-    """{s: c_ab^s} with tau_a tau_b = sum_s c_ab^s tau_s"""
+    """{s: c_ab^s} with tau_a tau_b = sum_s c_ab^s tau_s. On Gr(2, 4), the
+    square of the Schubert divisor sigma_1 is sigma_2 + sigma_11 - t2 sigma_1
+    (cell dimensions shown)
+    >>> from bbcells.core import bb_cells
+    >>> from bbcells.frontends.flag import grassmannian
+    >>> cells = bb_cells(grassmannian(2, 4))
+    >>> classes = flow_up_classes(cells)
+    >>> (d,) = cells.cells_of_dimension(3)
+    >>> constants = structure_constants(cells, classes, d, d)
+    >>> sorted((cells.dim_of(s), str(c)) for s, c in constants.items())
+    [(2, '1'), (2, '1'), (3, '-t2')]
+    """
     data = cells.data
     nvars = data.rank
     order = bb_order(cells)
@@ -175,7 +226,17 @@ def structure_constants(cells, classes, a, b):
 
 def integrate(data, values, point_values=None):
     """sum_p f_p / e_p with e_p = product of all tangent weights at p (ABBV),
-    evaluated at the rational point `point_values` of the parameter space"""
+    evaluated at the rational point `point_values` of the parameter space.
+    The degree of Gr(2, 4) in the Pluecker embedding is 2:
+    >>> from bbcells.core import bb_cells
+    >>> from bbcells.frontends.flag import grassmannian
+    >>> G = grassmannian(2, 4)
+    >>> cells = bb_cells(G)
+    >>> (d,) = cells.cells_of_dimension(3)
+    >>> classes = flow_up_classes(cells, [d])
+    >>> integrate(G, {p: value(classes, d, p, 3) ** 4 for p in G.points})
+    Fraction(2, 1)
+    """
     if point_values is None:
         point_values = [Fraction(3 + 7 * i, 1 + 2 * i) for i in range(data.rank)]
     total = Fraction(0)

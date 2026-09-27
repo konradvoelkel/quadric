@@ -37,6 +37,15 @@ from bbcells.operations import identify, normal_weights, product, restrict
 
 @dataclass(frozen=True)
 class TwoOrbitCompletion(object):
+    """a completion Xbar = X + D of X by a divisor D, with the fixed points of
+    D identified in Xbar and their normal weights (see two_orbit); here the
+    affine quadric SO(3)/SO(2) in Q_2 = P^1 x P^1:
+    >>> print(affine_quadric(2).summary())
+    AQ_2 = Q_2 - Q_1
+      dim 2, torus rank 1; 4 fixed points of the completion, 2 in the open orbit
+      [X] = L + L^2
+      chi_c^A1(X) = <1> + <-1>  (rank 2, signature 0)
+    """
     name: str
     completion: FixedPointData
     boundary: FixedPointData
@@ -79,7 +88,16 @@ class TwoOrbitCompletion(object):
 
 
 def two_orbit(completion, boundary, name, mapping=None):
-    """assemble and validate a two-orbit completion on a common torus"""
+    """assemble and validate a two-orbit completion on a common torus. The
+    simplest case, P^1 = A^1 + a point (a point needs an explicit mapping):
+    >>> P1 = FixedPointData(1, 1, ("0", "oo"), (((1,),), ((-1,),)), name="P^1")
+    >>> point = FixedPointData(0, 1, ("oo",), ((),), name="pt")
+    >>> X = two_orbit(P1, point, "A^1", {"oo": "oo"})
+    >>> X.normal, X.open_fixed_points
+    ({'oo': (-1,)}, ('0',))
+    >>> print(X.k0_class().format("L"), "|", X.gw_euler_compact_support())
+    L | <-1>
+    """
     if boundary.dim != completion.dim - 1:
         raise ValueError("the boundary must be a divisor: dim %d vs %d"
                          % (boundary.dim, completion.dim))
