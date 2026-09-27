@@ -131,10 +131,11 @@ Knop) they are the $W_L$-averages $\pr(-\gamma)$. For complete symmetric
 varieties we derive all satellites from the Satake diagram, for every real
 form (Section~\ref{subsec:symmetric}).
 \item \emph{Certificates} (Section~\ref{sec:certificates}). Beyond (R), the
-unknown normal weight is $\pr(-\gamma)+c\zeta$ with an integer $c$. The BB
-counts of an orbit closure are a step function of $c$ and must equal its
-E-polynomial, which is known independently (Brion--Peyre and
-inclusion--exclusion, or Poincar\'e duality). This certifies $c=0$ in
+unknown normal weight is $\pr(-\gamma)+c\zeta$ with an integer $c$. The
+point count of an open orbit can be read off the fixed points of its
+closure (Lemma~\ref{lem:openorbit}); it is a step function of $c$ and must
+equal the Brion--Peyre count, or else the BB counts of the closure must be
+palindromic. This certifies $c=0$ in
 all Hermitian cases we tested, including those where the
 Atiyah--Bott--Berline--Vergne identities degenerate.
 \item \emph{Large Euler characteristics} (Section~\ref{sec:large}).
@@ -312,25 +313,45 @@ for every $\gamma\in\Sigma\smallsetminus I$:
 \end{enumerate}
 \end{proposition}
 \begin{proof}
-(2) The group $N_H(T)$ acts on the normal line of $D_\gamma$ at $x_I$.
+Write $x=x_I$, $L=L_{S_I}$, and let $N_\delta\subseteq T_xX/T_xO_I$ be the
+normal line of $D_\delta$, so that $T_xX/T_xO_I=\bigoplus_{\delta\in
+\Sigma\smallsetminus I}N_\delta$ and $\chi_\delta$ is the weight of $N_\delta$.
 
-(1) The fibre $F = L_{S_I}\cdot x_I$ over $eP_{S_I}$ is fixed pointwise by
-$Z$, because $Z$ is central in $L_{S_I}$ and contained in
-$T\subset H$. Its closure $\overline F$ is stable under $P_{S_I}$, since the
-unipotent radical of $P_{S_I}$ acts trivially on $F$. Hence $\overline F$
-contains a $B$-fixed point, and the only $B$-fixed point of a wonderful
-variety is the base point $z$ of the closed orbit. So $x_I$ and $z$ lie in
-one connected component of $X^Z$. Along this component, $Z$ acts on the
-fibres of the $G$-linearized line bundle $\mathcal O(D_\gamma)$ by a single
-character. At a point of $D_\gamma$ the fibre is the normal line of
-$D_\gamma$; at $z$ the character is $-\gamma|_Z$, the $T$-weight of the
-coordinate of the slice through $z$ that cuts out $D_\gamma$ (this
-orientation agrees with \cite[\S1.3]{BrionJoshua}, where the weight is
-$+\gamma$ at the $B^-$-fixed point).
+(2) Let $n\in N_H(T)$ with class $w\in W_H$. Then $n$ fixes $x$ and
+preserves every $G$-stable divisor, hence the line $N_\gamma$. For $v\in
+N_\gamma$ and $t\in T$ we have $t\cdot nv = n\cdot(n^{-1}tn)v =
+\chi_\gamma(n^{-1}tn)\,nv$, so $nv\in N_\gamma$ has weight $w\chi_\gamma$, and
+$w\chi_\gamma=\chi_\gamma$.
 
-(3) By (2), $\chi_\gamma - \pr(\chi_\gamma)$ lies in $V$, and by (1),
-$\pr(\chi_\gamma) = \pr(-\gamma)$, since $\pr$ is determined by the
-restriction to $Z$.
+(1) The fibre $F = L\cdot x$ of $O_I\to G/P_{S_I}$ over $eP_{S_I}$ is fixed
+pointwise by $Z$, because $Z$ is central in $L$ and $Z\subseteq T$ fixes
+$x$. The closure $\overline F$ is therefore contained in $X^Z$, and it is
+connected and stable under $P_{S_I}$, whose unipotent radical acts
+trivially on $F$. By Borel's fixed point theorem $\overline F$ contains a
+$B$-fixed point. A $B$-fixed point lies in a closed orbit, and a wonderful
+variety has a single closed orbit $G/Q$, with a single $B$-fixed point $z$.
+So $x$ and $z$ lie in one connected component $C$ of $X^Z$. Replacing $G$
+by its simply connected cover, $\mathcal O(D_\gamma)$ carries a
+$G$-linearization for which the canonical section $s_\gamma$ is invariant,
+so that $\mathcal O(D_\gamma)|_{D_\gamma}$ is equivariantly the normal bundle
+of $D_\gamma$. On $C$ the torus $Z$ acts on the fibres of $\mathcal
+O(D_\gamma)$ by a character that is locally constant, hence constant. Both
+$x$ and $z$ lie in $D_\gamma$; at $x$ the fibre is $N_\gamma$, of weight
+$\chi_\gamma$, and at $z$ it is the normal line of $D_\gamma$ at $z$, of
+weight $-\gamma$ (the coordinate of the slice through $z$ that cuts out
+$D_\gamma$; this orientation agrees with \cite[\S1.3]{BrionJoshua}, where the
+weight is $+\gamma$ at the $B^-$-fixed point). Hence $\chi_\gamma|_Z =
+-\gamma|_Z$.
+
+(3) The characters of $T$ that are trivial on $Z$ span
+$\operatorname{span}_\QQ\Phi_L$ rationally, so restriction to $Z$ identifies
+$X(T)_\QQ/\operatorname{span}_\QQ\Phi_L$ with $X(Z)_\QQ$. The $W_L$-average
+$\pr$ is the orthogonal projection with kernel $\operatorname{span}_\QQ\Phi_L$,
+because $W_L$ has no non-zero invariants in $\operatorname{span}_\QQ\Phi_L$.
+By (1), $\pr(\chi_\gamma)=\pr(-\gamma)$. The difference
+$\chi_\gamma-\pr(\chi_\gamma)$ lies in $\operatorname{span}_\QQ\Phi_L$ and is
+$W_H$-invariant by (2), since $\pr(\chi_\gamma)$ is $W_L$-invariant and
+$W_H\subseteq W_L$. So it lies in $V$.
 \end{proof}
 
 By Knop \cite[Prop.~2.1]{KnopRoots}, $\dim V$ is the number of colours of
@@ -446,64 +467,111 @@ $c$. Since all $T$-weights lie in the root lattice, $c$ lies in a coset
 $c_0+\ZZ$ that is computed from $\pr(-\gamma)$ and a primitive $\zeta$
 (here $c_0=0$). The package uses $c=0$ and certifies it.
 
-\subsection{The point-count certificate}
-Let $X^J$ be the closure of an orbit $O_J$ (itself a smooth wonderful
-variety), and suppose that all normal weights occurring in $X^J$ are known
-except the one of $D_\gamma$ at $x_K$, $K\cup\{\gamma\}\subseteq J$. For a
-generic cocharacter $\lambda$ and a fixed point $w x_K$ put
-$a_w = \langle w\,\pr(-\gamma),\lambda\rangle$ and
-$b_w = \langle w\zeta,\lambda\rangle$. The unknown weight at $wx_K$ pairs to
-$a_w+c\,b_w$, so the BB counts $P_\lambda(c)$ of the data with parameter $c$
-form a step function of $c$ that jumps only at the thresholds $-a_w/b_w$.
+\subsection{Open orbits from fixed points}
+Let $X^J$ be the closure of the orbit $O_J$; it is a smooth projective
+wonderful variety whose orbits are the $O_I$, $I\subseteq J$. Its boundary
+is the union of the smooth divisors $D_\delta\cap X^J$, $\delta\in J$, which
+cross normally; $O_I\subseteq D_\delta$ if and only if $\delta\notin I$; and
+at $x\in O_I$ the tangent space is $T_xO_I\oplus\bigoplus_{\delta\in
+J\smallsetminus I}N_\delta$, with $N_\delta$ the normal line of $D_\delta$.
+For a generic $\lambda$ and $x\in O_I^T$ let $d_x$ be the number of
+$\lambda$-positive weights of $T_xO_I$, and call $x$ \emph{$J$-open} if the
+weights of all $N_\delta$, $\delta\in J\smallsetminus I$, are $\lambda$-positive.
 
-\begin{theorem}\label{thm:certificate}
-Let $E(X^J)$ be the E-polynomial of $X^J$, and let $c^*$ be the true value.
-\begin{enumerate}
-\item If $\lambda$ is generic for the true data (i.e.\ $c^*$ is not a
-threshold of $\lambda$), then $P_\lambda(c^*) = E(X^J)$.
-\item If $O_J$ has $T$-fixed points, then
+\begin{lemma}\label{lem:openorbit}
+The plus-cell $C_x$ of $x\in O_I^T$ in $X^J$ meets $O_J$ in
+$\mathbb A^{d_x}\times\mathbb G_m^{|J\smallsetminus I|}$ if $x$ is $J$-open,
+and not at all otherwise. Hence
 \[
-E(X^J) = |G/P_{S_J}|(q)\,|L_{S_J}/H_{L,J}|(q) + \sum_{\emptyset\ne S\subseteq J}(-1)^{|S|+1}E(X^{J\smallsetminus S}),
+E(O_J) = \sum_{I\subseteq J}\ \sum_{x\in O_I^T\ J\text{-open}} q^{d_x}(q-1)^{|J\smallsetminus I|}.
 \]
-where the first term is given by the Brion--Peyre formula and the others
-by the BB counts of closures that do not involve the unknown.
-\item In any case $P_\lambda(c^*)$ is palindromic of degree $\dim X^J$.
-\end{enumerate}
-Consequently, if $\lambda_1,\dots,\lambda_m$ have pairwise disjoint
-threshold sets, $m\ge 2$, then $c^*$ lies in
-$\bigcap_i\bigl(A_{\lambda_i}\cup T_{\lambda_i}\bigr)$, where $T_\lambda$ is the
-set of thresholds and $A_\lambda$ the union of the open intervals between
-thresholds on which $P_\lambda$ equals $E(X^J)$ (resp.\ is palindromic).
-\end{theorem}
+\end{lemma}
 \begin{proof}
-(1) With the true weights, the data are the fixed-point data of $X^J$, and
-$\lambda$ is generic for them; the BB decomposition of the smooth projective
-$X^J$ into affine spaces gives $E(X^J)=\sum_d c_d q^d$.
-(2) The orbits of $X^J$ stratify it into the open orbit $O_J$ and the
-boundary $\bigcup_{\gamma\in J}X^{J\smallsetminus\{\gamma\}}$, with
-$X^{J\smallsetminus S}\cap X^{J\smallsetminus S'}=X^{J\smallsetminus(S\cup S')}$;
-the E-polynomial is additive, which gives the inclusion--exclusion. The
-orbit $O_J$ fibres Zariski-locally trivially over $G/P_{S_J}$ with fibre
-the satellite, and $E(L/H_L)$ is the Brion--Peyre count. The orbit $O_K$
-lies in $X^{J\smallsetminus S}$ only if $S\subseteq\{\gamma\}$, and
-$X^{K}$ has no normal direction $\gamma$, so no term with $S\ne\emptyset$
-involves the unknown.
-(3) Poincar\'e duality. For the last statement: every $c$ that is not a
-threshold of some $\lambda_i$ with $P_{\lambda_i}(c)\ne E(X^J)$ is excluded by
-(1); since the threshold sets are disjoint, $c^*$ is a threshold of at most
-one $\lambda_i$, so it is decided by the others.
+By Bia{\l}ynicki-Birula, $C_x$ is an affine space with an attractive fixed
+point $x$ at which $\lambda$ has only positive weights. Its coordinate ring
+$A$ is graded by $\lambda$ in non-negative degrees with $A_0=k$, and every
+system of $T$-homogeneous elements of the maximal ideal $\mathfrak m_x$ that
+is a basis modulo $\mathfrak m_x^2$ generates $A$ by the graded Nakayama
+lemma, hence is a system of $T$-equivariant coordinates. For
+$\delta\in I$ the divisor $D_\delta$ misses $C_x$: a point of
+$C_x\cap D_\delta$ would have its limit $x$ in the closed set $D_\delta$. For
+$\delta\in J\smallsetminus I$, the set $C_x\cap D_\delta$ is the plus-cell of
+$x$ in the smooth projective variety $D_\delta\cap X^J$, an affine space of
+dimension $\dim C_x - [N_\delta\text{ is }\lambda\text{-positive}]$. If
+$N_\delta$ is negative, $C_x\subseteq D_\delta$ by irreducibility and
+$C_x\cap O_J=\emptyset$. If all $N_\delta$ are positive, each $C_x\cap
+D_\delta$ is a smooth $T$-stable hypersurface of $C_x$, cut out by a
+$T$-homogeneous $f_\delta$ ($A$ is factorial with constant units), and the
+differentials $df_\delta(x)$ are linearly independent by normal crossings.
+Completing the $f_\delta$ to coordinates gives
+$C_x\cap O_J = C_x\smallsetminus\bigcup_\delta\{f_\delta=0\}\cong\mathbb
+A^{d_x}\times\mathbb G_m^{|J\smallsetminus I|}$. Since $X^J$ is the disjoint
+union of the $C_x$, the formula follows from additivity of $E$.
 \end{proof}
 
-Intersecting with $c_0+\ZZ$ gives a finite list of candidates when every
-admissible interval is bounded; if only $c=0$ remains, $c=0$ is proved,
-given the fixed-point data of the known orbits. In practice the admissible
-set at each $\lambda$ is a single interval around $0$ of half-width below
-$0.1$.
+The lemma is an identity between the fixed-point data and the point count
+of a single orbit. The package tests it against the Brion--Peyre formula
+(Section~\ref{subsec:orbitcounts}) on every orbit of AI(3), AI(4), AIII(2,2),
+AIII(2,3), CI(3), $G$, BI(3,4), DIII(5), EIII, FI and AIII(3,4).
+
+\subsection{The point-count certificate}
+Suppose that all normal weights occurring in $X^J$ are known except the one
+of $D_\gamma$ at $x_K$, with $K\cup\{\gamma\}\subseteq J$. For a generic
+cocharacter $\lambda$ and a fixed point $wx_K$ put
+$a_w = \langle w\,\pr(-\gamma),\lambda\rangle$ and
+$b_w = \langle w\zeta,\lambda\rangle$. The unknown weight at $wx_K$ pairs to
+$a_w+c\,b_w$. Let $Q_\lambda(c)$ be the right-hand side of
+Lemma~\ref{lem:openorbit} and $P_\lambda(c)$ the BB count, both computed from
+the data with parameter $c$. They are step functions of $c$ that jump only
+at the thresholds $-a_w/b_w$.
+
+\begin{theorem}\label{thm:certificate}
+Let $c^*$ be the true value, and let $\lambda$ be generic for the true data,
+i.e.\ $c^*$ is not a threshold of $\lambda$.
+\begin{enumerate}
+\item $Q_\lambda(c^*) = E(O_J)$ and $P_\lambda(c^*) = E(X^J)$.
+\item If $O_J$ has $T$-fixed points, then
+$E(O_J) = |G/P_{S_J}|(q)\,|L_{S_J}/H_{L,J}|(q)$, where the second factor is
+given by the Brion--Peyre formula.
+\item $P_\lambda(c^*)$ is palindromic of degree $\dim X^J$.
+\end{enumerate}
+Consequently, let $\lambda_1,\dots,\lambda_m$, $m\ge 2$, have pairwise disjoint
+threshold sets $T_{\lambda_i}$, and let $A_{\lambda_i}$ be the union of the open
+intervals between thresholds on which $Q_{\lambda_i}$ equals
+$|G/P_{S_J}|(q)|L_{S_J}/H_{L,J}|(q)$ (if $O_J$ has fixed points), resp.\ on
+which $P_{\lambda_i}$ is palindromic. Then
+$c^*\in\bigcap_i\bigl(A_{\lambda_i}\cup T_{\lambda_i}\bigr)$, and $c^*$ lies
+in $A_{\lambda_i}$ for all but at most one $i$.
+\end{theorem}
+\begin{proof}
+(1) With the true weights the data are the fixed-point data of $X^J$, and
+$\lambda$ is generic for them. Lemma~\ref{lem:openorbit} gives the first
+equation, and the BB decomposition of $X^J$ into affine spaces the second.
+(2) The orbit $O_J=G\times^{P_{S_J}}(L_{S_J}/H_{L,J})$ fibres over $G/P_{S_J}$,
+Zariski-locally trivially since $G\to G/P_{S_J}$ has local sections, so $E$
+is multiplicative; the satellite contains a maximal torus, and its
+virtual Poincar\'e polynomial is the Brion--Peyre count \cite{BrionPeyre}.
+(3) Poincar\'e duality for the smooth projective $X^J$, whose odd
+cohomology vanishes and whose Betti numbers $b_{2d}$ are the cell counts.
+For the last statement: $c^*$ is a threshold of at most one $\lambda_i$,
+because the threshold sets are disjoint, and for every other $i$ it lies in
+$A_{\lambda_i}$ by (1)--(3).
+\end{proof}
+
+All $T$-weights lie in the root lattice, so $c^*$ lies in a coset
+$c_0+\ZZ$ that is computed from $\pr(-\gamma)$ and a primitive $\zeta$
+(here $c_0=0$). Intersecting with $c_0+\ZZ$ gives a finite list of
+candidates when every admissible interval is bounded; if only $c=0$
+remains, $c=0$ is proved, given the fixed-point data of the known orbits.
+In practice the admissible set at each $\lambda$ is a single interval
+around $0$ of half-width below $0.1$.
 
 Two unknowns on different orbits are handled jointly: every fixed point
-sees at most one of them, so $P_\lambda = P_0+F_1(c_1)+F_2(c_2)$, and the
-admissible boxes are found by matching the values of $F_2$ against
-$E-P_0-F_1$ in a hash table.
+sees at most one of them, so $Q_\lambda = Q_0+F_1(c_1)+F_2(c_2)$ (and
+likewise $P_\lambda$). With three samples whose threshold sets are disjoint
+for each unknown, one sample is generic for both, and the admissible boxes
+are found by matching the values of $F_2$ against $E-Q_0-F_1$ in a hash
+table.
 
 \subsection{Induction over orbit closures}
 The unknowns $(K,\gamma)$ are decided one at a time, each on the smallest
@@ -689,22 +757,44 @@ $\codim q\le\codim p$, where $\codim p$ is the number of negative weights.
 A canonical class for $p$ is unique if it exists. It exists if every
 fixed point $q\ne p$ in the closure of the plus-cell $C_p$ satisfies
 $\dim C_q<\dim C_p$; then it is the equivariant class of
-$\overline{C_p}$. Conversely, if the canonical class of $p$ does not exist,
+$\overline{C_p}$. In particular, if the canonical class of $p$ does not exist,
 then $\overline{C_p}$ contains a fixed point $q\ne p$ with $\dim C_q\ge \dim C_p$.
 \end{proposition}
 \begin{proof}
-The class $[\overline{C_p}]$ restricts to $e^-_p$ at $p$, since $C_p$ is
-smooth there with normal space the negative weight space, and to zero at
-fixed points outside $\overline{C_p}$. If $\overline{C_p}$ contains no fixed
-point $q\ne p$ with $\codim q\le\codim p$, this class is canonical; this
-proves existence and, by contraposition, the last statement. Uniqueness:
-the difference $\delta$ of two canonical classes vanishes at $p$ and at all
-$q$ with $\codim q\le\codim p$. Order the fixed points by a Morse function of
-an ample class; if $\delta\ne0$, let $q$ be minimal with $\delta(q)\ne 0$. By
-the Atiyah--Bott lemma \cite{AtiyahBott84}, applied to the filtration by
-closed unions of plus-cells (whose open parts have affine pavings and are
-therefore equivariantly formal), $\delta(q)$ is divisible by $e^-_q$, which has degree $\codim q>\codim p=\deg\delta$,
-a contradiction.
+Existence. The equivariant class $[\overline{C_p}]\in H_T^{2\codim
+p}(X)$ restricts to zero at fixed points outside $\overline{C_p}$, and to
+$e^-_p$ at $p$, since $\overline{C_p}$ is smooth at $p$ with normal space the
+negative weight space. If every fixed point $q\ne p$ of $\overline{C_p}$
+has $\dim C_q<\dim C_p$, i.e.\ $\codim q>\codim p$, the class is canonical.
+This also proves the last statement.
+
+Uniqueness. The BB decomposition of a smooth projective variety is
+filtrable \cite{BB76}: the fixed points can be numbered
+$q_1,\dots,q_N$ so that $X_k = C_{q_1}\cup\dots\cup C_{q_k}$ is closed for
+every $k$. Let $U_k = X\smallsetminus X_{k-1}$; it is open, contains
+$C_{q_k}$ as a closed smooth subvariety with normal bundle of rank $\codim
+q_k$, and $U_{k+1} = U_k\smallsetminus C_{q_k}$. We first show by descending
+induction on $k$ that restriction to fixed points is injective on
+$H_T^*(U_k)$ and that $H_T^{\mathrm{odd}}(U_k)=0$. The Gysin sequence
+\[
+\cdots\to H_T^{*-2\codim q_k}(C_{q_k})\to H_T^*(U_k)\to H_T^*(U_{k+1})\to\cdots
+\]
+has $H_T^*(C_{q_k}) = H_T^*(q_k)$, a polynomial ring in even degrees; with
+the induction hypothesis the sequence splits into short exact sequences.
+If $\alpha\in H_T^*(U_k)$ vanishes at all fixed points, then
+$\alpha|_{U_{k+1}}=0$, so $\alpha$ is the push-forward of some $\beta\in
+H_T^*(q_k)$, and $0=\alpha(q_k) = \beta\,e^-_{q_k}$ forces $\beta=0$, since
+$e^-_{q_k}$ is a non-zero product of weights.
+
+The same argument shows: if $\delta\in H_T^*(X)$ vanishes at $q_{k+1},\dots,q_N$,
+then $\delta|_{U_{k+1}}=0$, and $\delta(q_k)$ is divisible by $e^-_{q_k}$. Now
+let $\delta$ be the difference of two canonical classes for $p$; it is
+homogeneous of degree $\codim p$ and vanishes at $p$ and at every $q$ with
+$\codim q\le\codim p$. If $\delta\ne0$, let $k$ be maximal with
+$\delta(q_k)\ne0$. Then $\codim q_k>\codim p$, and $\delta(q_k)$ is a
+non-zero polynomial of degree $\codim p$ divisible by $e^-_{q_k}$, of
+degree $\codim q_k$, a contradiction. So $\delta$ vanishes at all fixed
+points, and $\delta=0$ by injectivity for $U_1=X$.
 \end{proof}
 
 The package constructs canonical classes point by point in a Morse order.

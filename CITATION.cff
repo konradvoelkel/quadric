@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "bbcells: Białynicki-Birula cell structures, motives and quadratic invariants from combinatorial data"
+type: software
+authors:
+  - family-names: Voelkel
+    given-names: Konrad
+version: 0.1.0.dev0
+license: GPL-3.0-only
+repository-code: "https://github.com/konradvoelkel/quadric"
+keywords:
+  - Bialynicki-Birula decomposition
+  - spherical varieties
+  - complete symmetric varieties
+  - equivariant cohomology
+  - real algebraic geometry

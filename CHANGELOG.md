@@ -1,0 +1,49 @@
+# Changelog
+
+All notable changes to `bbcells`. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
+[Semantic Versioning](https://semver.org/).
+
+## [Unreleased] — 0.1.0
+
+First release, to accompany the companion paper (`paper/`).
+
+### Engine and invariants
+- Fixed-point data (points, tangent weights, optional annotations) as the
+  single input format; Białynicki-Birula cells for any generic cocharacter.
+- Chow motive, Betti and Hodge numbers, classes in $K_0(\mathrm{Var})$,
+  point counts, the quadratic Euler characteristic in $GW(k)$.
+- Consistency checks: independence of the cocharacter, Poincaré duality,
+  holomorphic Lefschetz formula for $\chi_y$.
+
+### Front ends
+- Smooth complete toric varieties (fans, named examples, JSON).
+- Flag varieties $G/P$ of every Cartan type; quadrics.
+- Wonderful compactifications of adjoint groups; rank-one two-orbit
+  varieties; toroidal and coloured horospherical varieties.
+- Blow-ups along $T$-stable centres, products, restriction to subtori.
+- Spherical varieties assembled orbit by orbit; complete symmetric varieties
+  of every real form from Satake diagrams, including $E_6$–$E_8$; toroidal
+  varieties over a wonderful model.
+- Point-count certificates for normal weights beyond condition (R), with the
+  point count of an open orbit read off the fixed points.
+- Cell counts of $E_7$ and $E_8$ complete symmetric varieties without
+  storing the fixed points.
+
+### Equivariant cohomology
+- GKM rings; Brion's description beyond GKM with components read off the
+  fixed-point data.
+- Characteristic numbers by localization (Chasles' 3264, Schubert's
+  666841088, complete quadrics in $\mathbb P^4$ and $\mathbb P^5$).
+- Canonical classes, integral cohomology where they exist, divisor
+  subalgebras.
+
+### Real points
+- Real Schubert cells and $H^*(G/P(\mathbb R);\mathbb Z)$ for every type.
+- Exact real incidences of toric varieties by discrete Morse theory.
+- Predictions of rational Betti numbers of $X(\mathbb R)$ under hypothesis H1,
+  for GKM and graded non-GKM decompositions (experimental).
+
+### Project
+- Standard library only, Python 3.10–3.13, CI on every push.
+- Licensed under GPL-3.0-only.

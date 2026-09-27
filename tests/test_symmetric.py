@@ -125,6 +125,31 @@ class TestNewCases(unittest.TestCase):
                     D.R.name, orbits, X, len(D.spherical_roots)).items():
                 self.assertEqual(bb, expected, (case, name))
 
+    def test_open_orbit_count_against_brion_peyre(self):
+        # |O_J| read off the fixed points of the closure (cells meeting O_J in
+        # A^d x G_m^m) against |G/P_{S_J}| |L/H_L| (Brion-Peyre), every orbit
+        import random
+        from bbcells.oracles import from_degrees, levi_degrees
+        rng = random.Random(1)
+        for case in [("AI", 3), ("AI", 4), ("AIII", 2, 2), ("AIII", 2, 3), ("CI", 3), ("G",),
+                     ("BI", 3, 4), ("DIII", 5)]:
+            D = symmetric.diagram(*case)
+            X = D.fixed_point_data()
+            for o in D.orbits(strict=False):
+                lam = [rng.randrange(1, 10 ** 6) for _ in range(D.R.rank)]
+                got = spherical.open_orbit_count(spherical.orbit_closure(X, o.roots), lam)
+                expected = (from_degrees(D.R.degrees, levi_degrees(D.R.cartan, set(o.levi)))
+                            * spherical.satellite_point_count(D.R.name, o))
+                self.assertEqual(got, expected, (case, o.name))
+
+    def test_certificate_on_a_larger_closure(self):
+        # (O3, 1) of AIII(3,4) on all of X rather than on X^{1,2}: the target
+        # |O_J| does not involve the boundary closures, which see the unknown
+        D = symmetric.diagram("AIII", 3, 4)
+        restricted = spherical._restrict(D.orbits(strict=False), {0, 1, 2}, ("O3", 1))
+        self.assertEqual(spherical.certify_by_point_count(D.R.name, restricted)[0],
+                         {"O3": [0]})
+
     def test_certificate_by_orbit_closures(self):
         for case, expected in [(("AIII", 2, 3), {("O2", 0): [0]}), (("EIII",), {("O1", 1): [0]})]:
             D = symmetric.diagram(*case)

@@ -252,8 +252,9 @@ release goes out together with the paper.
 - [ ] **E3 Performance.** Modular arithmetic with rational reconstruction in
   `brion.volume_ring` and `canonical_classes` (complete quadrics in
   $\mathbb P^4$ take 33 min now); `multiprocessing` for the streaming counts.
-- [ ] **E4 Release 0.1.** Version, changelog, `CITATION.cff`, tag,
-  and an archived copy with a DOI for the paper.
+- [ ] **E4 Release 0.1.** Prepared: `CHANGELOG.md`, `CITATION.cff`,
+  license. Left for KV, together with P5: the version number, the tag, and an
+  archived copy with a DOI for the paper.
 
 ### 4.4 Decisions for KV
 

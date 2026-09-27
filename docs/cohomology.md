@@ -94,9 +94,11 @@ Reproduced (`tests/test_brion.py`):
   - $\tau_p(p) = e^-_p$, the product of the $\lambda$-negative weights;
   - $\tau_p(q) = 0$ for $q\ne p$ with $\operatorname{codim}q\le\operatorname{codim}p$.
 
-  It is unique if it exists. It exists if and only if the closure of the
-  plus-cell of $p$ meets no cell of at least its own dimension, and then it
-  is the class of that closure.
+  It is unique if it exists (proof in the paper, Prop. 6.4: filtrability of
+  the BB decomposition and the Gysin sequences). It exists if the closure of
+  the plus-cell of $p$ meets no cell of at least its own dimension, and then
+  it is the class of that closure. So if it does not exist, that closure
+  meets such a cell. The converse is not claimed.
 - The points are ordered by a Morse function: on each Brion component, a
   point comes after the points with fewer negative weights along $\chi$. At
   $q$, each component $Y$ on which $q$ has $m\in\{1,2\}$ negative weights

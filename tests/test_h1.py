@@ -110,6 +110,20 @@ class TestBeyondGKM(unittest.TestCase):
         self.assertEqual(len(expected), 1)
         self.assertEqual(self.prediction(X, (79, -15, 11, 55)), expected)
 
+    def test_complete_quadric_surfaces_direct_rule_fails(self):
+        # the oracle is H_*(X(R); Q) = Q_0 + Q_5 (docs/real.md 5.4); the direct
+        # rule on the Brion curves admits no sign completion, as for conics
+        from bbcells import brion
+        from bbcells.frontends import spherical
+        X = brion.with_invariant_curves(spherical.complete_quadrics(4))
+        cells = bb_cells(X, (-1, 47, 3))
+        dims = {p: cells.dim_of(p) for p in X.points}
+        self.assertEqual(sum((-1) ** d for d in dims.values()), 1 - 1)
+        magnitudes = {(x, y): 2 for x, y, m in h1.curve_parities(cells)
+                      if dims[x] == dims[y] + 1 and m is not None and m % 2 == 0}
+        with self.assertRaises(ValueError):
+            realcells.sign_choices(dims, magnitudes)
+
     def test_complete_conics_need_one_correction(self):
         # no graded cocharacter; the direct rule admits no sign completion, and
         # removing the one term from the top of the even equal-dimension curve to

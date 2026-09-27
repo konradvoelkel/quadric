@@ -729,6 +729,42 @@ def orbit_count_check(cartan_type, orbits, X, rank):
     return result
 
 
+def _open_term(d, m):
+    """the coefficients of q^d (q - 1)^m, lowest degree first"""
+    from math import comb
+    return [0] * d + [comb(m, k) * (-1) ** (m - k) for k in range(m + 1)]
+
+
+def open_orbit_count(X, cocharacter):
+    """the point count (E-polynomial) of the open orbit O_J of a wonderful
+    variety, or of an orbit closure X = X^J, from its fixed points alone:
+        |O_J|(q) = sum of q^d (q - 1)^m
+    over the fixed points x in the orbits O_I, I c J, at which all m = |J - I|
+    normal weights are lambda-positive, d being the number of lambda-positive
+    tangent weights of O_I at x. The plus-cell of such an x meets O_J in
+    A^d x G_m^m, the others miss O_J (docs/spherical.md section 7).
+    The cocharacter must be generic.
+    >>> X = complete_quadrics(3)                        # complete conics
+    >>> print(open_orbit_count(X, (1, 3)).format("q"))  # smooth conics
+    -q^2 + q^5
+    >>> print(open_orbit_count(orbit_closure(X, (0,)), (1, 3)).format("q"))
+    q^2 + q^3 + q^4
+    """
+    counts = []
+    for label, weights in zip(X.points, X.weights):
+        values = [sum(a * b for a, b in zip(w, cocharacter)) for w in weights]
+        if 0 in values:
+            raise ValueError("the cocharacter is not generic at %s" % label)
+        m = len(X.annotation(label)["normal_roots"])
+        tangent, normal = values[:len(values) - m], values[len(values) - m:]
+        if all(v > 0 for v in normal):
+            term = _open_term(sum(v > 0 for v in tangent), m)
+            counts += [0] * (len(term) - len(counts))
+            for k, c in enumerate(term):
+                counts[k] += c
+    return IntPoly(tuple(counts))
+
+
 def _sum_sign(terms):
     """the sign (-1, 0, 1) of a sum of Fractions, proved: exact zero by
     cancelling equal and opposite terms, a nonzero sign by 150-digit decimal
@@ -1001,18 +1037,18 @@ def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
     point count of the variety assembled from `orbits` (an orbit closure X^J).
 
     With chi = normal + c zeta (normal the W_L-average, as in
-    certify_normal_weights), the number of lambda-positive weights at the
-    fixed point w x of a marked orbit is d_w + [a_w + c b_w > 0], with
-    a_w = <w(normal), lambda> and b_w = <w(zeta), lambda>. So the BB count is
-    P_lambda(c) = P_0 + sum_i F_i(c_i), each F_i constant between the
-    thresholds -a_w / b_w of its orbit. For the true c and lambda generic for
-    it, P_lambda(c) is the E-polynomial of X^J: |O_J| = |G/P_{S_J}|(q)
-    |L/H_L|(q) (Brion-Peyre) plus the count of the boundary (inclusion-
-    exclusion over the X^{J - S}, which do not see the unknowns), independent
-    of c. If O_J has no T-fixed points, only Poincare duality is used: the
-    counts must be palindromic (the condition v - reverse(v) = 0, linear in
-    the counts like the first). The boxes of intervals that satisfy the
-    condition are found by matching F_1 against the target minus F_2. The thresholds of each unknown are
+    certify_normal_weights), the unknown weight at the fixed point w x of a
+    marked orbit pairs with lambda to a_w + c b_w, with a_w = <w(normal),
+    lambda> and b_w = <w(zeta), lambda>. Every count below is therefore of the
+    form P_0 + sum_i F_i(c_i), each F_i constant between the thresholds
+    -a_w / b_w of its orbit, and for the true c and lambda generic for it
+    the count is that of the variety:
+      * if O_J has T-fixed points, the count of O_J from the fixed points
+        (open_orbit_count) must equal |G/P_{S_J}|(q) |L/H_L|(q) (Brion-Peyre);
+      * otherwise the BB count of X^J must be palindromic (Poincare duality;
+        the condition v - reverse(v) = 0, linear in the counts like the first).
+    The boxes of intervals that satisfy the condition are found by matching
+    F_1 against the target minus F_2. The thresholds of each unknown are
     checked to be disjoint across the samples, so for the true c at most one
     sample per unknown is not generic; with more samples than unknowns some
     sample decides. The weights lie in the root lattice (G adjoint), so c_i
@@ -1023,7 +1059,6 @@ def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
     from math import ceil, floor
     from itertools import product
     from bbcells.oracles import from_degrees, levi_degrees
-    from bbcells.core import bb_cells
     R = RootSystem(cartan_type)
     rng = random.Random(seed)
     marked = [o for o in orbits if o.note == BEYOND_R]
@@ -1047,15 +1082,6 @@ def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
         J |= set(o.roots) | set(o.normal_roots)
     top = [o for o in orbits if set(o.roots) == J]
     X = assemble(cartan_type, orbits)
-    if top:
-        flag = from_degrees(R.degrees, levi_degrees(R.cartan, set(top[0].levi)))
-        expected = flag * satellite_point_count(cartan_type, top[0])
-        for size in range(1, len(J) + 1):
-            for S in combinations(sorted(J), size):
-                term = IntPoly.from_counts(bb_cells(orbit_closure(X, J - set(S))).counts)
-                expected = expected + term if size % 2 else expected - term
-    else:
-        expected = None                   # only Poincare duality: palindromic counts
     grouped = {}
     for label, weights in zip(X.points, X.weights):
         a = X.annotation(label)
@@ -1063,16 +1089,33 @@ def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
     data = [(o, grouped.get(o.name, {})) for o in orbits]
     dim = len(X.weights[0])
     length = dim + 2
-    if expected is not None:
+    if top:
+        flag = from_degrees(R.degrees, levi_degrees(R.cartan, set(top[0].levi)))
+        expected = flag * satellite_point_count(cartan_type, top[0])
         target = list(expected.coefficients) + [0] * (length - len(expected.coefficients))
         if len(target) > length:
             raise ValueError("the E-polynomial has too high a degree")
         condition = lambda v: tuple(v)
+
+        def term(d, normal):
+            """the count of the plus-cell in O_J: q^d (q - 1)^m or 0"""
+            v = [0] * length
+            if all(normal):
+                for k, c in enumerate(_open_term(d, len(normal))):
+                    v[k] += c
+            return v
     else:
         target = [0] * length
         # v -> v - reverse(v) on degrees 0..dim (the last slot must stay empty)
         condition = lambda v: tuple(v[d] - v[dim - d] for d in range(dim + 1)) + (v[dim + 1],)
+
+        def term(d, normal):
+            """the BB cell: q^(d + number of positive normal weights)"""
+            v = [0] * length
+            v[d + sum(normal)] += 1
+            return v
     target = condition(target)
+    add = lambda u, v, sign=1: [x + sign * y for x, y in zip(u, v)]
     samples, seen = [], [set() for _ in marked]
     attempts = 0
     while len(samples) < trials:
@@ -1082,38 +1125,46 @@ def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
         lam = [rng.randrange(1, 10 ** 9) for _ in range(R.rank)]
         pair = lambda w: sum(a * b for a, b in zip(w, lam))
         counts = [0] * length                  # every unknown at -infinity
-        moving = [[] for _ in marked]          # (threshold, degree below, +1 or -1)
+        moving = [[] for _ in marked]          # (threshold, change of the count)
         generic = True
         for o, points in data:
             i = next((k for k, m in enumerate(marked) if m is o), None)
+            m = len(o.normal)
             for label, weights in points.items():
                 values = [pair(w) for w in weights]
+                tangent, normal = values[:len(values) - m], values[len(values) - m:]
                 if i is None:
-                    fixed, a, b = values, None, 0
+                    a, b = None, 0
                 else:
-                    fixed, a = values[:-1], values[-1]
+                    normal, a = normal[:-1], normal[-1]
                     b = pair(R.apply_word(_word_from_label(label), zetas[i]))
-                if any(v == 0 for v in fixed) or (a == 0 and b == 0):
+                if any(v == 0 for v in tangent + normal) or (a == 0 and b == 0):
                     generic = False
                     break
-                d = sum(v > 0 for v in fixed)
-                if a is None or b == 0:
-                    counts[d + (a is not None and a > 0)] += 1
+                d = sum(v > 0 for v in tangent)
+                normal = [v > 0 for v in normal]
+                if a is None:
+                    counts = add(counts, term(d, normal))
+                elif b == 0:
+                    counts = add(counts, term(d, normal + [a > 0]))
                 else:
+                    below, above = term(d, normal + [False]), term(d, normal + [True])
                     # at c -> -infinity the weight a + c b is positive iff b < 0
-                    counts[d + (b < 0)] += 1
-                    moving[i].append((Fraction(-a, b), d, 1 if b > 0 else -1))
+                    if b < 0:
+                        below, above = above, below
+                    counts = add(counts, below)
+                    moving[i].append((Fraction(-a, b), add(above, below, -1)))
             if not generic:
                 break
         if not generic:
             continue
-        thresholds = [{t for t, _, _ in m} for m in moving]
+        thresholds = [{t for t, _ in m} for m in moving]
         if any(t & old for t, old in zip(thresholds, seen)):
             continue
         # the piecewise constant F_i: intervals and their (cumulative) values
         pieces = []
         for m in moving:
-            m.sort()
+            m.sort(key=lambda entry: entry[0])
             delta, low, k, piece = [0] * length, None, 0, []
             while True:
                 high = m[k][0] if k < len(m) else None
@@ -1121,9 +1172,7 @@ def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
                 if high is None:
                     break
                 while k < len(m) and m[k][0] == high:
-                    _, d, step = m[k]
-                    delta[d] -= step
-                    delta[d + 1] += step
+                    delta = add(delta, m[k][1])
                     k += 1
                 low = high
             pieces.append(piece)

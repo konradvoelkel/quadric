@@ -312,12 +312,31 @@ $c\in\mathbb Z$.
     E-polynomial of the variety. Take the closure $X^J$ of an orbit $O_J$.
     If $O_J$ has no $T$-fixed points, only Poincaré duality is used: the
     counts must be palindromic. This is the linear condition
-    $v - \mathrm{rev}(v) = 0$, handled like the next one. If $O_J$ has fixed
-    points, the E-polynomial of $X^J$ is
-    $$E(X^J) = |G/P_{S_J}|(q)\,|L/H_L|(q) + \sum_{\emptyset\ne S\subseteq J}(-1)^{|S|+1}E(X^{J\smallsetminus S}),$$
-    by Brion–Peyre for the open orbit (§9) and inclusion–exclusion over the
-    boundary. The $X^{J\smallsetminus S}$ do not see the unknown, and their E-polynomials are
-    their BB counts.
+    $v - \mathrm{rev}(v) = 0$, handled like the next one.
+  - If $O_J$ has fixed points, the open orbit is counted from the fixed points
+    (`spherical.open_orbit_count`):
+    $$E(O_J) = \sum_{I\subseteq J}\ \sum_{x}\ q^{d_x}(q-1)^{|J\smallsetminus I|},$$
+    over the fixed points $x\in O_I^T$ whose normal weights (directions
+    $J\smallsetminus I$) are all $\lambda$-positive, $d_x$ being the number of
+    $\lambda$-positive tangent weights of $O_I$ at $x$. Reason: the boundary
+    divisors are coordinate hyperplanes of the plus-cell $C_x\cong\mathbb A^n$
+    in suitable $T$-equivariant coordinates, so $C_x\cap O_J\cong
+    \mathbb A^{d_x}\times\mathbb G_m^{|J\smallsetminus I|}$ if all normal
+    weights are positive, and $C_x\subset D_\delta$ if the normal weight of
+    $D_\delta$ is negative. The left side is Brion–Peyre (§9). The right side
+    is again a step function of $c$ (only fixed points of the marked orbit
+    whose other normal weights are positive depend on $c$).
+  - This replaces an earlier target, $E(X^J)$ by inclusion–exclusion over the
+    boundary closures $X^{J\smallsetminus S}$ with their BB counts. That
+    target is valid only if no boundary closure sees an unknown. This holds
+    for a single unknown on $J=K\cup\{\gamma\}$, but not on a larger $J$, and
+    not for a pair of unknowns: for the pair $(O_3,\gamma_0)$,
+    $(O_{23},\gamma_0)$ on $X$, the closure $X^{\{0,2\}}$ sees the first. The
+    old target then used $c=0$ inside the target. The new one needs no counts
+    of other closures. The formula is tested against Brion–Peyre on every
+    orbit of AI(3), AI(4), AIII(2,2), AIII(2,3), CI(3), $G$, BI(3,4), DIII(5),
+    EIII, FI and AIII(3,4), and all certified cases below are re-certified
+    with it.
   - The admissible set at $\lambda$ is the union of the intervals between
     thresholds where $P_\lambda = E(X^J)$, together with the thresholds
     themselves, where $\lambda$ decides nothing.
