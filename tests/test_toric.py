@@ -18,7 +18,7 @@ def cell_polynomial(fan, lam=None):
 
 
 class TestToricOracles(unittest.TestCase):
-    """PLAN.md 4.1"""
+    """PLAN.md 5.1"""
 
     def test_projective_spaces(self):
         for n in range(1, 6):

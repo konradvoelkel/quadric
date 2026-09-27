@@ -1,4 +1,4 @@
-"""regression tests for the H1 experiments (docs/H1.md)"""
+"""regression tests for the H1 experiments (docs/real.md)"""
 
 import itertools
 import unittest
@@ -44,7 +44,7 @@ class TestRealRealization(unittest.TestCase):
                                                      bound=8))
 
     def test_non_graded_surfaces_by_deflection(self):
-        """the deflection rule (docs/H1.md, section 5) against Choi-Park"""
+        """the deflection rule (docs/real.md, section 5.1) against Choi-Park"""
         dp6 = toric.del_pezzo_6()
         fans = [dp6, toric.star_subdivision(dp6, (0, 1)),
                 toric.star_subdivision(toric.hirzebruch(1), (0, 1)),
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
 
 class TestBeyondGKM(unittest.TestCase):
-    """the rule on the curves of the Brion components (docs/H1.md, section 8)"""
+    """the rule on the curves of the Brion components (docs/real.md, section 4)"""
 
     def prediction(self, X, lam):
         from bbcells import brion

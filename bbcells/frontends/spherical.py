@@ -1,5 +1,5 @@
 """
-Spherical varieties assembled orbit by orbit (PLAN.md S6d, docs/S6d.md).
+Spherical varieties assembled orbit by orbit (PLAN.md S6d, docs/spherical.md).
 
 T-fixed points of a spherical variety can lie in non-closed G-orbits (for
 P^1 x P^1 > SL_2/T two of them lie in the open orbit), so the fixed-point
@@ -16,7 +16,7 @@ For a wonderful variety with spherical roots Sigma and S^p (the simple roots
 of the parabolic P(X)), the orbit O_I (I c Sigma) fibres over G/P_I with
 fibre the satellite L_I/H_{L,I}, where L_I is the Levi subgroup on
 S^p + supp(I). The orbit has T-fixed points iff the satellite does, and
-then (docs/S6d.md, section 3)
+then (docs/spherical.md, section 3)
     Phi_H = (Phi^+ - Phi_{L_I}) + Phi_{H_{L,I}},
     N_x   = the W_{L_I}-averages of -gamma, gamma in Sigma - I,
 the latter provided the reflections of W_{H_{L,I}} span the roots of L_I
@@ -453,7 +453,7 @@ def wonderful_orbits(cartan_type, spherical_roots, satellite, parabolic=(), stri
     describing H_{L,I} > T inside L_I (L_I = the Levi subgroup on
     S^p + supp(I)). With strict=False, orbits violating condition (R) are
     kept with the W_L-average as normal weights and marked with BEYOND_R;
-    the caller must then validate the result (docs/S6d.md, section 6)."""
+    the caller must then validate the result (docs/spherical.md, section 7)."""
     R = RootSystem(cartan_type)
     sigma = [tuple(g) for g in spherical_roots]
     for g in sigma:
@@ -605,7 +605,7 @@ def certify_normal_weights(cartan_type, orbits, trials=3, seed=0):
 
     For such an orbit the true normal weight of D_gamma at the base point is
     chi = proj(-gamma) + c zeta with c an integer and zeta a primitive vector
-    spanning the W_H-invariants in span(Phi_L) (docs/S6d.md, section 6: the
+    spanning the W_H-invariants in span(Phi_L) (docs/spherical.md, section 3: the
     connected centre of L acts on O(D_gamma) along the component of X^Z
     through x_I and z by -gamma, and chi is W_H-invariant). The
     Atiyah-Bott-Berline-Vergne identity sum_p 1/e_p(lambda) = 0 is evaluated

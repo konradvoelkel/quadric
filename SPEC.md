@@ -256,7 +256,7 @@ $[S^{2d+2,d+1}, S^{2d+1,d}] = \pi_{1,1}(\mathbb{S}) \cong W(k)\cdot\eta$.
   Before H1 is proved or found in the literature, every output that depends
   on it is labelled `conditional_on="H1"`. Experiments supporting a refined
   form H1′ (the GKM form of Kocherlakota's rule) in both the real and the
-  complex realization are recorded in `docs/H1.md`. Supporting evidence: the unstable
+  complex realization are recorded in `docs/real.md`. Supporting evidence: the unstable
   Thom-space cell structures of arXiv:1805.04338 (`thm:unstable-thom-cells`)
   are constructed over any base smooth over a Dedekind ring, in particular
   over $\mathbb{Z}$. Test oracles for H1: Kocherlakota
@@ -329,13 +329,17 @@ Minimum test cases. All must pass before a front end counts as done.
    - **M6d [R]** general smooth complete toroidal spherical varieties from
      Luna–Vust data, using Brion's GKM description and the local structure
      theorem, with smoothness checked by Gagliardi's criterion.
-     First step done (`docs/S6d.md`): wonderful varieties from spherical
+     First step done (`docs/spherical.md`): wonderful varieties from spherical
      roots, $S^p$ and satellites, including complete quadrics and complete
      skew forms in every dimension. M6c is finished by deriving the satellites of
      symmetric varieties from Satake diagrams (all real forms of types A–D,
-     $E_6$–$E_8$, $F_4$, $G_2$; `docs/S6d.md` §6). M6d also has toroidal varieties
-     over a wonderful model (§7) and equivariant cohomology beyond GKM
-     (`brion.py`, §9). The open research steps are S7.1–S7.6 in `PLAN.md`.
+     $E_6$–$E_8$, $F_4$, $G_2$; `docs/spherical.md` §6). M6d also has toroidal
+     varieties over a wonderful model (`docs/spherical.md` §8) and equivariant
+     cohomology beyond GKM (`brion.py`, `docs/cohomology.md`).
+7. **M7 [R]:** research beyond M6: certificates for normal weights,
+   characteristic numbers and cell classes beyond GKM, cell counts for
+   $E_7$/$E_8$, real incidences beyond GKM (`docs/real.md`). Status and the
+   remaining steps are in `PLAN.md` §§3–4.
 
 ## 5. Decisions (v0.2)
 

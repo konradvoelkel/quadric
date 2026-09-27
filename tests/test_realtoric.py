@@ -34,7 +34,7 @@ class TestRealToric(unittest.TestCase):
                          .integral_homology(), [[0], [0, 2], []])
 
     def test_gkm_rule_entrywise_on_graded_decompositions(self):
-        # H1': |[x : y]| = 2 iff x, y are joined by a curve with m even (docs/H1.md)
+        # H1': |[x : y]| = 2 iff x, y are joined by a curve with m even (docs/real.md)
         for fan in FANS:
             cells = h1.find_graded_cocharacter(toric.fixed_point_data(fan))
             if cells is None:

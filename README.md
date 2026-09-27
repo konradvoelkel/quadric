@@ -22,9 +22,8 @@ computing cells for the type $D_{3}$ space
 This script is the seed of `bbcells`, a pure-Python tool computing
 Bialynicki-Birula cell structures from combinatorial data and, from them,
 the Chow motive, Betti and Hodge numbers, classes in K_0(Var), point counts,
-the quadratic Euler characteristic in GW(k), and, for real flag varieties,
-H^*(X(R); Z). See [SPEC.md](SPEC.md) (what), [PLAN.md](PLAN.md) (how, with
-the status of each step) and [LITERATURE.md](LITERATURE.md) (sources).
+the quadratic Euler characteristic in GW(k), equivariant cohomology, and
+the real cell complexes of X(R).
 
     python3 -m bbcells toric --named P1xF2          # smooth complete fans (or a JSON file)
     python3 -m bbcells flag E6 --parabolic 1        # G/P for all Cartan types
@@ -35,12 +34,26 @@ the status of each step) and [LITERATURE.md](LITERATURE.md) (sources).
     python3 -m bbcells spherical complete-quadrics 5   # assembled orbit by orbit, 450 cells
     python3 -m bbcells symmetric AIII 2 3           # complete symmetric varieties from Satake diagrams
     python3 -m bbcells symmetric CI 2 --fan fan.json   # toroidal variety over it (blow-ups etc.)
+    python3 -m bbcells symmetric EVI --counts-only  # cell counts without listing 758079 fixed points
     python3 -m bbcells real A3                      # H^*(Fl(R^4); Z)
 
 Every front end is tested against an independent oracle (point counts,
 Weyl group degrees, blow-up and fibration formulas, published tables, and
 this script for quadrics). Every computation is also checked against the
-holomorphic Lefschetz formula for $\chi_y$.
+holomorphic Lefschetz formula for $\chi_y$. Some results go beyond the
+command line so far and are available from Python: characteristic numbers
+such as Chasles' 3264 (`bbcells.brion`), certificates for the normal
+weights of complete symmetric varieties (`bbcells.frontends.spherical`),
+and exact real incidences of toric varieties (`bbcells.realtoric`).
+
+Documentation:
+- [SPEC.md](SPEC.md): what the tool computes; [PLAN.md](PLAN.md): status and
+  plan; [LITERATURE.md](LITERATURE.md): sources;
+- [docs/spherical.md](docs/spherical.md): spherical varieties orbit by orbit;
+- [docs/cohomology.md](docs/cohomology.md): equivariant cohomology beyond GKM;
+- [docs/real.md](docs/real.md): real points and hypothesis H1;
+- [docs/history.md](docs/history.md): the completed implementation steps;
+- [paper/](paper/): the companion paper.
 
 ## Development
 

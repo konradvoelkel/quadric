@@ -1,5 +1,5 @@
 """
-Equivariant cohomology beyond GKM (docs/S6d.md, section 10).
+Equivariant cohomology beyond GKM (docs/cohomology.md).
 
 Brion (Equivariant cohomology and equivariant intersection theory, 1998,
 Thm 6 and the proof of Thm 9): for a smooth complete spherical X with

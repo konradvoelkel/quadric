@@ -1,6 +1,6 @@
 """
 Exact real BB incidences of smooth complete toric varieties (PLAN.md S7.5,
-docs/H1.md section 7).
+docs/real.md section 3.2).
 
 The real points X(R) = P x (Z/2)^n / ~ carry a regular CW structure: a face
 G of P, i.e. a cone tau of the fan, contributes one cell of dimension

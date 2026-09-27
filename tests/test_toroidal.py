@@ -1,4 +1,4 @@
-"""toroidal varieties over wonderful models (docs/S6d.md, section 8)"""
+"""toroidal varieties over wonderful models (docs/spherical.md, section 8)"""
 
 import unittest
 from itertools import combinations

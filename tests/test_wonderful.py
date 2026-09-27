@@ -8,7 +8,7 @@ from tests._util import doctests_for
 
 load_tests = doctests_for(wonderful)
 
-# PLAN.md 4.3, computed independently when the plan was written
+# PLAN.md 5.3, computed independently when the plan was written
 EXPECTED = {
     "A1": (1, 1, 1, 1),
     "A2": (1, 2, 4, 7, 8, 7, 4, 2, 1),

@@ -1,4 +1,4 @@
-"""complete symmetric varieties from Satake diagrams (docs/S6d.md, section 6)"""
+"""complete symmetric varieties from Satake diagrams (docs/spherical.md, section 6)"""
 
 import unittest
 

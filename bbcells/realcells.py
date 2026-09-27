@@ -290,7 +290,7 @@ def type_a_signed(cartan_type, crossed=None):
     return RealCellComplex(data.name + "(R)", dims, incidences, signed=True)
 
 
-# -- the GKM form of Kocherlakota's rule (PLAN.md S5.3, docs/H1.md) ----------
+# -- the GKM form of Kocherlakota's rule (PLAN.md S5.3, docs/real.md) ----------
 
 def positive_weight_sum(cells, p):
     """sigma(p): the sum of the lambda-positive tangent weights at p, i.e. the
@@ -310,7 +310,7 @@ def gkm_incidences(cells):
     dimension, dim x = dim y + 1, where sigma(x) - sigma(y) = m phi with phi
     the weight of the curve at x; magnitude 2 if m is even, 0 if odd, None if
     sigma(x) - sigma(y) is not a multiple of phi. Conjecturally these are the
-    unsigned incidences of the cellular chain complex of X(R) (docs/H1.md)."""
+    unsigned incidences of the cellular chain complex of X(R) (docs/real.md)."""
     from bbcells.core import pairing
     data = cells.data
     result = {}

@@ -260,7 +260,7 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
 - ✓ M. Brion, E. Peyre, *The virtual Poincaré polynomials of homogeneous
   spaces*, Compositio Math. 134 (2002); arXiv:math/0102052. Thm 1(a) gives
   $|G/H|(q)$ from the Molien series of $N_H(T)/T$; this is
-  `oracles.brion_peyre` (`docs/S6d.md` §8).
+  `oracles.brion_peyre` (`docs/spherical.md` §9).
 - ✓ E. Strickland, *Schubert-type cells for complete quadrics*, Adv. Math. 62
   (1986); *Equivariant Betti numbers for symmetric varieties*, J. Algebra
   145 (1992). C. De Concini, M. Goresky, R. MacPherson, C. Procesi, *On the
@@ -274,7 +274,7 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   arXiv:0906.3529. The table after Thm 2.3 (§2.2) gives the ML
   degrees $\varphi(n,d)$ of generic linear concentration models for
   $n\le6$; the symmetry $\varphi(n,d)=\varphi(n,\binom{n+1}2+1-d)$ is Eq. (12).
-  `tests/test_brion.py` and `docs/S6d.md` §9 reproduce the rows.
+  `tests/test_brion.py` and `docs/cohomology.md` §3 reproduce the rows.
 - ✓a L. Manivel, M. Michałek, L. Monin, T. Seynnaeve, M. Vodička, *Complete
   quadrics: Schubert calculus for Gaussian models and semidefinite
   programming*, arXiv:2011.08791. Prop. 3.5:
@@ -289,7 +289,7 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   quadrics in $\mathbb P^{n-1}$ tangent to $\binom{n+1}2-1$ general quadrics.
   Our first three agree. For $n=6$ both our computation and an independent
   evaluation of Brion's degree formula give 1810718299257984458113941504
-  (`docs/S6d.md` §9). The discrepancy is unresolved.
+  (`docs/cohomology.md` §3). The discrepancy is unresolved.
 
 **General smooth projective spherical varieties**
 

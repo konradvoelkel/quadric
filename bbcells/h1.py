@@ -1,5 +1,5 @@
 """
-Experiments on hypothesis H1 (SPEC.md 3.5, docs/H1.md, PLAN.md S5.3).
+Experiments on hypothesis H1 (SPEC.md 3.5, docs/real.md, PLAN.md S5.3).
 
 The GKM form of Kocherlakota's rule (realcells.gkm_incidences) predicts, for
 cells x, y of adjacent dimension joined by an invariant curve with weight phi,
@@ -67,7 +67,7 @@ def sq2_mismatches(cells):
     return mismatches
 
 
-# -- non-graded decompositions of surfaces (docs/H1.md, section 5) ------------
+# -- non-graded decompositions of surfaces (docs/real.md, section 5.1) ---------
 
 def _multiple_of(d, phi):
     k = next(i for i, c in enumerate(phi) if c)
@@ -104,9 +104,9 @@ def curve_parities(cells):
     weight at x, is lambda-positive). With the normal weights paired
     (pair_normal_weights), m = 1 + sum of a over the directions positive at
     both ends, defined when dim x = dim y + 1 and no normal direction changes
-    sign (the local picture of docs/H1.md, section 2), or when dim x = dim y
+    sign (the local picture of docs/real.md, section 2), or when dim x = dim y
     and exactly one direction goes from negative at x to positive at y
-    (section 6). Otherwise m is None."""
+    (section 5.1). Otherwise m is None."""
     from bbcells.core import pairing
     data, lam = cells.data, cells.cocharacter
     result = []
@@ -178,7 +178,7 @@ def surface_prediction(cells, limit=1 << 18):
     return result
 
 
-# -- beyond GKM: the curves of the Brion components (docs/H1.md, section 8) ----
+# -- beyond GKM: the curves of the Brion components (docs/real.md, section 4) ---
 
 def brion_prediction(cells):
     """the rational Betti vectors of X(R) over all sign completions of the

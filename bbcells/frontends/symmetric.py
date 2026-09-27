@@ -1,5 +1,5 @@
 """
-Complete symmetric varieties from Satake diagrams (docs/S6d.md, section 6).
+Complete symmetric varieties from Satake diagrams (docs/spherical.md, section 6).
 
 For an involution theta of G with Satake diagram (black nodes, arrows), the
 complete symmetric variety of De Concini-Procesi is the wonderful

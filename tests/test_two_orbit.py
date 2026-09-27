@@ -1,4 +1,4 @@
-"""rank-one two-orbit completions against PLAN.md 4.4"""
+"""rank-one two-orbit completions against PLAN.md 5.4"""
 
 import unittest
 

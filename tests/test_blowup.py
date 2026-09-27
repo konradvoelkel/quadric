@@ -78,7 +78,7 @@ class TestLinear(unittest.TestCase):
 class TestCompleteConics(unittest.TestCase):
 
     def test_oracle(self):
-        """PLAN.md 4.5: [P^5] - [P^2] + [P^2]^2"""
+        """PLAN.md 5.5: [P^5] - [P^2] + [P^2]^2"""
         X = complete_conics.complete_conics()
         cells = bb_cells(X)
         self.assertTrue(cells.check().ok, str(cells.check()))

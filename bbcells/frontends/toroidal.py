@@ -1,5 +1,5 @@
 """
-Smooth complete toroidal varieties over a wonderful model (docs/S6d.md, section 8).
+Smooth complete toroidal varieties over a wonderful model (docs/spherical.md, section 8).
 
 Let X_w be the wonderful variety of G/H (H = N_G(H)) with spherical roots
 gamma_1, ..., gamma_r, a basis of the weight lattice M = Z Sigma. The valuation

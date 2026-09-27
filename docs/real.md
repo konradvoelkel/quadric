@@ -1,9 +1,13 @@
-# H1: η-incidences from GKM data — experiments
+# Real points and $\eta$-incidences
 
-Status: 2026-09-25, results of PLAN.md S5.3. The code is in `bbcells/realcells.py`
-(`gkm_incidences`) and `bbcells/h1.py`; the regression tests are in
-`tests/test_h1.py`. The results below are experimental evidence, not proofs,
-except where marked *proved*.
+Status (2026-09-27). This note collects what the package knows about the
+real cell complex of $X(\mathbb R)$ and hypothesis H1 (`SPEC.md` §3.5). The
+code is in `realcells.py` (flag varieties, the GKM rule), `h1.py`
+(predictions and experiments), `realtoric.py` (exact incidences for toric
+varieties) and `brion.invariant_curves` (curves beyond GKM); the tests are
+`tests/test_realcells.py`, `tests/test_h1.py` and `tests/test_realtoric.py`.
+Everything below is experimental evidence, not proof, except where marked
+*proved*.
 
 ## 1. The question
 
@@ -51,7 +55,9 @@ $d+1$ to cell $d$ is nonzero iff $d$ is odd. This matches the known
 $n_\varepsilon\eta$ attaching maps of $\mathbb{P}^n$ (for example $\mathbb{P}^2 = \mathrm{cofib}(\eta)$
 and $\mathbb{P}^3/\mathbb{P}^1 \simeq S^{4,2}\vee S^{6,3}$ stably).
 
-## 3. Experiments
+## 3. Evidence for GKM varieties
+
+### 3.1 Sign completions against oracles
 
 **Real realization, toric varieties.** The fans were $\mathbb{P}^2$, $\mathbb{P}^3$, $F_0,\dots,F_4$,
 $\mathrm{Bl}_{pt}\mathbb{P}^2$, $\mathrm{Bl}_{line}\mathbb{P}^3$, $\mathrm{Bl}_{pt}\mathbb{P}^3$,
@@ -79,42 +85,87 @@ $A_3/B$, $B_2/B$, $G_2/B$, $Q_4$ and $Q_5$. The dual cochain $y^*$ is the
 class of the closure of the minus-cell, i.e. the flow-up class for
 $-\lambda$, and $Sq^2 a = a^2$ on $H^2$.
 
-## 4. Refined conjecture
+### 3.2 Exact incidences for toric varieties
 
-> **H1′.** Let $X$ be a smooth projective GKM variety over $\mathbb{Z}$ with a
-> generic cocharacter whose BB decomposition is graded (every invariant curve
-> goes down in dimension). Then the stable attaching map between cells of
-> adjacent dimensions has $\eta$-component $\varepsilon_{xy}\,\eta$ with
-> $\varepsilon_{xy} \in W(\mathbb{Z}) = \mathbb{Z}$, where $\varepsilon_{xy} = \pm 1$ if $x, y$ are joined by an
-> invariant curve with $m$ even, and $\varepsilon_{xy} = 0$ otherwise.
+`realtoric.RealToricComplex` computes the real BB incidences of a smooth
+complete toric variety exactly.
 
-The evidence is consistent in both realizations. It says nothing about the
-motivic statement beyond them: the realizations detect $\varepsilon_{xy}$ mod 2
-(complex) and as an integer up to gauge (real), and that is all that was tested.
+$X(\mathbb R) = P\times(\mathbb Z/2)^n/\!\sim$ has a regular CW structure
+(Davis–Januszkiewicz).
+- **Fine cells.** A cone $\tau$ contributes one cell per class of
+  $(\mathbb Z/2)^n/\Lambda_\tau$, oriented by its face. The boundary is
+  $\partial(\tau,e) = \sum_r (-1)^{n-|\tau|+\#\{i\in\tau: i<r\}}(\tau+r,e)$.
+- **BB cells as unions of fine cells.** The real BB cell of $v$ is, in the
+  ray coordinates of $v$, the set $\{+,-,0\}^{d_v}$ of fine cells.
+- **Morse complex.** The lexicographic matching (pair $0$ with $-$ at the
+  first coordinate that is not $+$) leaves one critical cell per fixed point
+  and is acyclic. Algebraic Morse theory then gives an integral chain
+  complex on the BB cells, whether the decomposition is graded or not.
+- **Checks.** On nine fans at three cocharacters each:
+  - both the fine complex and the Morse complex have the Choi–Park Betti
+    numbers;
+  - the integral homology has only 2-torsion (e.g. $\mathbb{RP}^3$ and the
+    Klein bottle $F_1(\mathbb R)$).
 
-## 5. Limits and open points
+**H1′ entrywise.** For graded decompositions the cellular complex is
+canonical, so the rule of §2 can be compared entry by entry, not only
+through Betti numbers after a sign completion. On random smooth complete
+toric varieties the exact $|[x:y]|$ equals the prediction
+($2$ iff $x$, $y$ are joined by a curve with $m$ even) in every entry:
 
-- **Non-graded decompositions.** $dP_6$ admits none: on a hexagon with a
-  generic height function two 1-cells are always adjacent. There the cells
-  do not form a CW complex filtered by dimension, and the adjacent-cell
-  formula alone is not defined. §6 gives a rule for surfaces.
-- **Undetermined curves.** The rule needs $\sigma(x)-\sigma(y) \in \mathbb{Z}\varphi$.
-  This held in every example so far; `gkm_incidences` reports `None` otherwise.
-- **Signs.** They were determined only by $\partial^2 = 0$, which happened to be
-  unique up to gauge in all examples. A sign rule from GKM data (the analogue
-  of Matszangosz's $s(I,J)$) is open.
-- **Beyond realizations.** A proof of H1′ would need the attaching maps in
-  $SH(\mathbb{Z})$ themselves, for example via the Thom-space cell structures of
-  arXiv:1805.04338 restricted to invariant curves.
-- **Chow–Witt.** For cellular varieties the real cycle class map (HWXZ)
-  determines $\widetilde{CH}^*$ from $CH^*$ and $H^*(X(\mathbb{R});\mathbb{Z})$, so the real
-  incidences computed here are exactly what enters. An explicit
-  $\widetilde{CH}^*$ output is a natural next step.
+| dimension | decompositions | nonzero incidences |
+|---|---|---|
+| 2 | 14 | 9 |
+| 3 | 42 | 70 |
+| 4 | 40 | 151 |
 
-## 6. Non-graded surfaces: the deflection rule
+There was no mismatch.
 
-Status: 2026-09-27 (PLAN S7.5; `h1.surface_prediction`, tested in
-`tests/test_h1.py`). This is experimental evidence, not a proof.
+## 4. Beyond GKM: the curves of the Brion components
+
+For a non-GKM variety the rule of §2 is applied to the invariant curves that
+the Brion components provide (`docs/cohomology.md` §2):
+- every $\mathbb P^1$ component;
+- the two lines of each $\mathbb P(\mathfrak{sl}_2)$ plane, of weight $\pm a$
+  (the conics of weight $2a$ join cells two apart);
+- the four boundary curves of each ruled surface, from each extreme point
+  to each saddle, also when $a=b$.
+
+Parities come from pairing the normal weights at the two ends. Equal
+weights are paired first, then the rest by congruence modulo $\varphi$ with
+the smallest $|a|$. When normal weights are congruent modulo $\varphi$, the
+weights do not show the splitting of the normal bundle; flip-free pairings
+all give the same $m$.
+
+**Graded non-GKM decompositions.** The prediction is unique and equals the
+oracle in every tested chamber:
+
+| variety | torus | oracle | chambers |
+|---|---|---|---|
+| $\mathbb P^2\times\check{\mathbb P}^2$ (AIII(1,2)) | $PGL_3$ | $\mathbb{RP}^2\times\mathbb{RP}^2$ | 20 |
+| $\mathbb P^3\times\check{\mathbb P}^3$ (AIII(1,3)) | $PGL_4$ | $\mathbb{RP}^3\times\mathbb{RP}^3$ | 8 |
+| $\mathbb P^4\times\check{\mathbb P}^4$ (AIII(1,4)) | $PGL_5$ | $\mathbb{RP}^4\times\mathbb{RP}^4$ | 12 |
+| $\mathrm{Gr}(2,6)$ (CII(1,2)) | $Sp_6$ | Casian–Kodama | 20 |
+| $\mathrm{Gr}(2,8)$ (CII(1,3)) | $Sp_8$ | Casian–Kodama | 12 |
+| $E_6/P_1$ (FII) | $F_4$ | Kocherlakota with the $E_6$-torus | 6 |
+
+In each case $X(\mathbb R)$ is the same real variety as for a larger torus,
+where the answer is known. So this is a genuine test of the rule on
+non-GKM data.
+
+## 5. Non-graded decompositions
+
+A decomposition is *graded* if every invariant curve goes down in cell
+dimension. Otherwise the cells do not form a CW complex filtered by
+dimension, and the adjacent-cell formula of §2 alone is not defined.
+Already $dP_6$ admits no graded cocharacter: on a hexagon with a generic
+height function two 1-cells are always adjacent. With rational
+coefficients a chain complex on the BB cells still exists (a Morse complex
+after perturbation), but it is only defined up to filtered change of basis.
+
+### 5.1 Surfaces: the deflection rule
+
+`h1.surface_prediction`, tested in `tests/test_h1.py`.
 
 A curve $a\to b$ between cells of **equal** dimension breaks the
 Morse–Smale condition for the real Morse function $\langle\mu,\lambda\rangle$
@@ -149,60 +200,16 @@ Variants all fail on non-graded pentagons:
 - slides into $\partial a$ instead of $\partial c$;
 - the product rule.
 
-**Limits.**
-- *Threefolds.* In dimension 3 the rule is wrong: 23 of 72 random
+### 5.2 Dimension three
+
+In dimension 3 the rule is wrong: 23 of 72 random
   decompositions agree, 6 disagree, and the rest admit no sign completion.
   There the ascending manifolds of index-1 points are 2-dimensional, and
   slides can chain. A rule would need the flow on those manifolds.
-- *Complete conics.* These are the first non-GKM target. Take the Brion
-  components as curves: the $\mathbb P^1$'s, the two lines of each
-  $\mathbb P(\mathfrak{sl}_2)$ plane (weight $a$; the pencil of conics of
-  weight $2a$ joins cells two apart) and the four boundary curves of each
-  ruled surface. Then no cocharacter is graded: at least two curves join
-  cells of equal dimension, the same phenomenon as in `docs/S6d.md` §9.
-  The oracle is known. $X(\mathbb R)$ is the real blow-up of
-  $\mathbb{RP}^5$ along the Veronese $\mathbb{RP}^2$, and the exceptional
-  divisor is an $\mathbb{RP}^2$-bundle, which is $\mathbb Q$-acyclic over its
-  base. By the five lemma, $H^*(X(\mathbb R);\mathbb Q)\cong H^*(\mathbb{RP}^5;\mathbb Q)$,
-  so the rational Betti numbers are $1,0,0,0,0,1$. A rule for dimension 5
-  is still missing.
 
-## 7. Exact incidences for toric varieties
+The exact complexes of §3.2 show why.
 
-Status: 2026-09-27 (`bbcells/realtoric.py`, `tests/test_realtoric.py`).
-
-$X(\mathbb R) = P\times(\mathbb Z/2)^n/\!\sim$ has a regular CW structure
-(Davis–Januszkiewicz).
-- **Fine cells.** A cone $\tau$ contributes one cell per class of
-  $(\mathbb Z/2)^n/\Lambda_\tau$, oriented by its face. The boundary is
-  $\partial(\tau,e) = \sum_r (-1)^{n-|\tau|+\#\{i\in\tau: i<r\}}(\tau+r,e)$.
-- **BB cells as unions of fine cells.** The real BB cell of $v$ is, in the
-  ray coordinates of $v$, the set $\{+,-,0\}^{d_v}$ of fine cells.
-- **Morse complex.** The lexicographic matching (pair $0$ with $-$ at the
-  first coordinate that is not $+$) leaves one critical cell per fixed point
-  and is acyclic. Algebraic Morse theory then gives an integral chain
-  complex on the BB cells, whether the decomposition is graded or not.
-- **Checks.** On nine fans at three cocharacters each:
-  - both the fine complex and the Morse complex have the Choi–Park Betti
-    numbers;
-  - the integral homology has only 2-torsion (e.g. $\mathbb{RP}^3$ and the
-    Klein bottle $F_1(\mathbb R)$).
-
-**H1′ entrywise.** For graded decompositions the cellular complex is
-canonical, so the rule of §2 can be compared entry by entry, not only
-through Betti numbers after a sign completion. On random smooth complete
-toric varieties the exact $|[x:y]|$ equals the prediction
-($2$ iff $x$, $y$ are joined by a curve with $m$ even) in every entry:
-
-| dimension | decompositions | nonzero incidences |
-|---|---|---|
-| 2 | 14 | 9 |
-| 3 | 42 | 70 |
-| 4 | 40 | 151 |
-
-There was no mismatch.
-
-**Non-graded decompositions in dimension 3** (12 random threefolds, 3 cocharacters each):
+In 12 random threefolds at 3 cocharacters each:
 - A curve with $m$ even always gives $|[x:y]|=2$ (123 of 123).
 - A curve with $m$ odd always gives $0$ (238 of 238).
 - A curve along which normal directions change sign gives $0$ or $2$, with
@@ -212,50 +219,23 @@ There was no mismatch.
 
 In the non-graded case the complex is only defined up to filtered change
 of basis, so these entries are not invariants, and a local rule can only
-aim at some representative. The deflection rule of §6 does not give one in
-dimension 3 or for complete conics: no sign choice satisfies
-$\partial^2=0$. The oracle for complete conics stays
-$1,0,0,0,0,1$ (§6).
+aim at some representative. The deflection rule of §5.1 does not give one in
+dimension 3.
 
-## 8. Beyond GKM: the curves of the Brion components
+### 5.3 Complete conics
 
-Status: 2026-09-27 (`brion.invariant_curves`, `h1.brion_prediction`,
-`tests/test_h1.py::TestBeyondGKM`).
+These are the first non-GKM, non-graded target, and their real points are
+known. $X(\mathbb R)$ is the real blow-up of $\mathbb{RP}^5$ along the
+Veronese $\mathbb{RP}^2$. The exceptional divisor is an
+$\mathbb{RP}^2$-bundle over $\mathbb{RP}^2$, and $\mathbb{RP}^2$ is
+$\mathbb Q$-acyclic. By the five lemma applied to the blow-up square,
+$H^*(X(\mathbb R);\mathbb Q)\cong H^*(\mathbb{RP}^5;\mathbb Q)$ (*proved*), so the
+rational Betti numbers are $1,0,0,0,0,1$.
 
-For a non-GKM variety the rule of §2 is applied to the invariant curves that
-the Brion components provide (`docs/S6d.md` §9):
-- every $\mathbb P^1$ component;
-- the two lines of each $\mathbb P(\mathfrak{sl}_2)$ plane, of weight $\pm a$
-  (the conics of weight $2a$ join cells two apart);
-- the four boundary curves of each ruled surface, from each extreme point
-  to each saddle, also when $a=b$.
-
-Parities come from pairing the normal weights at the two ends. Equal
-weights are paired first, then the rest by congruence modulo $\varphi$ with
-the smallest $|a|$. When normal weights are congruent modulo $\varphi$, the
-weights do not show the splitting of the normal bundle; flip-free pairings
-all give the same $m$.
-
-**Graded non-GKM decompositions.** The prediction is unique and equals the
-oracle in every tested chamber:
-
-| variety | torus | oracle | chambers |
-|---|---|---|---|
-| $\mathbb P^2\times\check{\mathbb P}^2$ (AIII(1,2)) | $PGL_3$ | $\mathbb{RP}^2\times\mathbb{RP}^2$ | 20 |
-| $\mathbb P^3\times\check{\mathbb P}^3$ (AIII(1,3)) | $PGL_4$ | $\mathbb{RP}^3\times\mathbb{RP}^3$ | 8 |
-| $\mathbb P^4\times\check{\mathbb P}^4$ (AIII(1,4)) | $PGL_5$ | $\mathbb{RP}^4\times\mathbb{RP}^4$ | 12 |
-| $\mathrm{Gr}(2,6)$ (CII(1,2)) | $Sp_6$ | Casian–Kodama | 20 |
-| $\mathrm{Gr}(2,8)$ (CII(1,3)) | $Sp_8$ | Casian–Kodama | 12 |
-| $E_6/P_1$ (FII) | $F_4$ | Kocherlakota with the $E_6$-torus | 6 |
-
-In each case $X(\mathbb R)$ is the same real variety as for a larger torus,
-where the answer is known. So this is a genuine test of the rule on
-non-GKM data.
-
-**Non-graded.** No rank-two complete symmetric variety tested (AI(3),
-AI(4), AII(3), AIII(2,2), AIII(2,3), BI(2,3), CI(2), CI(3), CII(2,2),
-DI(2,4), $G_2$) has a graded cocharacter along these curves: 576 random generic
-cocharacters were tried. For complete conics:
+No rank-two complete symmetric variety tested has a graded cocharacter
+along the curves of §4: AI(3), AI(4), AII(3), AIII(2,2), AIII(2,3),
+BI(2,3), CI(2), CI(3), CII(2,2), DI(2,4) and $G_2$, with 576 random generic
+cocharacters. For complete conics:
 - the direct prediction admits no sign completion;
 - in each of 21 chambers, removing exactly one term gives the oracle
   $1,0,0,0,0,1$, and that term is unique;
@@ -263,9 +243,43 @@ cocharacters were tried. For complete conics:
   curve with $m$ even to the lower end of the one with $m$ odd; there are
   always exactly two such curves.
 
-A rule that explains this is open. Neither the deflection rule of §6 nor a
+A rule that explains this is open. Neither the deflection rule of §5.1 nor a
 rule summing over paths of slides reproduces it. The closest consistent
 complex also drops the paths that stay inside one
 $\mathbb P(\mathfrak{sl}_2)$ plane, which suggests that the planes need
 their own local model.
 
+## 6. Conjecture H1′ and open points
+
+> **H1′.** Let $X$ be a smooth projective GKM variety over $\mathbb{Z}$ with a
+> generic cocharacter whose BB decomposition is graded (every invariant curve
+> goes down in dimension). Then the stable attaching map between cells of
+> adjacent dimensions has $\eta$-component $\varepsilon_{xy}\,\eta$ with
+> $\varepsilon_{xy} \in W(\mathbb{Z}) = \mathbb{Z}$, where $\varepsilon_{xy} = \pm 1$ if $x, y$ are joined by an
+> invariant curve with $m$ even, and $\varepsilon_{xy} = 0$ otherwise.
+
+The evidence is consistent in both realizations. It says nothing about the
+motivic statement beyond them: the realizations detect $\varepsilon_{xy}$ mod 2
+(complex) and as an integer up to gauge (real), and that is all that was tested.
+
+Beyond the graded GKM case, §4 extends the evidence to graded non-GKM
+decompositions along the curves of the Brion components.
+
+Open points:
+
+- **Undetermined curves.** The rule needs $\sigma(x)-\sigma(y) \in \mathbb{Z}\varphi$.
+  This held in every GKM example so far; `gkm_incidences` reports `None`
+  otherwise. Beyond GKM, `h1.curve_parities` pairs the normal weights
+  explicitly (§4).
+- **Signs.** They were determined only by $\partial^2 = 0$, which happened to be
+  unique up to gauge in all examples. A sign rule from GKM data (the analogue
+  of Matszangosz's $s(I,J)$) is open.
+- **Beyond realizations.** A proof of H1′ would need the attaching maps in
+  $SH(\mathbb{Z})$ themselves, for example via the Thom-space cell structures of
+  arXiv:1805.04338 restricted to invariant curves.
+- **Chow–Witt.** For cellular varieties the real cycle class map (HWXZ)
+  determines $\widetilde{CH}^*$ from $CH^*$ and $H^*(X(\mathbb{R});\mathbb{Z})$, so the real
+  incidences computed here are exactly what enters. An explicit
+  $\widetilde{CH}^*$ output is a natural next step.
+- **Non-graded decompositions** in dimension $\ge3$ (§§5.2–5.3), in
+  particular every rank-two complete symmetric variety.

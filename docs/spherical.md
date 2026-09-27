@@ -1,20 +1,21 @@
-# S6d — spherical varieties orbit by orbit
+# Spherical varieties orbit by orbit
 
-Status (2026-09-26):
+Status (2026-09-27). This note documents `frontends/spherical.py`,
+`frontends/symmetric.py` and `frontends/toroidal.py`:
 
-- **Wonderful varieties with given satellites** (`frontends/spherical.py`).
-  The first families are complete quadrics and complete skew forms in every
-  dimension.
-- **Symmetric varieties** (`frontends/symmetric.py`, §6). The satellites
-  are derived from the Satake diagram, for all real forms of types A–D and
-  $E_6$–$E_8$, $F_4$ and $G_2$.
-- **Toroidal varieties over a wonderful model** (`frontends/toroidal.py`, §7).
-- **Equivariant cohomology beyond GKM**, by Brion's local conditions
-  (`brion.py`, §9).
+- wonderful varieties with given satellites (§3), in particular complete
+  quadrics and complete skew forms in every dimension;
+- complete symmetric varieties from Satake diagrams (§6), for all real forms
+  of types A–D, $E_6$–$E_8$, $F_4$ and $G_2$;
+- certificates for the normal weights beyond condition (R) (§7);
+- toroidal varieties over a wonderful model (§8);
+- orbit counts (§9), and cell counts without listing fixed points (§10).
 
-Every result is tested against the holomorphic Lefschetz formula (§5). Orbit
-by orbit, every result is also tested against Brion–Peyre point counts
-(§8). §10 says how to do what remains.
+Every result is tested against the holomorphic Lefschetz formula (§5) and,
+orbit by orbit, against Brion–Peyre point counts (§9). Equivariant
+cohomology, characteristic numbers and cell classes are in
+`docs/cohomology.md`; real points are in `docs/real.md`. Open problems are
+listed in §11 and planned in `PLAN.md` §4.
 
 Conventions are those of `PLAN.md` §1: characters are in simple-root
 coordinates of $G$ (the torus of $G_{\mathrm{ad}}$). The base point of $G/P$
@@ -61,9 +62,9 @@ points. These are the `OrbitDatum` objects, and `assemble` builds the
 reflections in the roots of $H$, the component reflections, and possibly
 non-reflection components (§6). For the reflection part $W'$, Dyer (1990)
 shows that every coset $wW'$ has a unique element of minimal length,
-characterized by $w(eta)>0$ for all $eta\in\Phi_{W'}^+$. Deodhar's lemma
+characterized by $w(\beta)>0$ for all $\beta\in\Phi_{W'}^+$. Deodhar's lemma
 holds for reflection subgroups by the same criterion. If $w$ is minimal and
-$w^{-1}lpha_i$ is not a positive root of $W'$, then $s_iw$ is minimal;
+$w^{-1}\alpha_i$ is not a positive root of $W'$, then $s_iw$ is minimal;
 otherwise $s_iw\in wW'$. A search by length over inverse permutations of
 the roots therefore produces every minimal representative together with a
 reduced word, without ever listing $W$. Component elements then glue these
@@ -134,7 +135,7 @@ $-\gamma + a\alpha$ and $-\gamma + (\langle\gamma,\alpha^\vee\rangle - a)\alpha$
 where $a = c(D^+,\gamma)$ is a Cartan-pairing coefficient of a colour.
 Since $c(D^+,\gamma) \ne c(D^-,\gamma)$ in general, the average is not the
 normal weight. `wonderful_orbits` therefore refuses such orbits by default
-(`strict=True`). For symmetric varieties, §6 shows how to decide the
+(`strict=True`). For symmetric varieties, §7 shows how to decide the
 remaining component.
 
 *Implemented families.*
@@ -244,6 +245,55 @@ the wonderful compactification of $G_{\mathrm{ad}}/G_{\mathrm{ad}}^\theta$.
   `component_elements`. The cosets are Dyer representatives of the
   reflection part, glued by the component group.
 
+**Verification.**
+
+- Exact fixed-point data agrees with the earlier front ends:
+  - AI$(n)$ = complete quadrics ($n\le5$);
+  - AII$(n)$ = complete skew forms ($n\le3$);
+  - AIII$(1,q)$ = $PGL_n/GL_{n-1}$;
+  - CII$(1,q)$ = $\mathbb{HP}^q$;
+  - BI$(1,2k)$ = $\mathbb{P}^{2k}\smallsetminus Q_{2k-1}$;
+  - FII = $\mathbb{OP}^2$.
+- Exceptional isomorphisms give the same data from different diagrams on
+  different root systems, after relabelling nodes:
+  - CI(2) = BI(2,3) and CII(1,1) = BI(1,4) ($B_2 = C_2$);
+  - DI(3,3) = AI(4), DI(1,5) = AII(2), DI(2,4) = AIII(2,2) and
+    DIII(3) = AIII(1,3) ($D_3 = A_3$);
+  - DI(2,6) = DIII(4) (triality).
+- New varieties (dimension: number of fixed points), all passing every
+  check:
+
+  | form | fixed points |
+  |---|---|
+  | AIII(2,2) | 8: 39 |
+  | AIII(3,3) | 18: 1180 |
+  | CI(3) | 12: 148 |
+  | CI(4) | 20: 1624 |
+  | CII(2,2) | 16: 123 |
+  | BI(3,4) | 12: 147 |
+  | DI(4,4) | 16: 747 |
+  | DIII(6) | 30: 4576 |
+  | G | 8: 27 |
+  | FI | 28: 4788 |
+  | EIV | 26: 270 |
+  | EII | 40: 110916 |
+  | EI | 42: 370170 |
+  | EVII | 54: 23464 |
+  | AIII(2,3) (beyond R, certified) | 12: 190 |
+  | DIII(5) (beyond R, certified) | 20: 656 |
+  | EIII (beyond R, certified) | 32: 2619 |
+  | AIII(3,4) (beyond R, certified jointly) | 24: 8015 |
+  | DIII(7) (beyond R, certified jointly) | 42: 55168 |
+
+  For $G_2/SO_4$, the count $27 = 12+6+6+3$ can be checked by hand.
+
+## 7. Certificates beyond condition (R)
+
+Condition (R) of §3 fails exactly when a satellite has more colours than
+its rank. For symmetric varieties this happens for Hermitian satellites.
+The code then uses the $W_L$-average and decides the remaining unknown by
+one of the certificates below (`spherical.certify_by_closures`).
+
 **Hermitian satellites beyond (R).** In these cases $V$ is the line $\mathbb Q\zeta$
 spanned by the centre of the Hermitian $K$:
 - AIII$(p,q)$ with $p\ne q$, $p\ge2$;
@@ -265,7 +315,7 @@ $c\in\mathbb Z$.
     $v - \mathrm{rev}(v) = 0$, handled like the next one. If $O_J$ has fixed
     points, the E-polynomial of $X^J$ is
     $$E(X^J) = |G/P_{S_J}|(q)\,|L/H_L|(q) + \sum_{\emptyset\ne S\subseteq J}(-1)^{|S|+1}E(X^{J\smallsetminus S}),$$
-    by Brion–Peyre for the open orbit (§8) and inclusion–exclusion over the
+    by Brion–Peyre for the open orbit (§9) and inclusion–exclusion over the
     boundary. The $X^{J\smallsetminus S}$ do not see the unknown, and their E-polynomials are
     their BB counts.
   - The admissible set at $\lambda$ is the union of the intervals between
@@ -317,7 +367,7 @@ $c\in\mathbb Z$.
     order. The moments $\int c_1^T(TX)^k$ have tiny leading coefficients, so
     $C$ exceeds $10^5$. This degeneracy prompted the point-count certificate.
 - **Uncertified cases** keep the weaker mark `BEYOND_R`. They are accepted
-  only if every check passes, including the orbit counts of §8.
+  only if every check passes, including the orbit counts of §9.
 - **Independent confirmation.** A literature search found an orbit-sum
   E-polynomial computation (De Concini–Springer's method with Brion–Peyre
   fibres). It reproduces AIII(2,3) = 1,3,8,15,23,29,32,29,23,15,8,3,1, as well
@@ -332,49 +382,7 @@ $c\in\mathbb Z$.
   - Gaps: the sign in $\operatorname{div} f_\gamma$; reducedness of $D\cap F$;
     that colours not moved by $S_I$ miss the localization.
 
-**Verification.**
-
-- Exact fixed-point data agrees with the earlier front ends:
-  - AI$(n)$ = complete quadrics ($n\le5$);
-  - AII$(n)$ = complete skew forms ($n\le3$);
-  - AIII$(1,q)$ = $PGL_n/GL_{n-1}$;
-  - CII$(1,q)$ = $\mathbb{HP}^q$;
-  - BI$(1,2k)$ = $\mathbb{P}^{2k}\smallsetminus Q_{2k-1}$;
-  - FII = $\mathbb{OP}^2$.
-- Exceptional isomorphisms give the same data from different diagrams on
-  different root systems, after relabelling nodes:
-  - CI(2) = BI(2,3) and CII(1,1) = BI(1,4) ($B_2 = C_2$);
-  - DI(3,3) = AI(4), DI(1,5) = AII(2), DI(2,4) = AIII(2,2) and
-    DIII(3) = AIII(1,3) ($D_3 = A_3$);
-  - DI(2,6) = DIII(4) (triality).
-- New varieties (dimension: number of fixed points), all passing every
-  check:
-
-  | form | fixed points |
-  |---|---|
-  | AIII(2,2) | 8: 39 |
-  | AIII(3,3) | 18: 1180 |
-  | CI(3) | 12: 148 |
-  | CI(4) | 20: 1624 |
-  | CII(2,2) | 16: 123 |
-  | BI(3,4) | 12: 147 |
-  | DI(4,4) | 16: 747 |
-  | DIII(6) | 30: 4576 |
-  | G | 8: 27 |
-  | FI | 28: 4788 |
-  | EIV | 26: 270 |
-  | EII | 40: 110916 |
-  | EI | 42: 370170 |
-  | EVII | 54: 23464 |
-  | AIII(2,3) (beyond R, certified) | 12: 190 |
-  | DIII(5) (beyond R, certified) | 20: 656 |
-  | EIII (beyond R, certified) | 32: 2619 |
-  | AIII(3,4) (beyond R, certified jointly) | 24: 8015 |
-  | DIII(7) (beyond R, certified jointly) | 42: 55168 |
-
-  For $G_2/SO_4$, the count $27 = 12+6+6+3$ can be checked by hand.
-
-## 7. Toroidal varieties over a wonderful model
+## 8. Toroidal varieties over a wonderful model
 
 Let $X_w$ be wonderful with spherical roots a basis of $M = \mathbb Z\Sigma$. Its
 valuation cone is the negative orthant $\mathcal V\subset N = M^\vee$, and the
@@ -400,7 +408,7 @@ dimension $\dim F_J - \dim\tau$.
     $\sum_\tau |O_{J(\tau)}|\,(q-1)^{\dim F_J - \dim\tau}$;
   - the command line takes a fan: `bbcells symmetric CI 2 --fan fan.json`.
 
-## 8. Orbit counts (Brion–Peyre)
+## 9. Orbit counts (Brion–Peyre)
 
 Brion–Peyre (Compositio 2002, Thm 1(a); arXiv:math/0102052) give
 $|G/H|(q) = q^{\dim G/H}F_H(1/q)/F_G(1/q)$, where $F_H$ is the Molien
@@ -417,198 +425,14 @@ They agree for AI(4), AIII(2,2), AIII(2,3), AIII(3,4), CI(3), BI(3,4),
 DI(4,4), DIII(5), DIII(7), G, FI and EIII. That includes the uncertified
 two-unknown cases.
 
-## 9. Equivariant cohomology beyond GKM
-
-Complete quadrics are not GKM: $\alpha$ and $2\alpha$ occur at the same
-fixed point, and there are infinitely many $T$-curves.
-
-**Brion's description** (arXiv:math/9802063, Thm 6 and the proof of Thm 9).
-The image of $H_T^*(X)\to H_T^*(X^T)$ is cut out by one set of conditions
-for each connected component $Y$ of $X^{\ker\chi}$. Such a $Y$ is:
-- a point;
-- a $\mathbb P^1$, which imposes $f_y\equiv f_z \bmod \chi$;
-- $\mathbb P(\mathfrak{sl}_2)$ or a ruled surface. Then all $f_p$ are
-  congruent mod $\chi$, and $\sum_{p\in Y^T} f_p/e_p$ is a polynomial,
-  where $e_p$ is the product of the two weights of $T_pY$.
-
-Banerjee–Can's K-theory version of the surface cases is necessary but not
-sufficient: the literature reader found counterexamples. So Brion's form is
-used.
-
-**Components from fixed-point data** (`brion.fixed_components`).
-- Points of one component have the same $\ker\chi$-representation
-  $T_pX$, i.e. the same weights modulo $\mathbb Z\chi$.
-- The weights along $\chi$ must form one of the patterns
-  $\{k,-k\}$ (curve), $\{a,-a\},\{a,2a\},\{-a,-2a\}$ (plane), or
-  $\{\pm a,\pm b\}$ (ruled surface). Ambiguity raises.
-
-**Validation.**
-- On flag and toric varieties, the inferred curves are exactly the GKM
-  edges.
-- Complete conics: 12 curves and 6 planes. Complete quadrics in
-  $\mathbb P^3$: 153 curves and 48 planes.
-- In every degree tested (0–3 and 0–2), the ring has the dimension of a free module with
-  the BB Poincaré series.
-- Dropping the second-order condition gives too many classes.
-
-**Characteristic numbers** (`brion.degree_one_class`, `line_bundle_class`,
-`integrate_monomial`).
-- A degree-one class is determined by its values on the closed orbit.
-  Propagation along the Brion components determines the rest: across a curve
-  $f_y - f_z$ is a multiple of $\chi$, and so on. The result is then checked
-  against every condition.
-- A $G$-linearized line bundle with weight $\mu$ at the base point $z$ of the
-  closed orbit has the value $w(\mu)$ at $wz$. For complete quadrics the colours
-  $\mu_k$ are the pullbacks of $\mathcal O(1)$ from
-  $\mathbb P(\operatorname{Sym}^2\Lambda^kV)$, of weight $-2\omega_k$.
-- Monomials in these classes are integrated by ABBV at a generic cocharacter,
-  in exact arithmetic. The result must be an integer, and it must not depend on
-  the cocharacter. Both are checked.
-
-Reproduced (`tests/test_brion.py`):
-- Complete conics:
-  - $\mu^a\nu^{5-a} = 1,2,4,4,2,1$;
-  - Chasles' $(2\mu+2\nu)^5 = 3264$.
-- Complete quadric surfaces:
-  - Schubert's $\mu^a\nu^{9-a} = 1,2,4,8,16,32,56,80,92,92$;
-  - $\rho^9 = 1$;
-  - 666841088 quadrics tangent to 9 quadrics;
-  - the triangle entries $\mu^3\nu^3\rho^3 = 104$ and $\mu^2\nu^5\rho^2=128$
-    (Brysiewicz–Fevola–Sturmfels, arXiv:2010.10879).
-- Complete quadrics in $\mathbb P^4$:
-  - 48942189946470400 quadrics tangent to 14 quadrics (Sturmfels,
-    *3264 questions*, Q5);
-  - $\mu_2^{14} = 7703$.
-- ML degrees of generic linear concentration models,
-  $\varphi(n,d)=\int\mu_1^{\binom{n+1}2-d}\mu_{n-1}^{d-1}$ (MMMSV,
-  arXiv:2011.08791, Prop. 3.5):
-  - $n=4$: 1,3,9,17,21,21,17,9,3,1;
-  - $n=5$: 1,4,16,44,86,137,188,212,…;
-  - $n=6$, $d\le7$: 1,5,25,90,240,528,1016.
-
-  These match the table after Thm 2.3 of Sturmfels–Uhler (arXiv:0906.3529).
-- Complete quadrics in $\mathbb P^5$ (3690 fixed points, 28440 components,
-  96 s):
-  - quadrics tangent to 20 quadrics: 1810718299257984458113941504;
-  - $\mu_k^{20} = 1, 803128, 61520094, 803128, 1$.
-
-  An independent computation with Brion's degree formula gives the same
-  number. The value 641211464734373953791690014720 listed in *3264
-  questions* Q5 differs from both. We have not resolved this.
-
-**Cell classes** (`brion.canonical_classes`, `integral_cohomology`).
-- The Goldin–Tolman class $\tau_p$ satisfies
-  - $\tau_p(p) = e^-_p$, the product of the $\lambda$-negative weights;
-  - $\tau_p(q) = 0$ for $q\ne p$ with $\operatorname{codim}q\le\operatorname{codim}p$.
-
-  It is unique if it exists. It exists if and only if the closure of the
-  plus-cell of $p$ meets no cell of at least its own dimension, and then it
-  is the class of that closure.
-- The points are ordered by a Morse function: on each Brion component, a
-  point comes after the points with fewer negative weights along $\chi$. At
-  $q$, each component $Y$ on which $q$ has $m\in\{1,2\}$ negative weights
-  gives $\tau(q)\equiv L_Y \bmod \chi^m$.
-  - For $m=1$, $L_Y$ is the value at an earlier point of $Y$.
-  - For $m=2$, $L_Y$ comes from the sum condition of the surface.
-
-  The moduli multiply to $e^-_q$, of degree greater than
-  $\operatorname{codim}p$, so $\tau(q)$ is unique. It is found by Newton
-  interpolation, $g = A + \prod\chi_i^{m_i}\,g'$, using only restriction to
-  hyperplanes and exact division. There are no global linear systems.
-- Validation:
-  - the result equals the GKM flow-up classes on flag varieties;
-  - it equals a global linear solve on CII(1,2) (ruled surfaces) and BI(1,4)
-    (planes).
-
-  `integral_cohomology` then evaluates the expansion at a rational point,
-  where it is triangular. It checks that the structure constants are
-  integers and that the Poincaré pairing is unimodular.
-- **Complete conics have no canonical classes.** In every chamber of
-  $\lambda$, two of the 12 points fail. So two plus-cell closures meet a
-  cell of their own dimension, and the BB decomposition is not a
-  stratification by cell closures. For the default cocharacter, points fail
-  in the same way for AI(4) (22 of 66), CI(2), CI(3), $G_2$, AIII(2,2),
-  DI(2,4), and even for the GKM variety AII(3) (14 of 90). Canonical classes
-  do exist for AIII(1,2), BI(1,4) and CII(1,2).
-
-**The divisor subalgebra** (`brion.volume_ring`).
-- By Poincaré duality, a form $f$ of degree $d$ in the degree-one classes
-  vanishes if and only if $\int fg = 0$ for all $g$ of degree $n-d$. So the
-  subalgebra generated by $D_1,\dots,D_k$ is $\mathbb Q[x]/\operatorname{Ann}(V)$,
-  with the volume polynomial $V = \int(\sum x_iD_i)^n/n!$ (Macaulay's inverse
-  system). $V$ comes from the characteristic numbers.
-- If its Hilbert function equals the Betti numbers, the $D_i$ generate
-  $H^*(X;\mathbb Q)$ and this is a presentation.
-- Complete conics: $H^* = \mathbb Q[\mu,\nu]/(r_3, r_4)$ with
-  $r_3 = 2\nu^3 - 3\mu\nu^2 + 3\mu^2\nu - 2\mu^3$.
-- Complete quadric surfaces: $\mathbb Q[\mu,\nu,\rho]$ modulo minimal
-  relations, 2 in degree 4, 2 in degree 5 and 1 in degree 6.
-- Complete quadrics in $\mathbb P^4$: the colours do **not** generate. Degree 3
-  has $\binom63 = 20$ monomials, but $b_6 = 21$. The Hilbert function of the
-  subalgebra is $1,4,10,20,35,52,65,70,\dots$, against the Betti numbers
-  $1,4,10,21,36,53,65,70,\dots$.
-
-## 10. How to do what remains
-
-1. **General Luna data (non-symmetric satellites).** Following
-   Bravi–Pezzini (arXiv:1103.0380 §3 and the table of arXiv:1109.6777):
-   - **Colour calculus.** Build the colours $\Delta$ with their full Cartan
-     pairing, and localize to $(S^p, I, A_I)$ on $S_I$ (colours can merge
-     or split).
-   - **Levi part.** Find a minimal distinguished $\Delta''$ with
-     $\Sigma/\Delta''=\emptyset$, and $\Delta'\subseteq\Delta''$. The satellite has full
-     rank iff $|\Delta''| = |\Sigma|$ and the very reductive system on
-     $S_M = S^p/\Delta''$ is a product of full-rank entries of the table. The
-     table has about 30 entries, e.g. $SO_{2n+1}/GL_n$,
-     $Sp_{2n+2}/GL_1\times Sp_{2n}$, $G_2/SL_3$ and the equal-rank
-     symmetric ones.
-   - **Stabilizer roots.** $\Phi_H$ and $W_H = W(L_K)$ follow. The roots of
-     $H^u$ come only from the explicit constructions: tails, higher defect,
-     and rank-0 quotients. Needs case-specific data.
-   - **Normal weights.** They lie in $\mathrm{pr}(-\gamma) + V$ by §3. Beyond
-     (R) they need the colour coefficients: the $GL_2/T$ example, and
-     $SO_{2n+1}/GL_n$, where some $\operatorname{supp}\gamma\subseteq S_I$.
-     - Either derive them from
-       $\operatorname{div} f_\gamma = -D_\gamma + \sum_D c(D,\gamma)D$ together with the
-       weights of $\mathcal O(D)$ at fixed points off $D$,
-     - or determine the unknowns in $V$ by the ABBV certificate of §6
-       (implemented for one unknown) and confirm them by §8.
-   - **Oracles.** Wasserman's rank-two tables, and the non-symmetric
-     reductive entries (#31–50 in arXiv:1109.6777).
-2. **Certificates beyond the Hermitian case.** The point-count
-   certificate of §6 decides one unknown, or two on different orbits, on any
-   orbit closure. It remains to:
-   - handle two unknowns on the same orbit (a line arrangement in the
-     $(c_1,c_2)$-plane), or three unknowns that meet only on one closure;
-   - give a full proof of the proposition's Hermitian case, closing the gaps
-     listed in §6.
-3. **Schubert calculus beyond GKM.** Done in part (§9): characteristic
-   numbers, canonical classes where they exist, and the divisor subalgebra.
-   Still open:
-   - a canonical integral basis when plus-cell closures are not unions of
-     cells, as for complete quadrics;
-   - the classes beyond the divisor subalgebra for complete quadrics in
-     $\mathbb P^{n-1}$, $n\ge5$.
-
-   Oracle: De Concini–Goresky–MacPherson–Procesi 1988.
-4. **Toroidal $X$ over $G/H$ with $\Lambda\supsetneq\mathbb Z\Sigma$.** Then
-   $O_\tau\to O_J$ is a finite cover times a torus. Needs the lattice
-   $\Lambda$ and the component group.
-5. **Real points of non-GKM varieties** (M5, hypothesis H1). The real
-   incidences need the $T$-curves and surfaces of §9 in the Kocherlakota
-   rule. For the planes this is open.
-6. **Large Euler characteristics.** Done for $E_7$ and EIX (§11). EVIII
-   is out of reach in pure Python: its closed orbit alone has
-   $|W(E_8)| = 696729600$ fixed points.
-
-## 11. Cell counts without listing fixed points
+## 10. Cell counts without listing fixed points
 
 `spherical.stream_cell_counts` and `symmetric.cell_counts` (command line:
 `bbcells symmetric EVI --counts-only`) count cells orbit by orbit, and never
 hold a list of fixed points.
 
 - The cosets $W/W_{\mathrm{refl}}$ of every orbit are enumerated one length
-  level at a time, by the search of §6. Each element is an inverse
+  level at a time, by the search of §2. Each element is an inverse
   permutation of the roots, stored as bytes.
 - Each representative $w$ contributes the number of $\lambda$-positive weights
   among $w(\Phi\smallsetminus\Phi_H)$ and $w(N)$.
@@ -632,3 +456,44 @@ Results (dimension, number of fixed points, time):
 
 For example, EVI has cell counts
 1, 4, 11, 26, 54, 105, 189, 321, 516, 794, 1176, …, 33607, 33805, 33607, …, 1.
+
+## 11. Open problems
+
+1. **General Luna data (non-symmetric satellites).** Following
+   Bravi–Pezzini (arXiv:1103.0380 §3 and the table of arXiv:1109.6777):
+   - **Colour calculus.** Build the colours $\Delta$ with their full Cartan
+     pairing, and localize to $(S^p, I, A_I)$ on $S_I$ (colours can merge
+     or split).
+   - **Levi part.** Find a minimal distinguished $\Delta''$ with
+     $\Sigma/\Delta''=\emptyset$, and $\Delta'\subseteq\Delta''$. The satellite has full
+     rank iff $|\Delta''| = |\Sigma|$ and the very reductive system on
+     $S_M = S^p/\Delta''$ is a product of full-rank entries of the table. The
+     table has about 30 entries, e.g. $SO_{2n+1}/GL_n$,
+     $Sp_{2n+2}/GL_1\times Sp_{2n}$, $G_2/SL_3$ and the equal-rank
+     symmetric ones.
+   - **Stabilizer roots.** $\Phi_H$ and $W_H = W(L_K)$ follow. The roots of
+     $H^u$ come only from the explicit constructions: tails, higher defect,
+     and rank-0 quotients. Needs case-specific data.
+   - **Normal weights.** They lie in $\mathrm{pr}(-\gamma) + V$ by §3. Beyond
+     (R) they need the colour coefficients: the $GL_2/T$ example, and
+     $SO_{2n+1}/GL_n$, where some $\operatorname{supp}\gamma\subseteq S_I$.
+     - Either derive them from
+       $\operatorname{div} f_\gamma = -D_\gamma + \sum_D c(D,\gamma)D$ together with the
+       weights of $\mathcal O(D)$ at fixed points off $D$,
+     - or determine the unknowns in $V$ by the certificates of §7
+       and confirm them by §9.
+   - **Oracles.** Wasserman's rank-two tables, and the non-symmetric
+     reductive entries (#31–50 in arXiv:1109.6777).
+2. **Certificates beyond the Hermitian case.** The point-count
+   certificate of §7 decides one unknown, or two on different orbits, on any
+   orbit closure. It remains to:
+   - handle two unknowns on the same orbit (a line arrangement in the
+     $(c_1,c_2)$-plane), or three unknowns that meet only on one closure;
+   - give a full proof of the proposition's Hermitian case, closing the gaps
+     listed in §7.
+3. **Toroidal $X$ over $G/H$ with $\Lambda\supsetneq\mathbb Z\Sigma$.** Then
+   $O_\tau\to O_J$ is a finite cover times a torus. Needs the lattice
+   $\Lambda$ and the component group.
+4. **Large Euler characteristics.** Done for $E_7$ and EIX (§10). EVIII
+   is out of reach in pure Python: its closed orbit alone has
+   $|W(E_8)| = 696729600$ fixed points.

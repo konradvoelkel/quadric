@@ -1,5 +1,5 @@
 """
-Independent formulas used as test oracles (PLAN.md section 4).
+Independent formulas used as test oracles (PLAN.md section 5).
 
 Nothing here uses the BB engine: the values come from point counts,
 product and blow-up formulas and Weyl group degrees. All polynomials are
@@ -174,7 +174,7 @@ def flag_variety(cartan_type, crossed=None):
 
 def wonderful(cartan_type):
     """|X(F_q)| for the wonderful compactification of the adjoint group, from
-    the G x G-orbit decomposition (PLAN.md 4.3):
+    the G x G-orbit decomposition (PLAN.md 5.3):
     sum_I |G/P_I|^2 * q^{N_I} (q - 1)^{|I|} prod_{d in deg W_I} [d]_q
     >>> wonderful("A1")
     IntPoly((1, 1, 1, 1))
@@ -426,7 +426,7 @@ def complete_skew_forms(n):
 
 
 def complete_conics():
-    """[P^5] - [P^2] + [P^2][P^2] (PLAN.md 4.5)"""
+    """[P^5] - [P^2] + [P^2][P^2] (PLAN.md 5.5)"""
     return blowup(projective_space(5), projective_space(2), 3)
 
 

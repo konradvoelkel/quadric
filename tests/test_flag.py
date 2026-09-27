@@ -13,7 +13,7 @@ SMALL_TYPES = ["A1", "A2", "A3", "A4", "B2", "B3", "B4", "C3", "C4", "D4", "G2",
 
 
 class TestFlagOracles(unittest.TestCase):
-    """PLAN.md 4.2: |G/P|(q) = prod[d_G] / prod[d_L]"""
+    """PLAN.md 5.2: |G/P|(q) = prod[d_G] / prod[d_L]"""
 
     def test_all_parabolics_of_rank_at_most_four(self):
         for name in SMALL_TYPES:
