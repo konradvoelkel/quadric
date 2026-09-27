@@ -139,6 +139,15 @@ class TestGolden(unittest.TestCase):
         self.assertEqual(code, 0, err)
         self.assertIn("rational Betti numbers of X(R): 1, 0, 0, 1", out)
 
+    def test_cli_chow_witt(self):
+        code, out, err = run_cli("real-toric", "--named", "P3", "--chow-witt")
+        self.assertEqual(code, 0, err)
+        self.assertIn("CH~^3 = Z^2", out)
+        code, out, err = run_cli("real", "A2", "--parabolic", "1", "--chow-witt",
+                                 "--format", "json")
+        self.assertEqual(code, 0, err)
+        self.assertEqual([g["free"] for g in json.loads(out)["chow_witt"]], [2, 1, 1])
+
     def test_cli_errors_are_reported(self):
         code, out, err = run_cli("toric", "--named", "P2", "--cocharacter", "1,1")
         self.assertEqual(code, 2)

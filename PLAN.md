@@ -237,9 +237,10 @@ release goes out together with the paper.
 - [ ] **R5 EVIII.** The cell counts from the orbit decomposition (Brion–Peyre
   and fibration formulas, cheap), and a BB confirmation on a random sample
   of cosets, since a full BB run needs about $10^9$ fixed points.
-- [ ] **R6 Chow–Witt output** (`real.md` §6). $\widetilde{CH}^*$ of cellular
-  varieties from $CH^*$ and the real incidences (real cycle class map), for
-  flag varieties and toric varieties first; later a sign rule.
+- [ ] **R6 Chow–Witt output** (`real.md` §7). Done without twist:
+  $\widetilde{CH}^q = CH^q\times_{\mathrm{Ch}^q}H^q(X(\mathbb R);\mathbb Z)$ for flag and
+  toric varieties (`bbcells.chowwitt`, `--chow-witt`). Open: twisted
+  coefficients and the ring structure; later a sign rule.
 
 ### 4.3 Track E — engineering and release
 

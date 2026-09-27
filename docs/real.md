@@ -318,9 +318,39 @@ Open points:
 - **Beyond realizations.** A proof of H1′ would need the attaching maps in
   $SH(\mathbb{Z})$ themselves, for example via the Thom-space cell structures of
   arXiv:1805.04338 restricted to invariant curves.
-- **Chow–Witt.** For cellular varieties the real cycle class map (HWXZ)
-  determines $\widetilde{CH}^*$ from $CH^*$ and $H^*(X(\mathbb{R});\mathbb{Z})$, so the real
-  incidences computed here are exactly what enters. An explicit
-  $\widetilde{CH}^*$ output is a natural next step.
+- **Chow–Witt.** Done without twist (`bbcells.chowwitt`, `real … --chow-witt`,
+  `real-toric … --chow-witt`); see §7. Open: twisted coefficients
+  $\widetilde{CH}^q(X,\mathcal L)$, which need $H^q(X(\mathbb R);\mathbb Z(\mathcal L))$
+  (incidences twisted along the invariant curves on which $\mathcal L$ has odd
+  degree), and the ring structure.
 - **Non-graded decompositions** in dimension $\ge3$ (§§5.2–5.3), in
   particular every rank-two complete symmetric variety.
+
+## 7. Chow–Witt groups over $\mathbb R$
+
+For a smooth cellular $X$ over $\mathbb R$, the Chow ring has no 2-torsion, so
+$\widetilde{CH}^q(X)=H^q(X,\mathbf I^q)\times_{\mathrm{Ch}^q(X)}CH^q(X)$
+(Hornbostel–Wendt; HWXZ, arXiv:2302.11003, §2). The real cycle class map is
+an isomorphism $H^q(X,\mathbf I^q)\cong H^q(X(\mathbb R);\mathbb Z)$ for cellular $X$, and
+it is compatible with the reduction to $\mathrm{Ch}^q(X)\cong
+H^q(X(\mathbb R);\mathbb Z/2)$ (Borel–Haefliger). Hence
+$$\widetilde{CH}^q(X) \cong CH^q(X)\times_{H^q(X(\mathbb R);\mathbb Z/2)}H^q(X(\mathbb R);\mathbb Z).$$
+
+- Both sides have bases indexed by the cells, and the cellular coboundaries of
+  $X(\mathbb R)$ are even. The isomorphism type of the fibre product does not
+  depend on how the bases correspond modulo 2, since every matrix in
+  $GL(\mathbb F_2)$ lifts to $GL(\mathbb Z)$. With $Z^q$ the cocycles,
+  $$\widetilde{CH}^q \cong (Z^q\oplus\mathbb Z^{c_q})\,/\,\{(\delta w,-\delta w/2)\},$$
+  which `chowwitt.chow_witt_groups` computes by Smith normal form.
+- Its rank is $\operatorname{rank} CH^q + b_q(X(\mathbb R);\mathbb Q)$. Its torsion is
+  the torsion of $H^q(X(\mathbb R);\mathbb Z)$ that is divisible by 2, so 2-torsion
+  disappears.
+- Checks (`tests/test_chowwitt.py`):
+  - $\widetilde{CH}^0 = GW(\mathbb R)=\mathbb Z^2$;
+  - $\widetilde{CH}^q(\mathbb P^n)=\mathbb Z$ for $0<q<n$, and the top group is
+    $GW(\mathbb R)$ for $n$ odd and $\mathbb Z$ for $n$ even, from both the toric
+    and the flag complex;
+  - the ranks on flag varieties.
+- Input: the exact toric Morse complexes (§3.2) and the signed real Schubert
+  complexes. Complexes predicted under H1 could be used the same way, and
+  would then be conditional on H1.

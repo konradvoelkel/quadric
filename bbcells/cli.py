@@ -183,6 +183,8 @@ def _run_real(args):
                                                                  nonzero))
         return 0
     cohomology = X.cohomology()
+    if args.chow_witt:
+        return _print_chow_witt(X.name, X, args.format)
     if args.format == "json":
         print(json.dumps({"name": X.name, "cohomology": [
             {"degree": c, "free": free, "torsion": torsion}
@@ -264,6 +266,8 @@ def _run_real_toric(args):
     fan = toric.load(args.file) if args.file else _named_fan(args.named)
     cells = bb_cells(toric.fixed_point_data(fan), args.cocharacter)
     X = RealToricComplex(fan, cells.cocharacter)
+    if args.chow_witt:
+        return _print_chow_witt(fan.name, X, args.format)
     homology, betti = X.integral_homology(), X.betti()
     if args.format == "json":
         print(json.dumps({"name": fan.name, "cocharacter": list(cells.cocharacter),
@@ -278,6 +282,23 @@ def _run_real_toric(args):
                 ["Z/%d" % t for t in summands if t]
         print("  H_%d = %s" % (d, " + ".join(parts) if parts else "0"))
     print("  rational Betti numbers: %s" % ", ".join(map(str, betti)))
+    return 0
+
+
+def _print_chow_witt(name, complex_, form):
+    import json
+    from bbcells import chowwitt
+    groups = chowwitt.chow_witt(complex_)
+    if form == "json":
+        print(json.dumps({"name": name, "chow_witt": [
+            {"degree": q, "free": free, "torsion": torsion}
+            for q, (free, torsion) in enumerate(groups)]}, indent=1))
+        return 0
+    print("%s: Chow-Witt groups CH~^q over R (untwisted; CH^q x_{Ch^q} H^q(X(R); Z))" % name)
+    for q, (free, torsion) in enumerate(groups):
+        parts = (["Z^%d" % free if free > 1 else "Z"] if free else []) + \
+                ["Z/%d" % t for t in torsion]
+        print("  CH~^%d = %s" % (q, " + ".join(parts) if parts else "0"))
     return 0
 
 
@@ -391,6 +412,8 @@ def build_parser():
     p = commands.add_parser("real", help="H^*(G/P(R); Z) from real Schubert cells")
     p.add_argument("cartan_type")
     p.add_argument("--parabolic", type=_parse_vector, default=None)
+    p.add_argument("--chow-witt", action="store_true",
+                   help="the Chow-Witt groups over R instead (untwisted)")
     p.add_argument("--format", choices=("text", "json"), default="text")
     p.set_defaults(run=_run_real)
 
@@ -400,6 +423,8 @@ def build_parser():
     p.add_argument("--named", help="P<n>, F<a>, dP6, or products like P1xF2")
     p.add_argument("--cocharacter", type=_parse_vector, default=None)
     p.add_argument("--format", choices=("text", "json"), default="text")
+    p.add_argument("--chow-witt", action="store_true",
+                   help="the Chow-Witt groups over R instead (untwisted)")
     p.set_defaults(run=_run_real_toric)
 
     p = commands.add_parser("characteristic",
