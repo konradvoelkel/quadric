@@ -434,11 +434,13 @@ def diagram(kind, *parameters):
     raise ValueError("unknown real form %r" % kind)
 
 
-def cell_counts(kind, *parameters, seed=0):
+def cell_counts(kind, *parameters, seed=0, processes=1):
     """the BB cell counts of the complete symmetric variety without listing
-    its fixed points (spherical.stream_cell_counts), for two pseudo-random
-    cocharacters; raises unless they agree and are palindromic. Orbits beyond
-    condition (R) use the W_L-average (not certified here).
+    its fixed points (spherical.stream_cell_counts, with the orbits counted
+    in parallel if processes > 1), for two pseudo-random cocharacters; raises
+    unless they agree and are palindromic. Orbits beyond condition (R) use
+    the W_L-average (proved by the opposition symmetry in the inner Hermitian
+    cases, spherical.certify_by_symmetry, and not checked here otherwise).
     >>> cell_counts("AI", 3)                            # complete conics
     (1, 2, 3, 3, 2, 1)
     """
@@ -446,10 +448,8 @@ def cell_counts(kind, *parameters, seed=0):
     D = diagram(kind, *parameters)
     orbits = D.orbits(strict=False)
     rng = random.Random(seed)
-    results = []
-    for _ in range(2):
-        lam = [rng.randrange(1, 10 ** 9) for _ in range(D.R.rank)]
-        results.append(spherical.stream_cell_counts(D.R.name, orbits, lam))
+    lams = [[rng.randrange(1, 10 ** 9) for _ in range(D.R.rank)] for _ in range(2)]
+    results = spherical.stream_cell_counts_many(D.R.name, orbits, lams, processes=processes)
     if results[0] != results[1] or results[0] != results[0][::-1]:
         raise ValueError("inconsistent cell counts: %r / %r" % tuple(results))
     return results[0]

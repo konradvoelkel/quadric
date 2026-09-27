@@ -757,7 +757,7 @@ def volume_ring(data, classes, lam):
     ([1, 2, 3, 3, 2, 1], {3: 1, 4: 1})
     """
     from itertools import combinations_with_replacement
-    from bbcells.linalg import null_space, rank as matrix_rank
+    from bbcells.linalg import certified_rank, null_space_and_free
     n, k = data.dim, len(classes)
     pair = lambda w: sum(Fraction(a) * b for a, b in zip(w, lam))
 
@@ -795,20 +795,25 @@ def volume_ring(data, classes, lam):
     for d in range(n + 1):
         rows, columns = exponents(d), exponents(n - d)
         matrix = [[numbers[add(a, b)] for a in rows] for b in columns]   # f -> (int f g)_g
-        kernel = null_space(matrix, len(rows)) if matrix else []
+        kernel, free = null_space_and_free(matrix, len(rows)) if matrix else ([], [])
         hilbert.append(len(rows) - len(kernel))
         relations[d] = [{a: c for a, c in zip(rows, v) if c} for v in kernel]
         if kernel:
-            index = {a: i for i, a in enumerate(rows)}
+            # the products of the relations of degree d - 1 with the variables,
+            # in the coordinates of the kernel basis (their values at the free
+            # columns); their rank is certified by modular elimination
+            column = {rows[f]: j for j, f in enumerate(free)}
             products = []
             for r in relations.get(d - 1, []):
                 for i in range(k):
                     unit = tuple(int(j == i) for j in range(k))
-                    v = [Fraction(0)] * len(rows)
+                    v = [Fraction(0)] * len(free)
                     for a, c in r.items():
-                        v[index[add(a, unit)]] += c
+                        j = column.get(add(a, unit))
+                        if j is not None:
+                            v[j] += c
                     products.append(v)
-            new = len(kernel) - (matrix_rank(products) if products else 0)
+            new = len(kernel) - (certified_rank(products) if products else 0)
             if new:
                 generators[d] = new
     return {"numbers": numbers, "hilbert": hilbert, "relations": relations,

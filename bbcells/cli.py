@@ -106,7 +106,7 @@ def _run_symmetric_counts(args):
     import json
     from bbcells.frontends import symmetric
     from bbcells.invariants import Invariants
-    counts = symmetric.cell_counts(args.kind, *args.parameters)
+    counts = symmetric.cell_counts(args.kind, *args.parameters, processes=args.processes)
     inv = Invariants(len(counts) - 1, counts)
     if args.format == "json":
         print(json.dumps({"name": "complete symmetric variety %s%s" % (args.kind, tuple(args.parameters)),
@@ -373,6 +373,8 @@ def build_parser():
     p.add_argument("--certify", choices=("symmetry", "points"), default=None,
                    help="show how the normal weights beyond condition (R) are decided: by the "
                         "opposition symmetry, or by point counts of orbit closures")
+    p.add_argument("--processes", type=int, default=1,
+                   help="with --counts-only: count the orbits in this many processes")
     p.add_argument("--counts-only", action="store_true",
                    help="stream the cell counts without listing fixed points (large E7/E8 cases)")
     _add_common(p)

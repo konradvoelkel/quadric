@@ -251,9 +251,15 @@ release goes out together with the paper.
   [--method sections]`, `real-toric`, and `--real-prediction` on every data
   command (GKM rule, else the rule on the Brion curves; experimental).
 
-- [ ] **E3 Performance.** Modular arithmetic with rational reconstruction in
-  `brion.volume_ring` and `canonical_classes` (complete quadrics in
-  $\mathbb P^4$ take 33 min now); `multiprocessing` for the streaming counts.
+- [x] **E3 Performance.** `linalg.certified_rank`: ranks over $\mathbb Q$ by
+  elimination modulo primes, proved by lifting a kernel of the right
+  dimension (Chinese remaindering, rational reconstruction, exact check).
+  `brion.volume_ring` uses it for the minimal relations: complete quadrics
+  in $\mathbb P^4$ take 18 s instead of 33 min. `stream_cell_counts` and
+  `symmetric.cell_counts` count (orbit, cocharacter) pairs in parallel
+  (`processes=`, CLI `--processes`). `canonical_classes` is still exact over
+  $\mathbb Q$; no computation needs it to be faster yet.
+
 - [ ] **E4 Release 0.1.** Prepared: `CHANGELOG.md`, `CITATION.cff`,
   license. Left for KV, together with P5: the version number, the tag, and an
   archived copy with a DOI for the paper.
