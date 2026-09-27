@@ -168,6 +168,25 @@ Reproduced (`tests/test_brion.py`):
   degree 6. The equivariant $c_3(T_X)$ is $e_3$ of the tangent weights. By
   contrast $c_2(T_X)$ lies in the divisor subalgebra (one relation in degree
   2) and adds nothing. About 6 min per cocharacter.
+- **Boundary classes** (`brion.boundary_class`). The boundary divisor $D_k$
+  (quadrics degenerating at rank $k$) maps to $Gr(k,n)$; the pushforward
+  $\beta_k = i_*\pi^*c_2(S)$ of the tautological bundle is a class of degree 3.
+  At a fixed point of $D_k$ the colour $\mu_k$ is $-2\varepsilon_W+\text{const}$ for the
+  $k$-subset $W=\pi(p)$, so $\beta_k(p)=e_2(\varepsilon_i:i\in W)$ times the normal weight
+  of $D_k$; its integrals against colour monomials are integers and
+  independent of $\lambda$. For $\mathbb P^4$ the colours and $\beta_3$ also generate.
+- **Complete quadrics in $\mathbb P^5$** (3690 fixed points, `subalgebra_hilbert`,
+  ranks modulo $p=2^{61}-1$, about 20 min each):
+  - $H^2$ and $H^4$ are spanned by the colours (5 and 15), so the
+    decomposables in degree 3 are the 35 colour monomials, while $b_6=37$:
+    **at least two generators are needed in degree 3** (proved).
+  - The colours with $c_3(T_X)$ reach 36 in degree 3; with $\beta_3$, $\beta_4$
+    (or $\beta_2,\beta_3$) they reach every Betti number except
+    $b_{10}=137$, where the Hilbert function is 136.
+  - **The colours, $\beta_3$, $\beta_4$ and $c_5(T_X)$ generate** $H^*(X;\mathbb Q)$: the
+    Hilbert function equals the Betti numbers
+    $1,5,15,37,76,137,216,303,383,441,462,\dots$ Whether a generator in degree
+    5 is necessary is open: the deficit of 1 is a modular lower bound.
 
 ## 6. Open problems
 
@@ -176,9 +195,11 @@ Reproduced (`tests/test_brion.py`):
    Still open:
    - a canonical integral basis when plus-cell closures are not unions of
      cells, as for complete quadrics;
-   - generators for complete quadrics in $\mathbb P^{n-1}$, $n\ge6$ (for
-     $\mathbb P^4$: the colours and $c_3(T_X)$, §5), and a comparison with
-     DGMP's description.
+   - generators for complete quadrics in $\mathbb P^{n-1}$, $n\ge7$ (for
+     $\mathbb P^4$: the colours and $c_3(T_X)$ or $\beta_3$; for $\mathbb P^5$: the
+     colours, $\beta_3$, $\beta_4$ and $c_5(T_X)$, §5), the minimal number of
+     generators in degree 5 for $\mathbb P^5$, and a comparison with DGMP's
+     description.
 
    Oracle: De Concini–Goresky–MacPherson–Procesi 1988.
 2. **Real points.** The invariant curves of the Brion components

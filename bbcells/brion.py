@@ -330,10 +330,11 @@ def degree_one_class(data, components, prescribed):
     return values
 
 
-def integrate_monomial(data, classes, exponents, lam):
+def integrate_monomial(data, classes, exponents, lam, factor=None):
     """ABBV: the integral of prod_i c_i^{e_i} over X, for degree-one classes
     c_i ({point: character}) with sum e_i = dim X, evaluated at lambda (the
-    result does not depend on lambda). The hyperplane class of P^2 (see
+    result does not depend on lambda); times a class of higher degree if
+    `factor` ({point: value at lambda}) is given. The hyperplane class of P^2 (see
     degree_one_class) has H^2 = 1:
     >>> from bbcells.core import FixedPointData
     >>> P2 = FixedPointData(2, 2, ("a", "b", "c"),
@@ -345,7 +346,7 @@ def integrate_monomial(data, classes, exponents, lam):
     pair = lambda w: sum(Fraction(a) * b for a, b in zip(w, lam))
     total = Fraction(0)
     for p, weights in zip(data.points, data.weights):
-        numerator = Fraction(1)
+        numerator = Fraction(1) if factor is None else Fraction(factor[p])
         for c, e in zip(classes, exponents):
             numerator *= pair(c[p]) ** e
         denominator = Fraction(1)
@@ -407,6 +408,55 @@ def complete_quadric_colours(n):
     return X, [line_bundle_class(X, components, cartan_type,
                                  tuple(-2 * x for x in R.fundamental_weight(k)))
                for k in range(R.rank)]
+
+
+def boundary_class(X, mu, k, degree, lam):
+    """the values at lam of the pushforward i_* pi^* c_degree(S) along the
+    boundary divisor D_k of complete quadrics (quadrics that degenerate to rank
+    k, k = 1, ..., n - 1), where pi: D_k -> Gr(k, n) and S is the tautological
+    bundle; a class of degree `degree` + 1. (X, mu) as from
+    complete_quadric_colours(n). At a fixed point p of D_k the colour mu_k is
+    -2 eps_W + const with W a k-subset (the image pi(p)), and the value is
+    e_degree(eps_i, i in W) times the normal weight of D_k at p; it is 0 off D_k.
+    With the colours it generates the cohomology of complete quadrics in P^4
+    (see tests/test_brion.py):
+    >>> X, mu = complete_quadric_colours(3)
+    >>> beta = boundary_class(X, mu, 2, 1, (3, 7))      # the line pairs, c_1(S)
+    >>> sum(1 for v in beta.values() if v)               # the fixed points on D_2
+    9
+    >>> [integrate_monomial(X, mu, [a, 3 - a], (3, 7), beta) for a in range(4)]
+    [Fraction(0, 1), Fraction(0, 1), Fraction(-2, 1), Fraction(-3, 1)]
+    """
+    n = len(mu) + 1
+    from bbcells.rootsystem import RootSystem
+    R = RootSystem("A%d" % (n - 1))
+    pair = lambda w: sum(Fraction(a) * b for a, b in zip(w, lam))
+    eps = []
+    for i in range(n):                  # eps_i = omega_1 - (alpha_1 + ... + alpha_{i-1})
+        v = [Fraction(x) for x in R.fundamental_weight(0)]
+        for j in range(i):
+            v[j] -= 1
+        eps.append(pair(v))
+    j = k - 1
+    values = {}
+    for p, weights in zip(X.points, X.weights):
+        roots = X.annotation(p)["normal_roots"]
+        if j not in roots:
+            values[p] = Fraction(0)
+            continue
+        c = list(mu[j][p]) + [0]
+        e = [c[0]] + [c[i] - c[i - 1] for i in range(1, n)]     # epsilon coordinates
+        low = min(e)
+        W = [i for i in range(n) if e[i] == low]
+        if len(W) != k or max(e) - low != 2:
+            raise AssertionError("the colour at %s is not -2 eps_W + const" % p)
+        elementary = [Fraction(1)] + [Fraction(0)] * degree
+        for i in W:
+            for d in range(degree, 0, -1):
+                elementary[d] += elementary[d - 1] * eps[i]
+        normal = weights[len(weights) - len(roots) + list(roots).index(j)]
+        values[p] = elementary[degree] * pair(normal)
+    return values
 
 
 def characteristic_number(n, exponents=None, coefficients=None, lam=None):

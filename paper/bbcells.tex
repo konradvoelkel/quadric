@@ -1122,6 +1122,32 @@ subalgebra, the subalgebra is everything. By contrast, $c_2(T_X)$ lies in the
 subalgebra of the colours.
 \end{computation}
 
+Other natural classes come from the boundary. The divisor $D_k$ of quadrics
+that degenerate at rank $k$ maps to the Grassmannian $Gr(k,n)$, and
+$\beta_k=i_*\pi^*c_2(S)$, with $S$ the tautological bundle, is a class of degree
+$3$. At a fixed point $p\in D_k$ the colour $\mu_k$ restricts to
+$-2\varepsilon_W$ plus a constant for the $k$-subset $W=\pi(p)$, so $\beta_k(p)$ is
+$e_2(\varepsilon_i:i\in W)$ times the normal weight of $D_k$ at $p$
+(\code{brion.boundary\_class}); its integrals against colour monomials are
+integers and do not depend on $\lambda$.
+
+\begin{computation}\label{comp:generatorsP5}
+For complete quadrics in $\PP^4$ the colours and $\beta_3$ generate as well.
+For complete quadrics in $\PP^5$ ($3690$ fixed points; ranks modulo
+$2^{61}-1$, which are lower bounds, \code{brion.subalgebra\_hilbert}):
+\begin{enumerate}
+\item $H^2$ and $H^4$ are spanned by the colours, so the decomposable classes
+of degree $3$ are spanned by the $35$ colour monomials, while $b_6=37$: at
+least two generators of degree $3$ are needed;
+\item the colours and $c_3(T_X)$ span $36$ dimensions in degree $3$; the colours
+with $\beta_3,\beta_4$ (or $\beta_2,\beta_3$) reach every Betti number except
+$b_{10}=137$, where they give $136$;
+\item the colours, $\beta_3$, $\beta_4$ and $c_5(T_X)$ generate $H^*(X;\QQ)$: the
+Hilbert function is $1,5,15,37,76,137,216,303,383,441,462,\dots$
+\end{enumerate}
+Whether a generator of degree $5$ is necessary remains open.
+\end{computation}
+
 % ===========================================================================
 \section{Real points}\label{sec:real}
 
@@ -1389,8 +1415,9 @@ Computation~\ref{comp:opposition}.
 \item \emph{The number of quadrics in $\PP^5$ tangent to $20$ general quadrics}
 (Remark after Computation~\ref{comp:characteristic}).
 \item \emph{An integral basis} of $H^*(X;\ZZ)$ adapted to the cells when
-canonical classes do not exist, as for complete conics; and the generators
-beyond the divisors for complete quadrics in $\PP^4$.
+canonical classes do not exist, as for complete conics; minimal generators
+for complete quadrics in $\PP^5$ (Computation~\ref{comp:generatorsP5}) and
+beyond, and the comparison with \cite{DGMP}.
 \item \emph{Finite covers beyond the symmetric case}: toroidal varieties with
 $\Lambda\supsetneq\ZZ\Sigma$ over wonderful varieties that are not symmetric
 (Section~\ref{subsec:covers} treats $G/G^\theta$).

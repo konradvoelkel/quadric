@@ -134,6 +134,25 @@ class TestGenerators(unittest.TestCase):
                   for p, ws in zip(X.points, X.weights)}
         self.assertEqual(brion.subalgebra_hilbert(X, values, [1] * 4 + [3], lam), betti)
 
+    def test_colours_and_a_boundary_class_generate_P4(self):
+        # i_* pi^* c_2(S) along D_3 -> Gr(3, 5) instead of c_3(T_X)
+        from fractions import Fraction
+        X, mu = brion.complete_quadric_colours(5)
+        lam = tuple(7 ** k + 3 * k for k in range(4))
+        pair = lambda w: sum(Fraction(a) * b for a, b in zip(w, lam))
+        beta = brion.boundary_class(X, mu, 3, 2, lam)
+        values = {p: [pair(c[p]) for c in mu] + [beta[p]] for p in X.points}
+        self.assertEqual(brion.subalgebra_hilbert(X, values, [1] * 4 + [3], lam),
+                         [1, 4, 10, 21, 36, 53, 65, 70, 65, 53, 36, 21, 10, 4, 1])
+        # integrals against colour monomials are integers, independent of lambda
+        other = (5, 11, 2, 29)
+        beta2 = brion.boundary_class(X, mu, 3, 2, other)
+        for exponents in [(11, 0, 0, 0), (3, 3, 3, 2), (0, 5, 0, 6)]:
+            a = brion.integrate_monomial(X, mu, exponents, lam, beta)
+            b = brion.integrate_monomial(X, mu, exponents, other, beta2)
+            self.assertEqual(a, b)
+            self.assertEqual(a.denominator, 1)
+
 
 class TestCanonicalClasses(unittest.TestCase):
     """Goldin-Tolman classes by interpolation over Brion components"""

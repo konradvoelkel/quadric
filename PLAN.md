@@ -241,9 +241,13 @@ release goes out together with the paper.
   satellites from the spherical system alone (colour calculus).
 - [ ] **R3 The ring of complete quadrics** (S7.3c, `cohomology.md` §§5–6).
   Done: for $\mathbb P^4$ the colours and $c_3(T_X)$ generate $H^*(X;\mathbb Q)$
-  (`brion.subalgebra`). Open: $\mathbb P^5$ and beyond, the comparison with
-  De Concini–Goresky–MacPherson–Procesi, and an integral basis when cell
-  closures are not unions of cells.
+  (`brion.subalgebra`), as do the colours and the boundary class $\beta_3$;
+  for $\mathbb P^5$ at least two generators are needed in degree 3, and the
+  colours, $\beta_3$, $\beta_4$ and $c_5(T_X)$ generate
+  (`brion.boundary_class`, `brion.subalgebra_hilbert`, `cohomology.md` §5).
+  Open: whether degree 5 needs a generator, $\mathbb P^6$ and beyond, the
+  comparison with De Concini–Goresky–MacPherson–Procesi, and an integral
+  basis when cell closures are not unions of cells.
 - [x] **R4 Toroidal varieties with $\Lambda\supsetneq\mathbb Z\Sigma$** (S7.4).
   Done for $G/G^\theta$, $G$ simply connected (`spherical.md` §8, paper
   Prop. covers): $\Lambda$ by Helgason's theorem (`SatakeDiagram.lattice`),
@@ -305,7 +309,7 @@ release goes out together with the paper.
 ```
 done:   P1, P2, P4; P3 (a-d) written; P5 bibliography; E1-E3; R4; R5; R6 without twist;
         R2 first family
-next:   R3 beyond P^4, R2 (more of Bravi-Pezzini's list), R1 (a rule for the planes)
+next:   R2 (more of Bravi-Pezzini's list), R1 (a rule for the planes), R3 (P^6)
 later:  E4 (release); R2 beyond rank two
 ```
 
