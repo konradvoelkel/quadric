@@ -2,22 +2,26 @@
 
 Status (2026-09-27): all papers cited here with an arXiv ID were downloaded
 with `tools/fetch_arxiv.py`, and their titles and authors were matched
-against the arXiv metadata in `literature/arxiv_metadata.json`. Entries
-without an arXiv ID are checked against web search results only. Crossref and
-zbMATH are still unreachable, so journal data for entries without an arXiv
-journal-ref is not independently confirmed. The entries added on 2026-09-26
-and 2026-09-27 (characteristic numbers, Tchoudjem, Banerjee–Can–Joyce) were
-checked against their arXiv abstract pages instead of being downloaded.
+against the arXiv metadata in `literature/arxiv_metadata.json`. The entries
+added on 2026-09-26 and 2026-09-27 (characteristic numbers, Tchoudjem,
+Banerjee–Can–Joyce) were checked against their arXiv abstract pages instead
+of being downloaded. On 2026-09-27 the bibliography was checked against
+Crossref and zbMATH Open: every entry that is also in the companion paper's
+bibliography, `paper/references.bib`, was looked up in both, and where they
+list a publication the data here agree with those records (marker ✓c).
+Other entries without an arXiv ID are checked against web search results
+only.
 
-The companion paper's bibliography, `paper/references.bib`, uses these
-sources and marks every entry whose data could not be confirmed with a
-comment `% UNVERIFIED` (PLAN P5).
+`paper/references.bib` marks the entries whose data neither Crossref nor
+zbMATH confirms with a comment `% UNVERIFIED` (PLAN P5).
 
 Markers:
 
 - ✓a title and authors match the arXiv record; the journal data comes from
   arXiv's journal-ref where one is given;
 - ✓ author, title and venue confirmed by a search result;
+- ✓c journal data (volume, year, pages, DOI) checked against Crossref and
+  zbMATH Open on 2026-09-27, as in `paper/references.bib`;
 - ✓m from memory and very likely right, but not confirmed this round;
 - **?** check before citing.
 
@@ -42,12 +46,12 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   a base smooth over a Dedekind ring or a field), which supports hypothesis H1;
   and the conjecture that two-orbit completable homogeneous spaces are
   unstably cellular.
-- ✓ K. Voelkel, *Motivic cell structures for projective spaces over split
-  quaternions*, PhD thesis, Freiburg (2016), advisor M. Wendt; available via
-  FreiDok and the DNB. Quaternionic projective spaces and the Cayley plane;
-  affine quadrics as motivic spheres.
+- ✓c K. Voelkel, *Motivic cell structures for projective spaces over split
+  quaternions*, PhD thesis, Freiburg (2016), doi:10.6094/UNIFR/11448, advisor
+  M. Wendt; available via FreiDok and the DNB. Quaternionic projective
+  spaces and the Cayley plane; affine quadrics as motivic spheres.
 - ✓a M. Wendt, *More examples of motivic cell structures*, arXiv:1012.0454.
-- ✓m D. Dugger, D. Isaksen, *Motivic cell structures*, Algebr. Geom. Topol. 5
+- ✓c D. Dugger, D. Isaksen, *Motivic cell structures*, Algebr. Geom. Topol. 5
   (2005), 615–652.
 - Blog posts by KV (konradvoelkel.com, 2012–2013) on cellular objects in the
   motivic model category and on the motivic cell structure of toric surfaces.
@@ -55,12 +59,12 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
 
 ## 1. Białynicki-Birula decomposition and motives (§3.3)
 
-- ✓m A. Białynicki-Birula, *Some theorems on actions of algebraic groups*,
+- ✓c A. Białynicki-Birula, *Some theorems on actions of algebraic groups*,
   Ann. of Math. 98 (1973), 480–497.
-- **?** A. Białynicki-Birula, *Some properties of the decompositions of
+- ✓c A. Białynicki-Birula, *Some properties of the decompositions of
   algebraic varieties determined by actions of a torus*, Bull. Acad. Polon.
-  Sci. 24 (1976). On filtrability.
-- ✓a P. Brosnan, *On motivic decompositions arising from the method of
+  Sci. Sér. Sci. Math. Astronom. Phys. 24 (1976), 667–674. On filtrability.
+- ✓c P. Brosnan, *On motivic decompositions arising from the method of
   Białynicki-Birula*, Invent. Math. 161 (2005), 91–111; doi:10.1007/s00222-004-0419-7;
   arXiv:math/0407305.
 - ✓m V. Chernousov, S. Gille, A. Merkurjev, *Motivic decomposition of
@@ -76,25 +80,25 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   projective spherical varieties.
 - ✓ R. Joshua, *Algebraic K-theory and higher Chow groups of linear
   varieties*, Math. Proc. Cambridge Philos. Soc. 130 (2001), 37–60.
-- ✓a A. Weber, *Hirzebruch class and Białynicki-Birula decomposition*,
+- ✓c A. Weber, *Hirzebruch class and Białynicki-Birula decomposition*,
   Transform. Groups 22 (2017), 537–557; arXiv:1411.6594. Refines BB Betti
   numbers to $\chi_y$ and Hirzebruch classes via localization.
 
 ## 2. Motivic homotopy and quadratic invariants (§3.5)
 
-- ✓m F. Morel, V. Voevodsky, *$\mathbb{A}^1$-homotopy theory of schemes*,
+- ✓c F. Morel, V. Voevodsky, *$\mathbb{A}^1$-homotopy theory of schemes*,
   Publ. Math. IHÉS 90 (1999), 45–143.
 - ✓m F. Morel, *$\mathbb{A}^1$-algebraic topology over a field*, LNM 2052
   (2012). Milnor–Witt K-theory and $\pi_{1,1} = K^{MW}_{-1} = W\cdot\eta$.
 - ✓m A. Asok, B. Doran, J. Fasel, *Smooth models of motivic spheres and the
   clutching construction*, IMRN 2017.
-- ✓m M. Hoyois, *A quadratic refinement of the Grothendieck–Lefschetz–Verdier
+- ✓c M. Hoyois, *A quadratic refinement of the Grothendieck–Lefschetz–Verdier
   trace formula*, Algebr. Geom. Topol. 14 (2014), 3603–3658.
 - ✓m M. Levine, *Motivic Euler characteristics and Witt-valued characteristic
   classes*, Nagoya Math. J. 236 (2019), 251–310.
 - ✓m M. Levine, A. Raksit, *Motivic Gauss–Bonnet formulas*, Algebra Number
   Theory 14 (2020), 1801–1851.
-- ✓m M. Levine, *Aspects of enumerative geometry with quadratic forms*,
+- ✓c M. Levine, *Aspects of enumerative geometry with quadratic forms*,
   Doc. Math. 25 (2020), 2179–2239.
 - ✓a N. Arcila-Maya, C. Bethea, M. Opie, K. Wickelgren, I. Zakharevich,
   *Compactly supported $\mathbb{A}^1$-Euler characteristic and the Hochschild
@@ -104,23 +108,24 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
 
 ## 3. Chow–Witt groups and real realization (target of SPEC §3.5 Level A)
 
-- ✓m J. Hornbostel, M. Wendt, H. Xie, M. Zibrowius, *The real cycle class
+- ✓c J. Hornbostel, M. Wendt, H. Xie, M. Zibrowius, *The real cycle class
   map*, Ann. K-Theory 6 (2021), 239–317. For cellular varieties, $I^j$-cohomology
   is identified with $H^*(X(\mathbb{R});\mathbb{Z})$.
 - ✓m J. Hornbostel, M. Wendt, *Chow–Witt rings of classifying spaces for
   symplectic and special linear groups*, J. Topol. 12 (2019).
 - ✓a M. Wendt, *Chow–Witt rings of Grassmannians*, Algebr. Geom. Topol. 24
   (2024); arXiv:1805.06142.
-- ✓a T. Hudson, Á. Matszangosz, M. Wendt, *Chow–Witt rings and topology of flag
-  varieties*, J. Topol. 17 (2024); arXiv:2302.11003. Witt-sheaf cohomology of
-  type A partial flag varieties; all torsion in $H^*(\mathrm{Fl}(\mathbb{R});\mathbb{Z})$
-  is 2-torsion. **The main test oracle for M5.**
-- ✓ R. R. Kocherlakota, *Integral homology of real flag manifolds and loop
+- ✓c T. Hudson, Á. Matszangosz, M. Wendt, *Chow–Witt rings and topology of flag
+  varieties*, J. Topol. 17 (2024), no. 4, e70004; arXiv:2302.11003.
+  Witt-sheaf cohomology of type A partial flag varieties; all torsion in
+  $H^*(\mathrm{Fl}(\mathbb{R});\mathbb{Z})$ is 2-torsion. **The main test oracle for M5.**
+- ✓c R. R. Kocherlakota, *Integral homology of real flag manifolds and loop
   spaces of symmetric spaces*, Adv. Math. 110 (1995), 1–46. (Also confirmed
   by the bibliography of arXiv:1910.11149.)
-- ✓a Á. K. Matszangosz, *On the cohomology rings of real flag manifolds:
-  Schubert cycles*, arXiv:1910.11149. Incidence coefficients of real Schubert
-  cells in type A partial flag manifolds **with signs**:
+- ✓c Á. K. Matszangosz, *On the cohomology rings of real flag manifolds:
+  Schubert cycles*, Math. Ann. 381 (2021), 1537–1588; arXiv:1910.11149.
+  Incidence coefficients of real Schubert cells in type A partial flag
+  manifolds **with signs**:
   $[\Omega_I,\Omega_J] = 0$ or $(-1)^{s(I,J)}2$ according to the parity of
   $N_I(a,b)$. **The algorithm for PLAN S5.1** (implemented in
   `bbcells/realcells.py`). Two caveats found while implementing: the worked
@@ -128,7 +133,7 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   so its incidence is 0, not $+2$ (Kocherlakota's rule agrees:
   $\sigma(I)-\sigma(J) = 3e_{25}$); and the identity $m = N_I(a,b)+1$ used
   to rederive Kocherlakota's theorem holds for complete flags only.
-- ✓a L. Rabelo, L. A. B. San Martin, *Cellular homology of real flag
+- ✓c L. Rabelo, L. A. B. San Martin, *Cellular homology of real flag
   manifolds*, Indag. Math. 30 (2019), 745–772; arXiv:1810.00934. Signs for
   general real flag manifolds, $c(w,w') = (-1)^i\deg(\Phi_{w'}^{-1}\circ\Psi_{w'})(1+(-1)^\kappa)$.
   Implemented for the classical types in `realcells.rabelo_san_martin`: the
@@ -141,40 +146,41 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   incidences are $0$ or $\pm 2$; the model for the matrices $E_d$ in SPEC §3.5.
 - ✓a L. Casian, Y. Kodama, *On the cohomology of real Grassmann manifolds*,
   arXiv:1309.5520. Explicit incidence graphs via checkered Young diagrams.
-- ✓a S. Choi, H. Park, *On the cohomology and their torsion of real toric
-  objects*, Forum Math. (2017); arXiv:1311.7056. Real toric manifolds; odd
-  torsion occurs, so $\mathbb{Z}$ must be tracked and not only $\mathbb{F}_2$.
+- ✓c S. Choi, H. Park, *On the cohomology and their torsion of real toric
+  objects*, Forum Math. 29 (2017), 543–553; arXiv:1311.7056. Real toric
+  manifolds; odd torsion occurs, so $\mathbb{Z}$ must be tracked and not
+  only $\mathbb{F}_2$.
 - ✓ A. Suciu, A. Trevisan, *Real toric varieties and abelian covers of
-  generalized Davis–Januszkiewicz spaces* (preprint, 2012). Rational Betti
-  numbers of real toric varieties.
+  generalized Davis–Januszkiewicz spaces* (preprint, 2012; not in Crossref or
+  zbMATH). Rational Betti numbers of real toric varieties.
 - ✓a M. Franz, *The cohomology rings of real toric spaces and smooth real toric
   varieties*, Proc. Roy. Soc. Edinburgh Sect. A 152 (2022), 720–737;
   arXiv:2008.08961.
 
 ## 4. Spherical varieties: foundations
 
-- ✓m D. Luna, T. Vust, *Plongements d'espaces homogènes*, Comment. Math. Helv.
+- ✓c D. Luna, T. Vust, *Plongements d'espaces homogènes*, Comment. Math. Helv.
   58 (1983), 186–245.
-- ✓m F. Knop, *The Luna–Vust theory of spherical embeddings*, Proc. Hyderabad
-  Conf. on Algebraic Groups (1991), 225–249.
-- ✓m D. Timashev, *Homogeneous spaces and equivariant embeddings*, Encyclopaedia
+- ✓c F. Knop, *The Luna–Vust theory of spherical embeddings*, Proceedings of
+  the Hyderabad Conference on Algebraic Groups (S. Ramanan, ed.), Manoj
+  Prakashan, Madras (1991), 225–249.
+- ✓c D. Timashev, *Homogeneous spaces and equivariant embeddings*, Encyclopaedia
   Math. Sci. 138, Springer 2011.
-- ✓a N. Perrin, *On the geometry of spherical varieties*, Transform. Groups 19
+- ✓c N. Perrin, *On the geometry of spherical varieties*, Transform. Groups 19
   (2014), 171–223; arXiv:1211.1277.
 - ✓ G. Pezzini, *Lectures on spherical and wonderful varieties*, Les cours du
   CIRM 1 (2010), 33–53.
 - ✓m F. Knop, *On the set of orbits for a Borel subgroup*, Comment. Math. Helv.
   70 (1995), 285–309.
-- ✓a F. Knop, *Spherical roots of spherical varieties*, Ann. Inst. Fourier 64
+- ✓c F. Knop, *Spherical roots of spherical varieties*, Ann. Inst. Fourier 64
   (2014), 2503–2526; arXiv:1303.2466. Contains Akhiezer's classification of
   rank-one spherical varieties extended to all characteristics $\neq 2$,
   with a **table of cuspidal rank-one spherical varieties for adjoint
   groups** (§`sec:TABLE`), which is the case list for PLAN S6b.1.
-- **?** D. Akhiezer, *Equivariant completions of homogeneous algebraic
-  varieties by homogeneous divisors*, Ann. Global Anal. Geom. 1 (1983). The
-  original rank-one list, cited as [Ahi83] in arXiv:1805.04338; venue from
-  memory.
-- ✓a F. Knop, *Localization of spherical varieties*, Algebra Number Theory 8
+- ✓c D. Akhiezer, *Equivariant completions of homogeneous algebraic
+  varieties by homogeneous divisors*, Ann. Global Anal. Geom. 1 (1983),
+  49–78. The original rank-one list, cited as [Ahi83] in arXiv:1805.04338.
+- ✓c F. Knop, *Localization of spherical varieties*, Algebra Number Theory 8
   (2014), 703–728; arXiv:1303.2561.
 - ✓a G. Gagliardi, *A combinatorial smoothness criterion for spherical
   varieties*, Manuscripta Math. 146 (2015), 445–461; arXiv:1307.7702.
@@ -190,15 +196,15 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
 
 **Classification by spherical systems**
 
-- ✓m D. Luna, *Variétés sphériques de type A*, Publ. Math. IHÉS 94 (2001),
+- ✓c D. Luna, *Variétés sphériques de type A*, Publ. Math. IHÉS 94 (2001),
   161–226.
-- ✓m I. Losev, *Proof of the Knop conjecture*, Ann. Inst. Fourier 59 (2009);
-  I. Losev, *Uniqueness property for spherical homogeneous spaces*, Duke
-  Math. J. 147 (2009).
-- ✓a P. Bravi, G. Pezzini, *Wonderful subgroups of reductive groups and
+- ✓c I. Losev, *Proof of the Knop conjecture*, Ann. Inst. Fourier 59 (2009),
+  1105–1134; I. Losev, *Uniqueness property for spherical homogeneous
+  spaces*, Duke Math. J. 147 (2009), 315–343.
+- ✓c P. Bravi, G. Pezzini, *Wonderful subgroups of reductive groups and
   spherical systems*, J. Algebra 409 (2014), 101–147; arXiv:1103.0380.
-- ✓a P. Bravi, G. Pezzini, *Primitive wonderful varieties*, Math. Z. (2016);
-  arXiv:1106.3187.
+- ✓c P. Bravi, G. Pezzini, *Primitive wonderful varieties*, Math. Z. 282
+  (2016), 1067–1096; arXiv:1106.3187.
 - ✓a P. Bravi, G. Pezzini, *Wonderful varieties of type D*, Represent. Theory 9
   (2005); arXiv:math/0410472.
 - ✓a P. Bravi, *Primitive spherical systems*, arXiv:0909.3765 (journal version
@@ -216,26 +222,26 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
 
 **Wonderful and complete symmetric varieties (M4)**
 
-- ✓m C. De Concini, C. Procesi, *Complete symmetric varieties*, LNM 996 (1983),
+- ✓c C. De Concini, C. Procesi, *Complete symmetric varieties*, LNM 996 (1983),
   1–44; and *Complete symmetric varieties II*, Adv. Stud. Pure Math. 6 (1985),
   481–513.
-- ✓ C. De Concini, T. A. Springer, *Betti numbers of complete symmetric
-  varieties*, Geometry Today (Roma 1984), Progr. Math. 60 (1985), 87–104.
+- ✓c C. De Concini, T. A. Springer, *Betti numbers of complete symmetric
+  varieties*, Geometry Today (Roma 1984), Progr. Math. 60 (1985), 87–107.
   **Main reference and test oracle for M4.**
 - ✓m E. Bifet, C. De Concini, C. Procesi, *Cohomology of regular embeddings*,
   Adv. Math. 82 (1990), 1–34.
 - ✓ E. Strickland, *Equivariant cohomology of the wonderful group
   compactification*, J. Algebra (2006).
-- ✓a M. Brion, R. Joshua, *Equivariant Chow ring and Chern classes of wonderful
+- ✓c M. Brion, R. Joshua, *Equivariant Chow ring and Chern classes of wonderful
   symmetric varieties of minimal rank*, Transform. Groups 13 (2008), 471–493;
   arXiv:0705.1035.
-- ✓m B. Wasserman, *Wonderful varieties of rank two*, Transform. Groups 1
+- ✓c B. Wasserman, *Wonderful varieties of rank two*, Transform. Groups 1
   (1996), 375–403. Tables of spherical systems $(\Sigma, S^p)$ with the
   corresponding subgroups. The rank-one spherical roots used in
   `frontends/spherical.py` (e.g. $\alpha_1+2\alpha_2+3\alpha_3+2\alpha_4$ for
   $F_4/\mathrm{Spin}_9$) were checked against the normal weights of the
   S6b.1 completions, not copied from this table.
-- ✓m M. Dyer, *Reflection subgroups of Coxeter systems*, J. Algebra 135
+- ✓c M. Dyer, *Reflection subgroups of Coxeter systems*, J. Algebra 135
   (1990), 57–73. Each coset of a reflection subgroup has a unique element of
   minimal length; used to enumerate $W/W_H$ in S6d.
 - ✓m J. MacWilliams, *Orthogonal matrices over finite fields*, Amer. Math.
@@ -243,57 +249,63 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   over $\mathbb{F}_q$, which enters the orbit-decomposition oracle for
   complete quadrics (S6d).
 
-- ✓m S. Araki, *On root systems and an infinitesimal classification of
-  irreducible symmetric spaces*, J. Math. Osaka City Univ. 13 (1962), 1–34;
+- ✓c S. Araki, *On root systems and an infinitesimal classification of
+  irreducible symmetric spaces*, J. Math. Osaka City Univ. Ser. A 13 (1962),
+  1–34;
   S. Helgason, *Differential geometry, Lie groups, and symmetric spaces*,
   Academic Press 1978, Table VI. Satake diagrams in `frontends/symmetric.py`.
-- ✓m A. Borel, J. de Siebenthal, *Les sous-groupes fermés de rang maximum des
+- ✓c A. Borel, J. de Siebenthal, *Les sous-groupes fermés de rang maximum des
   groupes de Lie clos*, Comment. Math. Helv. 23 (1949), 200–221; V. Kac,
   *Infinite dimensional Lie algebras*, ch. 8 (automorphisms of finite order).
   Inner involutions as $\mathrm{Ad}(t_j)$ for one node $j$ of mark 1 or 2.
 
-- ✓a A. Tchoudjem, *Sur la cohomologie à support des fibrés en droites sur
-  les variétés symétriques complètes*, arXiv:0709.2584 (the title given here
-  before was that of related work on the minimal-rank case). Fixed
-  points of complete symmetric varieties that are not of minimal rank,
-  with the orbit part of their tangent weights.
+- ✓c A. Tchoudjem, *Sur la cohomologie à support des fibrés en droites sur
+  les variétés symétriques complètes*, Transform. Groups 15 (2010), 655–700;
+  arXiv:0709.2584 (the title given here before was that of related work on
+  the minimal-rank case). Fixed points of complete symmetric varieties that
+  are not of minimal rank, with the orbit part of their tangent weights.
 - ✓a S. Banerjee, M. B. Can, M. Joyce, *Combinatorial models for the variety
   of complete quadrics*, arXiv:1610.02698. Complete quadrics:
   fixed points are "barred permutations" (1, 3, 12, 66, 450; OEIS A080599),
   with tangent weights and cell dimensions. Their cell counts agree with
   `spherical.complete_quadrics`.
-- ✓ M. Michałek, L. Monin, J. Wiśniewski, arXiv:2004.07735, Prop 4.9. The
-  $T$-weights at every fixed point of complete quadrics; infinitely many
-  one-dimensional $T$-orbits (Rem 4.10).
-- ✓ M. Brion, E. Peyre, *The virtual Poincaré polynomials of homogeneous
-  spaces*, Compositio Math. 134 (2002); arXiv:math/0102052. Thm 1(a) gives
-  $|G/H|(q)$ from the Molien series of $N_H(T)/T$; this is
+- ✓c M. Michałek, L. Monin, J. Wiśniewski, *Maximum likelihood degree,
+  complete quadrics, and $\mathbb{C}^*$-action*, SIAM J. Appl. Algebra
+  Geom. 5 (2021), 60–85; arXiv:2004.07735, Prop 4.9. The $T$-weights at
+  every fixed point of complete quadrics; infinitely many one-dimensional
+  $T$-orbits (Rem 4.10).
+- ✓c M. Brion, E. Peyre, *The virtual Poincaré polynomials of homogeneous
+  spaces*, Compositio Math. 134 (2002), 319–335; arXiv:math/0102052.
+  Thm 1(a) gives $|G/H|(q)$ from the Molien series of $N_H(T)/T$; this is
   `oracles.brion_peyre` (`docs/spherical.md` §9).
-- ✓ E. Strickland, *Schubert-type cells for complete quadrics*, Adv. Math. 62
-  (1986); *Equivariant Betti numbers for symmetric varieties*, J. Algebra
-  145 (1992). C. De Concini, M. Goresky, R. MacPherson, C. Procesi, *On the
-  geometry of quadrics and their degenerations*, Comment. Math. Helv. 63
-  (1988). The oracle for S7.3.
+- ✓c E. Strickland, *Schubert-type cells for complete quadrics*, Adv. Math. 62
+  (1986), 238–248; *Equivariant Betti numbers for symmetric varieties*,
+  J. Algebra 145 (1992), 120–127. C. De Concini, M. Goresky, R. MacPherson,
+  C. Procesi, *On the geometry of quadrics and their degenerations*, Comment.
+  Math. Helv. 63 (1988), 337–413. The oracle for S7.3.
 
 **Characteristic numbers of complete quadrics (oracles for S7.3a)**
 
-- ✓a B. Sturmfels, C. Uhler, *Multivariate Gaussians, semidefinite matrix
-  completion, and convex algebraic geometry*, Ann. Inst. Statist. Math.;
-  arXiv:0906.3529. The table after Thm 2.3 (§2.2) gives the ML
-  degrees $\varphi(n,d)$ of generic linear concentration models for
+- ✓c B. Sturmfels, C. Uhler, *Multivariate Gaussians, semidefinite matrix
+  completion, and convex algebraic geometry*, Ann. Inst. Statist. Math. 62
+  (2010), 603–638; arXiv:0906.3529. The table after Thm 2.3 (§2.2) gives
+  the ML degrees $\varphi(n,d)$ of generic linear concentration models for
   $n\le6$; the symmetry $\varphi(n,d)=\varphi(n,\binom{n+1}2+1-d)$ is Eq. (12).
   `tests/test_brion.py` and `docs/cohomology.md` §3 reproduce the rows.
-- ✓a L. Manivel, M. Michałek, L. Monin, T. Seynnaeve, M. Vodička, *Complete
+- ✓c L. Manivel, M. Michałek, L. Monin, T. Seynnaeve, M. Vodička, *Complete
   quadrics: Schubert calculus for Gaussian models and semidefinite
-  programming*, arXiv:2011.08791. Prop. 3.5:
+  programming*, J. Eur. Math. Soc. 26 (2024), 3091–3135; arXiv:2011.08791.
+  Prop. 3.5 (arXiv numbering; not yet compared with the journal version):
   $\varphi(n,d)=\int\mu_1^{\binom{n+1}2-d}\mu_{n-1}^{d-1}$ on complete
   quadrics.
-- ✓a T. Brysiewicz, C. Fevola, B. Sturmfels, *Tangent quadrics in real
-  3-space*, arXiv:2010.10879. Schubert's triangle of characteristic numbers
-  $\mu^a\nu^b\rho^c$ of complete quadric surfaces, e.g. 104 and 128.
+- ✓c T. Brysiewicz, C. Fevola, B. Sturmfels, *Tangent quadrics in real
+  3-space*, Matematiche 76 (2021), 355–367; arXiv:2010.10879. Schubert's
+  triangle of characteristic numbers $\mu^a\nu^b\rho^c$ of complete quadric
+  surfaces, e.g. 104 and 128.
 - ✓ B. Sturmfels, *3264 questions about symmetric matrices*, notes for the
-  MPI Leipzig study groups (2020). Question 5 lists 3264, 666841088,
-  48942189946470400, 641211464734373953791690014720 as the numbers of
+  MPI Leipzig study groups (2020; not in Crossref or zbMATH). Question 5
+  lists 3264, 666841088, 48942189946470400,
+  641211464734373953791690014720 as the numbers of
   quadrics in $\mathbb P^{n-1}$ tangent to $\binom{n+1}2-1$ general quadrics.
   Our first three agree. For $n=6$ both our computation and an independent
   evaluation of Brion's degree formula give 1810718299257984458113941504
@@ -301,9 +313,11 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
 
 **General smooth projective spherical varieties**
 
-- ✓a M. Brion, *Equivariant cohomology and equivariant intersection theory*,
-  Montréal lectures 1997; arXiv:math/9802063. GKM-type description of
-  $H_T^*$ for spherical varieties; **the main reference for M3 and M6**.
+- ✓c M. Brion, *Equivariant cohomology and equivariant intersection theory*,
+  in *Representation theories and algebraic geometry* (Montréal 1997), NATO
+  Adv. Sci. Inst. Ser. C 514, Kluwer (1998), 1–37; arXiv:math/9802063.
+  GKM-type description of $H_T^*$ for spherical varieties; **the main
+  reference for M3 and M6**.
 - ✓m M. Brion, *Rational smoothness and fixed points of torus actions*,
   Transform. Groups 4 (1999), 127–156.
 - ✓a S. Banerjee, M. B. Can, *Equivariant K-theory of smooth projective
@@ -313,12 +327,12 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
 
 **Horospherical (M6a)**
 
-- ✓m B. Pasquier, *Variétés horosphériques de Fano*, Bull. Soc. Math. France
+- ✓c B. Pasquier, *Variétés horosphériques de Fano*, Bull. Soc. Math. France
   136 (2008), 195–225.
 - ✓a S. Monahan, *Horospherical stacks and stacky coloured fans*, Trans. AMS 378
   (2025), 1167–1214; arXiv:2305.01571.
-- ✓a V. Batyrev, A. Moreau, *The arc space of horospherical varieties and
-  motivic integration*, Compositio Math. (to appear per arXiv comments);
+- ✓c V. Batyrev, A. Moreau, *The arc space of horospherical varieties and
+  motivic integration*, Compositio Math. 149 (2013), 1327–1352;
   arXiv:1203.0671. For a $\mathbb{Q}$-Gorenstein horospherical $X$ with
   colored fan $\Sigma$:
   $E_{st}(X;u,v) = E(G/H;u,v)\sum_{n\in|\Sigma|\cap N}(uv)^{\omega_X(n)}$,
@@ -335,7 +349,7 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
 
 ## 6. Toric varieties and GKM theory (M1, M3)
 
-- ✓m M. F. Atiyah, R. Bott, *A Lefschetz fixed point formula for elliptic
+- ✓c M. F. Atiyah, R. Bott, *A Lefschetz fixed point formula for elliptic
   complexes II. Applications*, Ann. of Math. 88 (1968), 451–491. The
   holomorphic Lefschetz formula behind the $\chi_y$ check in
   `invariants.check`.
@@ -344,7 +358,7 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
 - ✓m W. Fulton, *Introduction to toric varieties*, Ann. of Math. Stud. 131
   (1993). §5.2: Betti numbers from the $h$-vector.
 - ✓m D. Cox, J. Little, H. Schenck, *Toric varieties*, GSM 124 (2011).
-- ✓a M. Goresky, R. Kottwitz, R. MacPherson, *Equivariant cohomology, Koszul
+- ✓c M. Goresky, R. Kottwitz, R. MacPherson, *Equivariant cohomology, Koszul
   duality, and the localization theorem*, Invent. Math. 131 (1998), 25–83.
 
 ## 7. Existing software (quick search, 2026-09)
@@ -376,3 +390,6 @@ Notes from the first run (2026-09-25):
 - `api.crossref.org`, `zbmath.org`, `api.openalex.org` and
   `api.semanticscholar.org` are still blocked. Allowing Crossref or zbMATH
   would let us check journal data (volumes, pages, DOIs) automatically.
+
+Update (2026-09-27): `api.crossref.org` and `api.zbmath.org` are reachable
+now, and the bibliography was checked against them (PLAN P5, marker ✓c).

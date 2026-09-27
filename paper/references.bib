@@ -1,39 +1,47 @@
 % references.bib -- bibliography for paper/bbcells.tex
 %
-% Sources, in this order: LITERATURE.md (markers as there), the arXiv records
-% in literature/arxiv_metadata.json, and arXiv abstract pages fetched on
-% 2026-09-27 for IDs not yet in that file (the arXiv API answered 406, the
-% abstract pages answered normally).
+% Sources: LITERATURE.md, the arXiv records in literature/arxiv_metadata.json,
+% and arXiv abstract pages fetched on 2026-09-27 for IDs not yet in that file
+% (the arXiv API answered 406, the abstract pages answered normally).
+% On 2026-09-27 every entry was looked up in Crossref (api.crossref.org) and
+% zbMATH Open (api.zbmath.org); the journal, volume, issue, year, pages and DOI
+% given agree with those records. Where the two disagree on an issue number,
+% the issue is omitted. Preprints are cited as such only if neither service
+% lists a journal version.
 % A line "% UNVERIFIED: ..." directly above an entry says which data could not
-% be confirmed from these sources. Fields that were not known are omitted.
+% be confirmed by Crossref or zbMATH. Fields that could not be confirmed are
+% omitted unless such a line names them.
 % Entries are ordered alphabetically by key (ignoring case).
 
-% UNVERIFIED: marked "?" in LITERATURE.md (venue from memory); pages unknown
 @article{Akhiezer,
   author  = {Akhiezer, Dmitri N.},
   title   = {Equivariant completions of homogeneous algebraic varieties by homogeneous divisors},
   journal = {Ann. Global Anal. Geom.},
   volume  = {1},
+  number  = {1},
   year    = {1983},
+  pages   = {49--78},
+  doi     = {10.1007/BF02329739},
 }
 
 @article{Araki,
   author  = {Araki, Sh\^{o}r\^{o}},
   title   = {On root systems and an infinitesimal classification of irreducible symmetric spaces},
-  journal = {J. Math. Osaka City Univ.},
+  journal = {J. Math. Osaka City Univ. Ser. A},
   volume  = {13},
   year    = {1962},
   pages   = {1--34},
 }
 
-% UNVERIFIED: not in LITERATURE.md and not on arXiv; volume, year and pages from memory
 @article{AtiyahBott84,
   author  = {Atiyah, Michael F. and Bott, Raoul},
   title   = {The moment map and equivariant cohomology},
   journal = {Topology},
   volume  = {23},
+  number  = {1},
   year    = {1984},
   pages   = {1--28},
+  doi     = {10.1016/0040-9383(84)90021-1},
 }
 
 @article{AtiyahBottLefschetz,
@@ -43,6 +51,7 @@
   volume  = {88},
   year    = {1968},
   pages   = {451--491},
+  doi     = {10.2307/1970721},
 }
 
 @misc{BanerjeeCanJoyce,
@@ -54,13 +63,15 @@
   note          = {Preprint, arXiv:1610.02698},
 }
 
-% UNVERIFIED: LITERATURE.md and arXiv only say "to appear in Compositio Math."; volume 149 and year 2013 from memory, pages unknown
 @article{BatyrevMoreau,
   author        = {Batyrev, Victor and Moreau, Anne},
   title         = {The arc space of horospherical varieties and motivic integration},
   journal       = {Compos. Math.},
   volume        = {149},
+  number        = {8},
   year          = {2013},
+  pages         = {1327--1352},
+  doi           = {10.1112/S0010437X13007124},
   eprint        = {1203.0671},
   archivePrefix = {arXiv},
 }
@@ -72,26 +83,38 @@
   volume  = {98},
   year    = {1973},
   pages   = {480--497},
+  doi     = {10.2307/1970915},
 }
 
-% UNVERIFIED: not in LITERATURE.md and not on arXiv; series name, issue and pages from memory
+@article{BB76,
+  author  = {Bia{\l}ynicki-Birula, Andrzej},
+  title   = {Some properties of the decompositions of algebraic varieties determined by actions of a torus},
+  journal = {Bull. Acad. Polon. Sci. S\'{e}r. Sci. Math. Astronom. Phys.},
+  volume  = {24},
+  year    = {1976},
+  pages   = {667--674},
+}
+
 @article{BerlineVergne,
   author  = {Berline, Nicole and Vergne, Mich\`{e}le},
   title   = {Classes caract\'{e}ristiques \'{e}quivariantes. {F}ormule de localisation en cohomologie \'{e}quivariante},
   journal = {C. R. Acad. Sci. Paris S\'{e}r. I Math.},
   volume  = {295},
-  number  = {9},
   year    = {1982},
   pages   = {539--541},
 }
 
-@misc{BFS,
+@article{BFS,
   author        = {Brysiewicz, Taylor and Fevola, Claudia and Sturmfels, Bernd},
   title         = {Tangent quadrics in real 3-space},
-  year          = {2020},
+  journal       = {Matematiche},
+  volume        = {76},
+  number        = {2},
+  year          = {2021},
+  pages         = {355--367},
+  doi           = {10.4418/2021.76.2.4},
   eprint        = {2010.10879},
   archivePrefix = {arXiv},
-  note          = {Preprint, arXiv:2010.10879},
 }
 
 @article{BorelDeSiebenthal,
@@ -101,6 +124,7 @@
   volume  = {23},
   year    = {1949},
   pages   = {200--221},
+  doi     = {10.1007/BF02565599},
 }
 
 @article{BravPez,
@@ -110,21 +134,24 @@
   volume        = {409},
   year          = {2014},
   pages         = {101--147},
+  doi           = {10.1016/j.jalgebra.2014.03.018},
   eprint        = {1103.0380},
   archivePrefix = {arXiv},
 }
 
-% UNVERIFIED: only journal and year known (LITERATURE.md; arXiv says "to appear in Math. Z."); volume and pages omitted
 @article{BravPezPrimitive,
   author        = {Bravi, Paolo and Pezzini, Guido},
   title         = {Primitive wonderful varieties},
   journal       = {Math. Z.},
+  volume        = {282},
+  number        = {3-4},
   year          = {2016},
+  pages         = {1067--1096},
+  doi           = {10.1007/s00209-015-1578-5},
   eprint        = {1106.3187},
   archivePrefix = {arXiv},
 }
 
-% UNVERIFIED: LITERATURE.md says only "Montreal lectures 1997"; proceedings volume, series, publisher and pages from memory
 @incollection{Brion98,
   author        = {Brion, Michel},
   title         = {Equivariant cohomology and equivariant intersection theory},
@@ -134,6 +161,7 @@
   publisher     = {Kluwer Acad. Publ., Dordrecht},
   year          = {1998},
   pages         = {1--37},
+  doi           = {10.1007/978-94-015-9131-7_1},
   eprint        = {math/9802063},
   archivePrefix = {arXiv},
 }
@@ -145,17 +173,20 @@
   volume        = {13},
   year          = {2008},
   pages         = {471--493},
+  doi           = {10.1007/s00031-008-9020-2},
   eprint        = {0705.1035},
   archivePrefix = {arXiv},
 }
 
-% UNVERIFIED: pages unknown (omitted); journal, volume and year from LITERATURE.md only
 @article{BrionPeyre,
   author        = {Brion, Michel and Peyre, Emmanuel},
   title         = {The virtual {P}oincar\'{e} polynomials of homogeneous spaces},
-  journal       = {Compositio Math.},
+  journal       = {Compos. Math.},
   volume        = {134},
+  number        = {3},
   year          = {2002},
+  pages         = {319--335},
+  doi           = {10.1023/A:1020984924857},
   eprint        = {math/0102052},
   archivePrefix = {arXiv},
 }
@@ -181,7 +212,7 @@
   note          = {Preprint, arXiv:1309.5520},
 }
 
-% UNVERIFIED: not in LITERATURE.md and not on arXiv; pages from memory
+% UNVERIFIED: not in Crossref, and zbMATH has no Chasles record before 1869; volume, year and pages from memory
 @article{Chasles,
   author  = {Chasles, Michel},
   title   = {Construction des coniques qui satisfont \`{a} cinq conditions},
@@ -191,28 +222,30 @@
   pages   = {297--308},
 }
 
-% UNVERIFIED: volume 29 from memory; pages unknown (omitted)
 @article{ChoiPark,
   author        = {Choi, Suyoung and Park, Hanchul},
   title         = {On the cohomology and their torsion of real toric objects},
   journal       = {Forum Math.},
   volume        = {29},
+  number        = {3},
   year          = {2017},
+  pages         = {543--553},
+  doi           = {10.1515/forum-2016-0025},
   eprint        = {1311.7056},
   archivePrefix = {arXiv},
 }
 
-% UNVERIFIED: not in LITERATURE.md and not on arXiv; volume, year and pages from memory
 @article{DavisJanuszkiewicz,
   author  = {Davis, Michael W. and Januszkiewicz, Tadeusz},
   title   = {Convex polytopes, {C}oxeter orbifolds and torus actions},
   journal = {Duke Math. J.},
   volume  = {62},
+  number  = {2},
   year    = {1991},
   pages   = {417--451},
+  doi     = {10.1215/S0012-7094-91-06217-4},
 }
 
-% UNVERIFIED: proceedings title (Invariant theory, Montecatini 1982) from memory
 @incollection{DCP83,
   author    = {De Concini, Corrado and Procesi, Claudio},
   title     = {Complete symmetric varieties},
@@ -222,6 +255,7 @@
   publisher = {Springer, Berlin},
   year      = {1983},
   pages     = {1--44},
+  doi       = {10.1007/bfb0063234},
 }
 
 @incollection{DCS,
@@ -232,20 +266,20 @@
   volume    = {60},
   publisher = {Birkh\"{a}user Boston, Boston, MA},
   year      = {1985},
-  pages     = {87--104},
+  pages     = {87--107},
 }
 
-% UNVERIFIED: not in LITERATURE.md and not on arXiv; volume, year and pages from memory
 @article{Deodhar,
   author  = {Deodhar, Vinay V.},
   title   = {A note on subgroups generated by reflections in {C}oxeter groups},
   journal = {Arch. Math. (Basel)},
   volume  = {53},
+  number  = {6},
   year    = {1989},
   pages   = {543--546},
+  doi     = {10.1007/BF01199813},
 }
 
-% UNVERIFIED: pages from memory (LITERATURE.md gives journal, volume and year only)
 @article{DGMP,
   author  = {De Concini, Corrado and Goresky, Mark and MacPherson, Robert and Procesi, Claudio},
   title   = {On the geometry of quadrics and their degenerations},
@@ -253,6 +287,7 @@
   volume  = {63},
   year    = {1988},
   pages   = {337--413},
+  doi     = {10.1007/BF02566772},
 }
 
 @article{DuggerIsaksen,
@@ -274,16 +309,18 @@
   volume  = {135},
   year    = {1990},
   pages   = {57--73},
+  doi     = {10.1016/0021-8693(90)90149-I},
 }
 
-% UNVERIFIED: not in LITERATURE.md and not on arXiv; volume, year and pages from memory
 @article{Forman,
   author  = {Forman, Robin},
   title   = {Morse theory for cell complexes},
   journal = {Adv. Math.},
   volume  = {134},
+  number  = {1},
   year    = {1998},
   pages   = {90--145},
+  doi     = {10.1006/aima.1997.1650},
 }
 
 @article{GKM,
@@ -293,9 +330,9 @@
   volume  = {131},
   year    = {1998},
   pages   = {25--83},
+  doi     = {10.1007/s002220050197},
 }
 
-% UNVERIFIED: pages omitted; arXiv journal-ref says "no. 4, pp. 1-25", which looks like the preprint's own pagination
 @article{GoldinTolman,
   author        = {Goldin, Rebecca F. and Tolman, Susan},
   title         = {Towards generalizing {S}chubert calculus in the symplectic category},
@@ -303,17 +340,21 @@
   volume        = {7},
   number        = {4},
   year          = {2009},
+  pages         = {449--473},
+  doi           = {10.4310/JSG.2009.v7.n4.a3},
   eprint        = {0904.1245},
   archivePrefix = {arXiv},
 }
 
-% UNVERIFIED: volume 17 and year 2024 from LITERATURE.md, but arXiv v2 (Nov. 2024) still says "to appear in Journal of Topology"; pages unknown
 @article{HMW,
   author        = {Hudson, Thomas and Matszangosz, \'{A}kos K. and Wendt, Matthias},
   title         = {{C}how--{W}itt rings and topology of flag varieties},
   journal       = {J. Topol.},
   volume        = {17},
+  number        = {4},
   year          = {2024},
+  pages         = {Paper No. e70004, 78},
+  doi           = {10.1112/topo.70004},
   eprint        = {2302.11003},
   archivePrefix = {arXiv},
 }
@@ -342,11 +383,11 @@
   archivePrefix = {arXiv},
 }
 
-% UNVERIFIED: proceedings title and publisher (Manoj Prakashan, Madras) from memory; LITERATURE.md gives "Proc. Hyderabad Conf. on Algebraic Groups (1991), 225-249"
 @incollection{Knop91,
   author    = {Knop, Friedrich},
   title     = {The {L}una--{V}ust theory of spherical embeddings},
   booktitle = {Proceedings of the {H}yderabad {C}onference on {A}lgebraic {G}roups ({H}yderabad, 1989)},
+  editor    = {Ramanan, S.},
   publisher = {Manoj Prakashan, Madras},
   year      = {1991},
   pages     = {225--249},
@@ -385,6 +426,7 @@
   number        = {2},
   year          = {2003},
   pages         = {221--260},
+  doi           = {10.1215/S0012-7094-03-11922-5},
   eprint        = {math/0112150},
   archivePrefix = {arXiv},
 }
@@ -396,9 +438,9 @@
   volume  = {110},
   year    = {1995},
   pages   = {1--46},
+  doi     = {10.1006/aima.1995.1001},
 }
 
-% UNVERIFIED: not in LITERATURE.md and not on arXiv; series and volume number from memory
 @book{Kozlov,
   author    = {Kozlov, Dmitry},
   title     = {Combinatorial algebraic topology},
@@ -406,6 +448,7 @@
   volume    = {21},
   publisher = {Springer, Berlin},
   year      = {2008},
+  doi       = {10.1007/978-3-540-71962-5},
 }
 
 @article{Levine,
@@ -427,6 +470,7 @@
   volume        = {59},
   year          = {2009},
   pages         = {1105--1134},
+  doi           = {10.5802/aif.2459},
   eprint        = {math/0612561},
   archivePrefix = {arXiv},
 }
@@ -438,6 +482,7 @@
   volume  = {94},
   year    = {2001},
   pages   = {161--226},
+  doi     = {10.1007/s10240-001-8194-0},
 }
 
 @article{LunaVust,
@@ -447,9 +492,10 @@
   volume  = {58},
   year    = {1983},
   pages   = {186--245},
+  doi     = {10.1007/BF02564633},
 }
 
-% UNVERIFIED: not in LITERATURE.md and not on arXiv; series and number from memory
+% UNVERIFIED: series and number from memory; zbMATH (JFM 46.0167.01) and Crossref confirm only author, title, publisher and year
 @book{Macaulay,
   author    = {Macaulay, F. S.},
   title     = {The algebraic theory of modular systems},
@@ -459,31 +505,43 @@
   year      = {1916},
 }
 
-@misc{Matszangosz,
+@article{Matszangosz,
   author        = {Matszangosz, \'{A}kos K.},
   title         = {On the cohomology rings of real flag manifolds: {S}chubert cycles},
-  year          = {2019},
+  journal       = {Math. Ann.},
+  volume        = {381},
+  number        = {3-4},
+  year          = {2021},
+  pages         = {1537--1588},
+  doi           = {10.1007/s00208-021-02237-z},
   eprint        = {1910.11149},
   archivePrefix = {arXiv},
-  note          = {Preprint, arXiv:1910.11149},
 }
 
-@misc{MichalekMoninWisniewski,
-  author        = {Micha{\l}ek, Mateusz and Monin, Leonid and Wi\'{s}niewski, Jaros{\l}aw},
-  title         = {Maximum likelihood degree, complete quadrics and {$\mathbb{C}^*$}-action},
-  year          = {2020},
+@article{MichalekMoninWisniewski,
+  author        = {Micha{\l}ek, Mateusz and Monin, Leonid and Wi\'{s}niewski, Jaros{\l}aw A.},
+  title         = {Maximum likelihood degree, complete quadrics, and {$\mathbb{C}^*$}-action},
+  journal       = {SIAM J. Appl. Algebra Geom.},
+  volume        = {5},
+  number        = {1},
+  year          = {2021},
+  pages         = {60--85},
+  doi           = {10.1137/20M1335960},
   eprint        = {2004.07735},
   archivePrefix = {arXiv},
-  note          = {Preprint, arXiv:2004.07735},
 }
 
-@misc{MMMSV,
+@article{MMMSV,
   author        = {Manivel, Laurent and Micha{\l}ek, Mateusz and Monin, Leonid and Seynnaeve, Tim and Vodi\v{c}ka, Martin},
   title         = {Complete quadrics: {S}chubert calculus for {G}aussian models and semidefinite programming},
-  year          = {2020},
+  journal       = {J. Eur. Math. Soc. (JEMS)},
+  volume        = {26},
+  number        = {8},
+  year          = {2024},
+  pages         = {3091--3135},
+  doi           = {10.4171/JEMS/1330},
   eprint        = {2011.08791},
   archivePrefix = {arXiv},
-  note          = {Preprint, arXiv:2011.08791},
 }
 
 @article{MorelVoevodsky,
@@ -493,16 +551,18 @@
   volume  = {90},
   year    = {1999},
   pages   = {45--143},
+  doi     = {10.1007/BF02698831},
 }
 
-% UNVERIFIED: the eprint was found by an arXiv search; the arXiv version is titled "Fano horospherical variety" (in French, same abstract), matched to this paper by content
 @article{Pasquier,
   author        = {Pasquier, Boris},
   title         = {Vari\'{e}t\'{e}s horosph\'{e}riques de {F}ano},
   journal       = {Bull. Soc. Math. France},
   volume        = {136},
+  number        = {2},
   year          = {2008},
   pages         = {195--225},
+  doi           = {10.24033/bsmf.2554},
   eprint        = {math/0610147},
   archivePrefix = {arXiv},
 }
@@ -514,6 +574,7 @@
   volume        = {19},
   year          = {2014},
   pages         = {171--223},
+  doi           = {10.1007/s00031-014-9254-0},
   eprint        = {1211.1277},
   archivePrefix = {arXiv},
 }
@@ -525,11 +586,11 @@
   volume        = {30},
   year          = {2019},
   pages         = {745--772},
+  doi           = {10.1016/j.indag.2019.05.001},
   eprint        = {1810.00934},
   archivePrefix = {arXiv},
 }
 
-% UNVERIFIED: not in LITERATURE.md and not on arXiv; publisher and year from memory
 @book{Schubert,
   author    = {Schubert, Hermann},
   title     = {Kalk\"{u}l der abz\"{a}hlenden {G}eometrie},
@@ -537,25 +598,29 @@
   year      = {1879},
 }
 
-% UNVERIFIED: not in LITERATURE.md and not on arXiv; volume, year and pages from memory
 @article{Skoldberg,
   author  = {Sk\"{o}ldberg, Emil},
   title   = {Morse theory from an algebraic viewpoint},
   journal = {Trans. Amer. Math. Soc.},
   volume  = {358},
+  number  = {1},
   year    = {2006},
   pages   = {115--129},
+  doi     = {10.1090/S0002-9947-05-04079-1},
 }
 
-% UNVERIFIED: pages unknown (omitted); journal, volume and year from LITERATURE.md only
 @article{Strickland86,
   author  = {Strickland, Elisabetta},
   title   = {Schubert-type cells for complete quadrics},
   journal = {Adv. Math.},
   volume  = {62},
+  number  = {3},
   year    = {1986},
+  pages   = {238--248},
+  doi     = {10.1016/0001-8708(86)90102-7},
 }
 
+% UNVERIFIED: not in Crossref or zbMATH; data from LITERATURE.md (web search result)
 @misc{Sturmfels3264,
   author       = {Sturmfels, Bernd},
   title        = {3264 questions about symmetric matrices},
@@ -563,17 +628,20 @@
   year         = {2020},
 }
 
-% UNVERIFIED: LITERATURE.md gives only the journal; volume 62 and year 2010 from memory, pages unknown
 @article{SturmfelsUhler,
   author        = {Sturmfels, Bernd and Uhler, Caroline},
   title         = {Multivariate {G}aussians, semidefinite matrix completion, and convex algebraic geometry},
   journal       = {Ann. Inst. Statist. Math.},
   volume        = {62},
+  number        = {4},
   year          = {2010},
+  pages         = {603--638},
+  doi           = {10.1007/s10463-010-0295-4},
   eprint        = {0906.3529},
   archivePrefix = {arXiv},
 }
 
+% UNVERIFIED: not in Crossref or zbMATH; data from LITERATURE.md (web search result)
 @misc{SuciuTrevisan,
   author = {Suciu, Alexander I. and Trevisan, Alvise},
   title  = {Real toric varieties and abelian covers of generalized {D}avis--{J}anuszkiewicz spaces},
@@ -581,14 +649,17 @@
   note   = {Preprint},
 }
 
-% UNVERIFIED: LITERATURE.md gives the title "Cohomologie des fibres en droites sur les varietes magnifiques de rang minimal" with arXiv:0709.2584, but that arXiv record has the title below; journal version not checked
-@misc{Tchoudjem,
+@article{Tchoudjem,
   author        = {Tchoudjem, Alexis},
   title         = {Sur la cohomologie \`{a} support des fibr\'{e}s en droites sur les vari\'{e}t\'{e}s sym\'{e}triques compl\`{e}tes},
-  year          = {2007},
+  journal       = {Transform. Groups},
+  volume        = {15},
+  number        = {3},
+  year          = {2010},
+  pages         = {655--700},
+  doi           = {10.1007/s00031-010-9105-6},
   eprint        = {0709.2584},
   archivePrefix = {arXiv},
-  note          = {Preprint, arXiv:0709.2584},
 }
 
 @book{Timashev,
@@ -596,13 +667,13 @@
   title         = {Homogeneous spaces and equivariant embeddings},
   series        = {Encyclopaedia Math. Sci.},
   volume        = {138},
-  publisher     = {Springer, Heidelberg},
+  publisher     = {Springer, Berlin},
   year          = {2011},
+  doi           = {10.1007/978-3-642-18399-7},
   eprint        = {math/0602228},
   archivePrefix = {arXiv},
 }
 
-% UNVERIFIED: not in LITERATURE.md and not on arXiv; proceedings title, publisher and pages from memory
 @incollection{Vainsencher,
   author    = {Vainsencher, Israel},
   title     = {Schubert calculus for complete quadrics},
@@ -612,6 +683,7 @@
   publisher = {Birkh\"{a}user Boston, Boston, MA},
   year      = {1982},
   pages     = {199--235},
+  doi       = {10.1007/978-1-4684-6726-0_10},
 }
 
 @phdthesis{VoelkelQuadrics,
@@ -619,6 +691,7 @@
   title  = {Motivic cell structures for projective spaces over split quaternions},
   school = {Universit\"{a}t Freiburg},
   year   = {2016},
+  doi    = {10.6094/UNIFR/11448},
 }
 
 @misc{VoelkelSpherical,
@@ -637,6 +710,7 @@
   volume  = {1},
   year    = {1996},
   pages   = {375--403},
+  doi     = {10.1007/BF02549213},
 }
 
 @article{Weber,
@@ -646,6 +720,7 @@
   volume        = {22},
   year          = {2017},
   pages         = {537--557},
+  doi           = {10.1007/s00031-016-9388-3},
   eprint        = {1411.6594},
   archivePrefix = {arXiv},
 }

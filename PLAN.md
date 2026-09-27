@@ -351,7 +351,7 @@ $W_H$, for every orbit with $T$-fixed points (`spherical.md` §9).
 | The $\mathbb P^5$ tangency number differs from the published list | Two independent computations agree; P4 adds a third before the paper states it. |
 | A rule for non-graded real incidences needs data beyond fixed points and curves | R1 computes a second oracle before any new rule; the notes say what is observation and what is proved. |
 | Pure Python limits (EVIII, $\mathbb P^5$ rings) | E3, and R5 through the orbit decomposition. |
-| Unverified bibliographic data (Crossref and zbMATH were unreachable) | Entries are marked in `LITERATURE.md` and `paper/references.bib`; P5 checks them. |
+| Bibliographic data that Crossref and zbMATH do not confirm (Chasles 1864, the series of Macaulay 1916, Sturmfels's *3264 questions*, Suciu–Trevisan); `\cite[Prop.~3.5]{MMMSV}` uses the arXiv numbering, while the entry now cites the JEMS version | All other entries were checked against Crossref and zbMATH on 2026-09-27. These four keep their `% UNVERIFIED` marker in `paper/references.bib`; P5 checks them and the MMMSV numbering against the original sources. |
 | H1 fails | Outputs that depend on it are labelled `conditional_on=("H1",)`; real incidences of flag varieties do not depend on it. |
 | Wording in arXiv:1805.04338, Example `hpn` | The boundary of $\mathbb{HP}^n$ in $\mathrm{Gr}(2,2n+2)$ must be the *isotropic* Grassmannian (dimension $4n-1$), while the text says "symplectic planes". `two_orbit.py` uses the isotropic one; KV to confirm the wording. |
 | Gaps in the general Hermitian argument | The certificates are computational proofs case by case; the general statement stays a conjecture until P3(c). |
