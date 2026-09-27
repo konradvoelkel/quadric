@@ -259,8 +259,11 @@ $c\in\mathbb Z$.
     and $b_w = \langle w\zeta,\lambda\rangle$. So the BB count $P_\lambda(c)$ is
     a step function of $c$, with steps at the thresholds $-a_w/b_w$.
   - For the true $c$ and a $\lambda$ generic for it, $P_\lambda(c)$ is the
-    E-polynomial of the variety. Take the closure $X^J$ of an orbit $O_J$
-    with $T$-fixed points. Its E-polynomial is
+    E-polynomial of the variety. Take the closure $X^J$ of an orbit $O_J$.
+    If $O_J$ has no $T$-fixed points, only Poincaré duality is used: the
+    counts must be palindromic. This is the linear condition
+    $v - \mathrm{rev}(v) = 0$, handled like the next one. If $O_J$ has fixed
+    points, the E-polynomial of $X^J$ is
     $$E(X^J) = |G/P_{S_J}|(q)\,|L/H_L|(q) + \sum_{\emptyset\ne S\subseteq J}(-1)^{|S|+1}E(X^{J\smallsetminus S}),$$
     by Brion–Peyre for the open orbit (§8) and inclusion–exclusion over the
     boundary. The $X^{J\smallsetminus S}$ do not see the unknown, and their E-polynomials are
@@ -278,21 +281,24 @@ $c\in\mathbb Z$.
     most one unknown. The admissible boxes are found by hashing: $F_2$ is
     matched against $E - P_0 - F_1$.
   - In practice the admissible set at $\lambda$ is a single interval around
-    0, of half-width below $0.1$.
+    0, of half-width below $0.1$. Palindromy alone is almost as sharp: for
+    AIII(3,4) it leaves a few intervals, all within $|c|<0.09$.
 - **Induction over orbit closures** (`spherical.certify_by_closures`).
   - An unknown $(K,\gamma)$, the normal weight of $D_\gamma$ on $O_K$, is
     decided on the smallest closure $X^J$, $J\supseteq K\cup\{\gamma\}$, whose
-    open orbit has fixed points and whose other normal weights are proved or
-    already certified.
+    other normal weights are proved or already certified. Among those, one
+    whose open orbit has fixed points is preferred (E-polynomial).
   - If no single unknown can be decided this way, a pair is decided jointly.
   - The ABBV certificate below is the last fallback.
 - **Certified** $c = 0$ (point counts; these orbits are marked
   `symmetric.CERTIFIED`):
   - AIII(2,3), AIII(2,4), AIII(2,5), DIII(5), EIII;
-  - AIII(3,4): $(O_3,\gamma_1)$ alone, then $(O_3,\gamma_0)$ and
-    $(O_{23},\gamma_0)$ jointly on $X$. $O_{13}$ has no $T$-fixed points, so
-    $(O_3,\gamma_0)$ has no smaller closure.
-  - DIII(7) and AIII(3,5) follow the same pattern as AIII(3,4).
+  - AIII(3,4): $(O_3,\gamma_1)$ on $X^{\{1,2\}}$ (E-polynomial),
+    $(O_3,\gamma_0)$ on $X^{\{0,2\}}$ (Poincaré duality; $O_{13}$ has no
+    $T$-fixed points), then $(O_{23},\gamma_0)$ on $X$. The joint step,
+    $(O_3,\gamma_0)$ and $(O_{23},\gamma_0)$ together on $X$, also gives
+    $(0,0)$ and is tested separately.
+  - DIII(7), AIII(3,5) and AIII(3,6) follow the same pattern.
 - **ABBV certificate** (`spherical.certify_normal_weights`), for a single
   unknown.
   - Take the ABBV identity $\sum_p 1/e_p(\lambda) = 0$ at random $\lambda$. It
@@ -484,6 +490,58 @@ Reproduced (`tests/test_brion.py`):
   number. The value 641211464734373953791690014720 listed in *3264
   questions* Q5 differs from both. We have not resolved this.
 
+**Cell classes** (`brion.canonical_classes`, `integral_cohomology`).
+- The Goldin–Tolman class $\tau_p$ satisfies
+  - $\tau_p(p) = e^-_p$, the product of the $\lambda$-negative weights;
+  - $\tau_p(q) = 0$ for $q\ne p$ with $\operatorname{codim}q\le\operatorname{codim}p$.
+
+  It is unique if it exists. It exists if and only if the closure of the
+  plus-cell of $p$ meets no cell of at least its own dimension, and then it
+  is the class of that closure.
+- The points are ordered by a Morse function: on each Brion component, a
+  point comes after the points with fewer negative weights along $\chi$. At
+  $q$, each component $Y$ on which $q$ has $m\in\{1,2\}$ negative weights
+  gives $\tau(q)\equiv L_Y \bmod \chi^m$.
+  - For $m=1$, $L_Y$ is the value at an earlier point of $Y$.
+  - For $m=2$, $L_Y$ comes from the sum condition of the surface.
+
+  The moduli multiply to $e^-_q$, of degree greater than
+  $\operatorname{codim}p$, so $\tau(q)$ is unique. It is found by Newton
+  interpolation, $g = A + \prod\chi_i^{m_i}\,g'$, using only restriction to
+  hyperplanes and exact division. There are no global linear systems.
+- Validation:
+  - the result equals the GKM flow-up classes on flag varieties;
+  - it equals a global linear solve on CII(1,2) (ruled surfaces) and BI(1,4)
+    (planes).
+
+  `integral_cohomology` then evaluates the expansion at a rational point,
+  where it is triangular. It checks that the structure constants are
+  integers and that the Poincaré pairing is unimodular.
+- **Complete conics have no canonical classes.** In every chamber of
+  $\lambda$, two of the 12 points fail. So two plus-cell closures meet a
+  cell of their own dimension, and the BB decomposition is not a
+  stratification by cell closures. For the default cocharacter, points fail
+  in the same way for AI(4) (22 of 66), CI(2), CI(3), $G_2$, AIII(2,2),
+  DI(2,4), and even for the GKM variety AII(3) (14 of 90). Canonical classes
+  do exist for AIII(1,2), BI(1,4) and CII(1,2).
+
+**The divisor subalgebra** (`brion.volume_ring`).
+- By Poincaré duality, a form $f$ of degree $d$ in the degree-one classes
+  vanishes if and only if $\int fg = 0$ for all $g$ of degree $n-d$. So the
+  subalgebra generated by $D_1,\dots,D_k$ is $\mathbb Q[x]/\operatorname{Ann}(V)$,
+  with the volume polynomial $V = \int(\sum x_iD_i)^n/n!$ (Macaulay's inverse
+  system). $V$ comes from the characteristic numbers.
+- If its Hilbert function equals the Betti numbers, the $D_i$ generate
+  $H^*(X;\mathbb Q)$ and this is a presentation.
+- Complete conics: $H^* = \mathbb Q[\mu,\nu]/(r_3, r_4)$ with
+  $r_3 = 2\nu^3 - 3\mu\nu^2 + 3\mu^2\nu - 2\mu^3$.
+- Complete quadric surfaces: $\mathbb Q[\mu,\nu,\rho]$ modulo minimal
+  relations, 2 in degree 4, 2 in degree 5 and 1 in degree 6.
+- Complete quadrics in $\mathbb P^4$: the colours do **not** generate. Degree 3
+  has $\binom63 = 20$ monomials, but $b_6 = 21$. The Hilbert function of the
+  subalgebra is $1,4,10,20,35,52,65,70,\dots$, against the Betti numbers
+  $1,4,10,21,36,53,65,70,\dots$.
+
 ## 10. How to do what remains
 
 1. **General Luna data (non-symmetric satellites).** Following
@@ -512,27 +570,30 @@ Reproduced (`tests/test_brion.py`):
    - **Oracles.** Wasserman's rank-two tables, and the non-symmetric
      reductive entries (#31–50 in arXiv:1109.6777).
 2. **Certificates beyond the Hermitian case.** The point-count
-   certificate of §6 decides one unknown, or two on different orbits, on a
-   closure whose open orbit has fixed points. It remains to:
+   certificate of §6 decides one unknown, or two on different orbits, on any
+   orbit closure. It remains to:
    - handle two unknowns on the same orbit (a line arrangement in the
-     $(c_1,c_2)$-plane);
-   - handle closures whose open orbit has no fixed points (it would need
-     $E(L/H_L)$ for satellites of smaller rank);
+     $(c_1,c_2)$-plane), or three unknowns that meet only on one closure;
    - give a full proof of the proposition's Hermitian case, closing the gaps
      listed in §6.
-3. **Schubert calculus beyond GKM.** Characteristic numbers are done (§9).
-   Still open: generalizing the flow-up classes and structure constants of
-   `equivariant.py` from edges to Brion components. The cells are known and
-   the ring conditions are in §9. Oracle: the cohomology of complete quadrics
-   (De Concini–Goresky–MacPherson–Procesi 1988).
+3. **Schubert calculus beyond GKM.** Done in part (§9): characteristic
+   numbers, canonical classes where they exist, and the divisor subalgebra.
+   Still open:
+   - a canonical integral basis when plus-cell closures are not unions of
+     cells, as for complete quadrics;
+   - the classes beyond the divisor subalgebra for complete quadrics in
+     $\mathbb P^{n-1}$, $n\ge5$.
+
+   Oracle: De Concini–Goresky–MacPherson–Procesi 1988.
 4. **Toroidal $X$ over $G/H$ with $\Lambda\supsetneq\mathbb Z\Sigma$.** Then
    $O_\tau\to O_J$ is a finite cover times a torus. Needs the lattice
    $\Lambda$ and the component group.
 5. **Real points of non-GKM varieties** (M5, hypothesis H1). The real
    incidences need the $T$-curves and surfaces of §9 in the Kocherlakota
    rule. For the planes this is open.
-6. **Large Euler characteristics.** Done for $E_7$ (§11). EVIII
-   ($E_8$) has more than $10^8$ fixed points and needs a compiled inner loop.
+6. **Large Euler characteristics.** Done for $E_7$ and EIX (§11). EVIII
+   is out of reach in pure Python: its closed orbit alone has
+   $|W(E_8)| = 696729600$ fixed points.
 
 ## 11. Cell counts without listing fixed points
 
@@ -560,6 +621,8 @@ Results (dimension, number of fixed points, time):
 | EI | 42 | 370170 | 14 s |
 | EVII | 54 | 23464 | 7 s |
 | EVI | 64 | 758079 | 48 s |
+| EV | 70 | 28373976 | 30 min |
+| EIX ($E_8$) | 112 | 7445880 | 13 min |
 
 For example, EVI has cell counts
 1, 4, 11, 26, 54, 105, 189, 321, 516, 794, 1176, …, 33607, 33805, 33607, …, 1.

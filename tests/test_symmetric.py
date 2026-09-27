@@ -147,12 +147,21 @@ class TestNewCases(unittest.TestCase):
         self.assertEqual(spherical.certify_by_point_count(R.name, shifted)[0], {"O2": [-1]})
 
     def test_joint_certificate(self):
-        # AIII(3,4): (O3, 1) alone, then (O3, 0) and (O23, 0) jointly on X
+        # AIII(3,4): (O3, 0) and (O23, 0) jointly on X, against the E-polynomial
+        D = symmetric.diagram("AIII", 3, 4)
+        orbits = D.orbits(strict=False)
+        restricted = spherical._restrict(orbits, {0, 1, 2}, ("O3", 0), ("O23", 0))
+        self.assertEqual(spherical.certify_by_point_count(D.R.name, restricted),
+                         ({"O3": [0], "O23": [0]}, [(0, 0)]))
+
+    def test_certificate_by_poincare_duality(self):
+        # the open orbit O13 of the closure of O3 + gamma_0 has no T-fixed points:
+        # (O3, 0) is decided there by palindromic counts alone
         D = symmetric.diagram("AIII", 3, 4)
         methods = {}
         result = spherical.certify_by_closures(D.R.name, D.orbits(strict=False), methods=methods)
         self.assertEqual(result, {("O3", 1): [0], ("O3", 0): [0], ("O23", 0): [0]})
-        self.assertEqual(methods[("O3", 0)], ("joint point count", (0, 1, 2)))
+        self.assertEqual(methods[("O3", 0)], ("point count", (0, 2)))
 
     def test_streaming_counts(self):
         for case in [("AI", 4), ("CI", 3), ("G",), ("AIII", 2, 2), ("AIII", 2, 3), ("DIII", 4)]:

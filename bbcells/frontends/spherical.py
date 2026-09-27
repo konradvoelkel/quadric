@@ -866,10 +866,11 @@ def certify_by_closures(cartan_type, orbits, trials=3, seed=0, methods=None):
     unknown (K, gamma), i.e. the normal weight of D_gamma on the marked orbit
     O_K, is decided on a closure X^J, J > K + gamma, in which every other
     normal weight is proved (condition (R)) or certified before:
-      * by certify_by_point_count, if the open orbit O_J has T-fixed points
-        (the smallest such J is used);
+      * by certify_by_point_count on the smallest such J (against the
+        E-polynomial if the open orbit O_J has T-fixed points, else by
+        Poincare duality);
       * if no unknown can be decided so, pairs of unknowns on different
-        orbits are decided jointly by the point count on the smallest such
+        orbits are decided jointly by the point count on the smallest
         closure containing both;
       * failing that, on X^{K + gamma} by certify_normal_weights (ABBV).
     This is repeated until no unknown is left. Returns
@@ -897,10 +898,10 @@ def certify_by_closures(cartan_type, orbits, trials=3, seed=0, methods=None):
             base |= roots_of[name] | {gamma}
         rest = sorted(everything - base)
         for size in range(len(rest) + 1):
-            for extra in combinations(rest, size):
-                J = base | set(extra)
-                if frozenset(J) in with_points and others_known(J, unknowns):
-                    return J
+            candidates = [base | set(extra) for extra in combinations(rest, size)]
+            candidates = [J for J in candidates if others_known(J, unknowns)]
+            if candidates:          # prefer an open orbit with fixed points (E-polynomial)
+                return max(candidates, key=lambda J: frozenset(J) in with_points)
         return None
 
     def record(unknowns, admissible, method, J):
@@ -986,8 +987,7 @@ def _lattice_shift(normal, zeta):
 def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
     """certify the unknown normal weights of the orbits marked BEYOND_R (one
     or two orbits; each unknown is the last normal weight of its orbit) by the
-    point count of the variety assembled from `orbits` (an orbit closure X^J
-    whose open orbit O_J has T-fixed points).
+    point count of the variety assembled from `orbits` (an orbit closure X^J).
 
     With chi = normal + c zeta (normal the W_L-average, as in
     certify_normal_weights), the number of lambda-positive weights at the
@@ -998,8 +998,10 @@ def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
     it, P_lambda(c) is the E-polynomial of X^J: |O_J| = |G/P_{S_J}|(q)
     |L/H_L|(q) (Brion-Peyre) plus the count of the boundary (inclusion-
     exclusion over the X^{J - S}, which do not see the unknowns), independent
-    of c. The boxes of intervals with the right count are found by matching
-    F_1 against the target minus F_2. The thresholds of each unknown are
+    of c. If O_J has no T-fixed points, only Poincare duality is used: the
+    counts must be palindromic (the condition v - reverse(v) = 0, linear in
+    the counts like the first). The boxes of intervals that satisfy the
+    condition are found by matching F_1 against the target minus F_2. The thresholds of each unknown are
     checked to be disjoint across the samples, so for the true c at most one
     sample per unknown is not generic; with more samples than unknowns some
     sample decides. The weights lie in the root lattice (G adjoint), so c_i
@@ -1033,24 +1035,33 @@ def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
     for o in orbits:
         J |= set(o.roots) | set(o.normal_roots)
     top = [o for o in orbits if set(o.roots) == J]
-    if not top:
-        raise ValueError("the open orbit of the closure has no T-fixed points")
-    flag = from_degrees(R.degrees, levi_degrees(R.cartan, set(top[0].levi)))
-    expected = flag * satellite_point_count(cartan_type, top[0])
     X = assemble(cartan_type, orbits)
-    for size in range(1, len(J) + 1):
-        for S in combinations(sorted(J), size):
-            term = IntPoly.from_counts(bb_cells(orbit_closure(X, J - set(S))).counts)
-            expected = expected + term if size % 2 else expected - term
+    if top:
+        flag = from_degrees(R.degrees, levi_degrees(R.cartan, set(top[0].levi)))
+        expected = flag * satellite_point_count(cartan_type, top[0])
+        for size in range(1, len(J) + 1):
+            for S in combinations(sorted(J), size):
+                term = IntPoly.from_counts(bb_cells(orbit_closure(X, J - set(S))).counts)
+                expected = expected + term if size % 2 else expected - term
+    else:
+        expected = None                   # only Poincare duality: palindromic counts
     grouped = {}
     for label, weights in zip(X.points, X.weights):
         a = X.annotation(label)
         grouped.setdefault(a["orbit"], {})[a["word"]] = weights
     data = [(o, grouped.get(o.name, {})) for o in orbits]
-    length = len(X.weights[0]) + 2
-    target = list(expected.coefficients) + [0] * (length - len(expected.coefficients))
-    if len(target) > length:
-        raise ValueError("the E-polynomial has too high a degree")
+    dim = len(X.weights[0])
+    length = dim + 2
+    if expected is not None:
+        target = list(expected.coefficients) + [0] * (length - len(expected.coefficients))
+        if len(target) > length:
+            raise ValueError("the E-polynomial has too high a degree")
+        condition = lambda v: tuple(v)
+    else:
+        target = [0] * length
+        # v -> v - reverse(v) on degrees 0..dim (the last slot must stay empty)
+        condition = lambda v: tuple(v[d] - v[dim - d] for d in range(dim + 1)) + (v[dim + 1],)
+    target = condition(target)
     samples, seen = [], [set() for _ in marked]
     attempts = 0
     while len(samples) < trials:
@@ -1095,7 +1106,7 @@ def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
             delta, low, k, piece = [0] * length, None, 0, []
             while True:
                 high = m[k][0] if k < len(m) else None
-                piece.append(((low, high), tuple(delta)))
+                piece.append(((low, high), condition(delta)))
                 if high is None:
                     break
                 while k < len(m) and m[k][0] == high:
@@ -1105,7 +1116,7 @@ def certify_by_point_count(cartan_type, orbits, trials=3, seed=0):
                     k += 1
                 low = high
             pieces.append(piece)
-        rest = tuple(t - c for t, c in zip(target, counts))
+        rest = tuple(t - c for t, c in zip(target, condition(counts)))
         if len(marked) == 1:
             boxes = [(interval,) for interval, value in pieces[0] if value == rest]
         else:

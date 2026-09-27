@@ -426,18 +426,25 @@ prints usage.
   case tested, including AIII(3,4) and DIII(7) with their joint steps. Still
   open: two unknowns on one orbit, closures whose open orbit has no fixed
   points, and a full proof of the proposition's Hermitian case.)*
-- [ ] **S7.3 Schubert calculus beyond GKM**.
+- [ ] **S7.3 Schubert calculus beyond GKM** (a, b done; c open).
   - [x] S7.3a Characteristic numbers: degree-one classes on Brion
     components, colours of complete quadrics, ABBV integration
     (`docs/S6d.md` §9). *(Done: 3264, 666841088, 48942189946470400 and the
     ML degrees $\varphi(n,d)$ are reproduced.)*
-  - [ ] S7.3b Flow-up classes and structure constants on Brion components;
-    the oracle is DGMP 1988 for complete quadrics.
+  - [x] S7.3b Canonical (Goldin–Tolman) classes by Newton interpolation on
+    Brion components, the integral ring where they exist, and the divisor
+    subalgebra $\mathbb Q[x]/\operatorname{Ann}(V)$ (`docs/S6d.md` §9).
+    *(Done. Complete conics have no canonical classes in any chamber, and
+    the colours generate $H^*$ for $n\le4$ but not for complete quadrics in
+    $\mathbb P^4$.)*
+  - [ ] S7.3c A canonical integral basis when cell closures are not unions
+    of cells; the oracle is DGMP 1988 for complete quadrics.
 - [ ] **S7.4 Toroidal $X$ with $\Lambda\supsetneq\mathbb Z\Sigma$** (finite covers).
 - [ ] **S7.5 Real incidences for non-GKM varieties** (M5 beyond GKM).
 - [x] **S7.6 Cell counts without listing fixed points** (`docs/S6d.md` §11).
-  *(Done for $E_7$: EII, EI, EVI (758079 fixed points, 48 s) and EVII.
-  EVIII needs a compiled inner loop.)*
+  *(Done for $E_7$: EII, EI, EVI (758079 fixed points, 48 s), EVII and EV
+  (28373976 fixed points, 30 min), and for EIX (7445880). EVIII has more
+  than $6\cdot10^8$ fixed points on its closed orbit alone.)*
 
 ---
 

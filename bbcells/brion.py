@@ -299,3 +299,343 @@ def line_bundle_class(data, components, cartan_type, weight, orbit="closed"):
     if not prescribed:
         raise ValueError("no fixed points in the orbit %r" % (orbit,))
     return degree_one_class(data, components, prescribed)
+
+
+# -- canonical classes and the integral cohomology ring (PLAN.md S7.3b) -------
+
+def _negative_multiplicities(data, components, lam):
+    """{(component index, point): number of lambda-negative weights of the
+    point along chi}"""
+    weights_of = dict(zip(data.points, data.weights))
+    pair = lambda w: sum(a * b for a, b in zip(w, lam))
+    result = {}
+    for index, (chi, points, kind) in enumerate(components):
+        for p in points:
+            along = [w for w in weights_of[p] if _multiple(w, chi) is not None]
+            result[(index, p)] = sum(1 for w in along if pair(w) < 0)
+    return result
+
+
+def morse_order(data, components, lam):
+    """the fixed points in an order in which, on every component Y of some
+    X^{ker chi}, a point comes after the points of Y with fewer lambda-negative
+    weights along chi (the order of a Morse function of an ample class; raises
+    on a cycle)"""
+    m = _negative_multiplicities(data, components, lam)
+    after = {p: set() for p in data.points}          # after[p]: points that must precede p
+    for index, (chi, points, kind) in enumerate(components):
+        for p in points:
+            for q in points:
+                if m[(index, q)] < m[(index, p)]:
+                    after[p].add(q)
+    position = {p: k for k, p in enumerate(data.points)}
+    waiting = {p: len(before) for p, before in after.items()}
+    successors = {p: [] for p in data.points}
+    for p, before in after.items():
+        for q in before:
+            successors[q].append(p)
+    import heapq
+    ready = [(position[p], p) for p, k in waiting.items() if k == 0]
+    heapq.heapify(ready)
+    order = []
+    while ready:
+        _, p = heapq.heappop(ready)
+        order.append(p)
+        for s in successors[p]:
+            waiting[s] -= 1
+            if waiting[s] == 0:
+                heapq.heappush(ready, (position[s], s))
+    if len(order) != len(data.points):
+        raise ValueError("the component relations have a cycle")
+    return order
+
+
+def _split(F, ell):
+    """(F0, F1) with F = F0 + ell F1 mod ell^2, both free of the variable that
+    restrict_to_hyperplane(ell) eliminates"""
+    F0 = F.restrict_to_hyperplane(ell)
+    rest = F - F0
+    F1 = rest.divide_by_linear(ell).restrict_to_hyperplane(ell) if not rest.is_zero() else rest
+    return F0, F1
+
+
+def _on_hyperplane(chi, ell):
+    """the linear form chi restricted to {ell = 0} (eliminating the variable
+    that restrict_to_hyperplane(ell) eliminates), as a vector"""
+    j = max(i for i, c in enumerate(ell) if c)
+    k = Fraction(chi[j], ell[j])
+    return tuple(Fraction(a) - k * b for a, b in zip(chi, ell))
+
+
+def _divide(F, factors):
+    for chi, e in factors:
+        for _ in range(e):
+            F = F.divide_by_linear(chi)
+    return F
+
+
+def _interpolate(constraints, degree, nvars):
+    """the homogeneous polynomial g of the given degree with g = L mod ell^m
+    for every (ell, m, L) (m in {1, 2}, the ell pairwise non-proportional,
+    sum m > degree), by Newton's scheme g = A + prod(ell_i^m_i) g'. Raises if
+    the constraints are inconsistent."""
+    (ell, m, L), rest = constraints[0], constraints[1:]
+    A, moduli = L, [(ell, m)]
+    for ell, m, L in rest:
+        e = degree - sum(k for _, k in moduli)
+        D0, D1 = _split(L - A, ell)
+        if e < 0:
+            if not D0.is_zero() or (m == 2 and not D1.is_zero()):
+                raise ValueError("inconsistent constraints")
+            moduli.append((ell, m))
+            continue
+        restricted = [(_on_hyperplane(chi, ell), k) for chi, k in moduli]
+        g0 = _divide(D0, restricted)
+        correction = g0
+        if m == 2:
+            P = Poly.product_of_linear([chi for chi, k in moduli for _ in range(k)], nvars)
+            P0, P1 = _split(P, ell)
+            numerator = D1 - (P1 * g0).restrict_to_hyperplane(ell)
+            if e == 0:
+                if not numerator.is_zero():
+                    raise ValueError("inconsistent constraints")
+            else:
+                correction = g0 + Poly.linear(ell) * _divide(numerator, restricted)
+        product = Poly.product_of_linear([chi for chi, k in moduli for _ in range(k)], nvars)
+        A = A + product * correction
+        moduli.append((ell, m))
+    return A
+
+
+def canonical_classes(data, components, lam, points=None, verify=True):
+    """{p: {q: Poly}}: the classes tau_p in H_T^*(X) with tau_p(p) = the
+    product of the lambda-negative weights at p and tau_p(q) = 0 for q != p
+    with codim(q) <= codim(p) (Goldin-Tolman canonical classes; the classes of
+    the closures of the plus-cells, which they characterize uniquely).
+    Points are processed in morse_order. At q, every lambda-negative weight
+    lies on a component Y of X^{ker chi} through q; for m negative weights of
+    q on Y the ring conditions give g = L mod chi^m, with L the value at an
+    earlier point of Y (m = 1) or from the sum condition of the surface
+    (m = 2). The product of these moduli is the Euler class of the negative
+    part, of degree codim(q) > codim(p), so g is unique; it is found by
+    _interpolate. With verify, every ring condition is checked at the end.
+    Such classes exist iff no plus-cell closure meets a cell of at least its
+    own dimension (then they are the closures' classes); otherwise this
+    raises. For complete conics it raises for every generic lambda."""
+    nvars = data.rank
+    weights_of = dict(zip(data.points, data.weights))
+    pair = lambda w: sum(a * b for a, b in zip(w, lam))
+    order = morse_order(data, components, lam)
+    rank_in_order = {p: k for k, p in enumerate(order)}
+    m = _negative_multiplicities(data, components, lam)
+    codim = {p: sum(1 for w in weights_of[p] if pair(w) < 0) for p in data.points}
+    at = {p: [] for p in data.points}
+    coefficients = {}
+    for index, (chi, pts, kind) in enumerate(components):
+        for p in pts:
+            at[p].append(index)
+        if kind in ("plane", "ruled"):
+            c = {}
+            for p in pts:
+                along = [w for w in weights_of[p] if _multiple(w, chi) is not None]
+                c[p] = Fraction(1, _multiple(along[0], chi) * _multiple(along[1], chi))
+            coefficients[index] = c
+    zero = Poly(nvars)
+    result = {}
+    for p in (data.points if points is None else points):
+        d = codim[p]
+        values = {}
+        for q in order:
+            if q == p:
+                values[q] = Poly.product_of_linear(
+                    [w for w in weights_of[q] if pair(w) < 0], nvars)
+                continue
+            if codim[q] <= d or rank_in_order[q] < rank_in_order[p]:
+                values[q] = zero          # before p: zero by induction (checked below)
+                continue
+            constraints = []
+            for index in at[q]:
+                k = m[(index, q)]
+                if k == 0:
+                    continue
+                chi, pts, kind = components[index]
+                if k == 1:
+                    r = next(x for x in pts if x != q and m[(index, x)] == 0)
+                    constraints.append((chi, 1, values[r]))
+                else:
+                    c = coefficients[index]
+                    L = zero
+                    for y in pts:
+                        if y != q:
+                            L = L + values[y] * Poly.constant(-c[y] / c[q], nvars)
+                    constraints.append((chi, 2, L))
+            if all(L.is_zero() for _, _, L in constraints):
+                values[q] = zero
+                continue
+            try:
+                values[q] = _interpolate(constraints, d, nvars)
+            except ValueError:
+                raise ValueError("no canonical class for %r: the closure of its plus-cell "
+                                 "meets a cell of at least its dimension (at %r)" % (p, q))
+        if verify:
+            _verify_class(values, components, coefficients)
+        result[p] = values
+    return result
+
+
+def _verify_class(values, components, coefficients):
+    for index, (chi, points, kind) in enumerate(components):
+        for q in points[1:]:
+            if not (values[q] - values[points[0]]).restrict_to_hyperplane(chi).is_zero():
+                raise ValueError("not in the ring: %r along %r" % (q, chi))
+        c = coefficients.get(index)
+        if c:
+            total = Poly(values[points[0]].nvars)
+            for p in points:
+                total = total + values[p] * Poly.constant(c[p], total.nvars)
+            j = next(i for i, x in enumerate(chi) if x)
+            if not total.restrict_to_hyperplane(chi).is_zero() or \
+                    not _derivative(total, j).restrict_to_hyperplane(chi).is_zero():
+                raise ValueError("not in the ring: the surface of direction %r" % (chi,))
+
+
+def integral_cohomology(data, components, lam, point=None):
+    """the ring H^*(X; Z) in the basis of the canonical classes (cell
+    closures): returns (order, codim, constants, pairing) with constants[(a, b)]
+    = {s: c} for tau_a tau_b = sum_s c tau_s (codim s = codim a + codim b) and
+    pairing[(a, b)] = int_X tau_a tau_b (codim a + codim b = dim X). The
+    equivariant expansion is evaluated at a rational point, where it is
+    triangular in morse_order; degree-zero coefficients are the ordinary
+    structure constants. Raises unless they are integers and the pairing is
+    unimodular in every degree."""
+    from bbcells.linalg import determinant
+    classes = canonical_classes(data, components, lam)
+    order = morse_order(data, components, lam)
+    weights_of = dict(zip(data.points, data.weights))
+    pair = lambda w: sum(a * b for a, b in zip(w, lam))
+    codim = {p: sum(1 for w in weights_of[p] if pair(w) < 0) for p in data.points}
+    if point is None:
+        point = [Fraction(3 + 7 * i, 1 + 2 * i) for i in range(data.rank)]
+    ev = lambda w: sum(Fraction(a) * b for a, b in zip(w, point))
+    euler_minus = {}
+    for q in data.points:
+        e = Fraction(1)
+        for w in weights_of[q]:
+            if pair(w) < 0:
+                e *= ev(w)
+        if e == 0:
+            raise ValueError("the evaluation point lies on a weight hyperplane")
+        euler_minus[q] = e
+    value = {p: {q: classes[p][q].evaluate(point) for q in order if not classes[p][q].is_zero()}
+             for p in data.points}
+    n = data.dim
+    constants, pairing = {}, {}
+    top = [p for p in data.points if codim[p] == n]
+    for i, a in enumerate(order):
+        for b in order[i:]:
+            if codim[a] + codim[b] > n:
+                continue
+            product = {q: value[a][q] * value[b][q] for q in value[a] if q in value[b]}
+            coefficient = {}
+            for q in order:
+                remainder = product.get(q, Fraction(0))
+                for s, c in coefficient.items():
+                    remainder -= c * value[s].get(q, 0)
+                if remainder:
+                    coefficient[q] = remainder / euler_minus[q]
+            ordinary = {s: c for s, c in coefficient.items() if codim[s] == codim[a] + codim[b]}
+            for s, c in ordinary.items():
+                if c.denominator != 1:
+                    raise ValueError("non-integral structure constant %s for %r, %r" % (c, a, b))
+            ordinary = {s: int(c) for s, c in ordinary.items()}
+            constants[(a, b)] = constants[(b, a)] = ordinary
+            if codim[a] + codim[b] == n:
+                pairing[(a, b)] = pairing[(b, a)] = sum(ordinary.get(t, 0) for t in top)
+    for k in range(n // 2 + 1):
+        rows = [p for p in order if codim[p] == k]
+        columns = [p for p in order if codim[p] == n - k]
+        matrix = [[pairing[(a, b)] for b in columns] for a in rows]
+        if len(rows) != len(columns) or abs(determinant(matrix)) != 1:
+            raise ValueError("the pairing of degrees %d and %d is not unimodular" % (k, n - k))
+    return order, codim, constants, pairing
+
+
+def volume_ring(data, classes, lam):
+    """the subalgebra of H^*(X; Q) generated by degree-one classes D_1..D_k
+    ({point: character} each), from the numbers int D^a (ABBV at lam):
+    by Poincare duality a form f of degree d vanishes iff int f g = 0 for
+    all g of degree dim X - d, so the algebra is Q[x_1..x_k]/Ann(V) with the
+    volume polynomial V = int (sum x_i D_i)^n / n! (Macaulay's inverse
+    system). Returns {"numbers": {a: int D^a}, "hilbert": [dim in degree d],
+    "relations": {d: basis of the relations of degree d, as {a: coefficient}},
+    "generators": {d: number of new relations of degree d}}. If "hilbert"
+    equals the Betti numbers, the D_i generate H^*(X; Q) and this is a
+    presentation of the ring.
+    >>> from bbcells.frontends.spherical import complete_quadrics
+    >>> from bbcells.rootsystem import RootSystem
+    >>> X = complete_quadrics(3)
+    >>> components = fixed_components(X)
+    >>> R = RootSystem("A2")
+    >>> mu, nu = (line_bundle_class(X, components, "A2",
+    ...           tuple(-2 * x for x in R.fundamental_weight(k))) for k in (0, 1))
+    >>> ring = volume_ring(X, [mu, nu], (3, 7))
+    >>> ring["hilbert"], ring["generators"]
+    ([1, 2, 3, 3, 2, 1], {3: 1, 4: 1})
+    """
+    from itertools import combinations_with_replacement
+    from bbcells.linalg import null_space, rank as matrix_rank
+    n, k = data.dim, len(classes)
+    pair = lambda w: sum(Fraction(a) * b for a, b in zip(w, lam))
+
+    def exponents(d):
+        result = []
+        for combo in combinations_with_replacement(range(k), d):
+            a = [0] * k
+            for i in combo:
+                a[i] += 1
+            result.append(tuple(a))
+        return sorted(result, reverse=True)
+
+    values = []
+    for p, weights in zip(data.points, data.weights):
+        e = Fraction(1)
+        for w in weights:
+            e *= pair(w)
+        if e == 0:
+            raise ValueError("lam is not generic")
+        values.append(([pair(c[p]) for c in classes], e))
+    numbers = {}
+    for a in exponents(n):
+        total = Fraction(0)
+        for x, e in values:
+            term = Fraction(1)
+            for xi, ai in zip(x, a):
+                if ai:
+                    term *= xi ** ai
+            total += term / e
+        if total.denominator != 1:
+            raise ValueError("non-integral intersection number %s for %r" % (total, a))
+        numbers[a] = int(total)
+    add = lambda a, b: tuple(x + y for x, y in zip(a, b))
+    hilbert, relations, generators = [], {}, {}
+    for d in range(n + 1):
+        rows, columns = exponents(d), exponents(n - d)
+        matrix = [[numbers[add(a, b)] for a in rows] for b in columns]   # f -> (int f g)_g
+        kernel = null_space(matrix, len(rows)) if matrix else []
+        hilbert.append(len(rows) - len(kernel))
+        relations[d] = [{a: c for a, c in zip(rows, v) if c} for v in kernel]
+        if kernel:
+            index = {a: i for i, a in enumerate(rows)}
+            products = []
+            for r in relations.get(d - 1, []):
+                for i in range(k):
+                    unit = tuple(int(j == i) for j in range(k))
+                    v = [Fraction(0)] * len(rows)
+                    for a, c in r.items():
+                        v[index[add(a, unit)]] += c
+                    products.append(v)
+            new = len(kernel) - (matrix_rank(products) if products else 0)
+            if new:
+                generators[d] = new
+    return {"numbers": numbers, "hilbert": hilbert, "relations": relations,
+            "generators": generators}
