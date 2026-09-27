@@ -166,8 +166,7 @@ Open research items (details in the notes): general Luna data; certificates
 for two unknowns on one orbit; a canonical integral basis beyond GKM;
 generators for complete quadrics beyond $\mathbb P^4$; toroidal varieties with
 $\Lambda\supsetneq\mathbb Z\Sigma$; real incidences of non-graded decompositions
-in dimension $\ge3$; twisted Chow–Witt groups; the combinatorial hypotheses of
-the opposition symmetry for all AIII and DIII.
+in dimension $\ge3$; twisted Chow–Witt groups.
 
 ---
 
@@ -290,7 +289,7 @@ release goes out together with the paper.
 
 ```
 done:   P1, P2, P4; P3 (a-d) written; P5 bibliography; E1-E3; R5; R6 without twist
-next:   R1 (a rule for the planes), R3 beyond P^4, R4, R2; the opposition hypotheses in general
+next:   R1 (a rule for the planes), R3 beyond P^4, R4, R2
 later:  P5 + E4 (submission and release together); R2, R3 beyond P^4, R4
 ```
 

@@ -142,8 +142,8 @@ palindromic. This certifies $c=0$ in
 all Hermitian cases we tested, including those where the
 Atiyah--Bott--Berline--Vergne identities degenerate. For inner involutions
 an automorphism built from the Chevalley involution proves $c=0$ under a
-combinatorial condition (Theorem~\ref{thm:opposition}), which holds in all
-Hermitian cases we checked, up to AIII$(p,q)$ with $p+q\le12$ and DIII(11).
+combinatorial condition (Theorem~\ref{thm:opposition}), which holds for all
+AIII$(p,q)$ and DIII$(n)$ (Proposition~\ref{prop:oppositionAD}) and for EIII.
 \item \emph{Large Euler characteristics} (Section~\ref{sec:large}).
 Streaming over cosets gives the cell counts of the complete symmetric
 varieties EI, EII, EV, EVI, EVII and EIX, up to $28\,373\,976$ fixed points.
@@ -661,16 +661,62 @@ $c\,\varepsilon(\zeta)=c\,u(\zeta)$, and $c=0$ since
 $\varepsilon(\zeta)\notin W_{L_K}\zeta$.
 \end{proof}
 
-\begin{computation}\label{comp:opposition}
+\begin{proposition}\label{prop:oppositionAD}
 The hypotheses of Theorem~\ref{thm:opposition} hold for every unknown of
-AIII$(p,q)$, $2\le p<q$, $p+q\le12$, of DIII$(n)$, $n=5,7,9,11$, and of EIII
-(\code{spherical.certify\_by\_symmetry}); all these involutions are inner. So
-$c=0$ in all these cases, in agreement with Computation~\ref{comp:certified}
-and beyond its reach.
-\end{computation}
+AIII$(p,q)$, $p<q$, and of DIII$(n)$, $n$ odd. Hence all their normal weights
+are the $W_L$-averages.
+\end{proposition}
+\begin{proof}
+Both involutions are inner. An orbit $O_K$ has $T$-fixed points if and only
+if every $\theta$-stable component of $S_\bullet\cup\supp K$ is of equal rank
+(Section~\ref{subsec:symmetric}).
 
-For the families AIII and DIII, a proof for all $p,q$ and $n$ needs only
-this combinatorial check in general, which we have not written out.
+AIII$(p,q)$, $G=PGL_n$, $n=p+q$: the black nodes are $p+1,\dots,q-1$, the
+arrows join $i$ and $n-i$ for $i\le p$, and $\varepsilon(i)=n-i$. The
+spherical roots are $\gamma_i=\alpha_i+\alpha_{n-i}$ ($i<p$) and
+$\gamma_p=\alpha_p+\dots+\alpha_q$, all $\varepsilon$-invariant. A component of
+$S_\bullet\cup\supp K$ that misses the middle is a pair of intervals exchanged
+by the arrows, of group type and not of equal rank. So the orbits with fixed
+points are those of $K_k=\{\gamma_k,\dots,\gamma_p\}$, with
+$S_{K_k}=[k,n-k]$, which is $\varepsilon$-stable, $L=GL_m$ with $m=n-2k+2$,
+and satellite of type AIII$(a,b)$, $a=p-k+1$, $b=q-k+1$. In the diagonal
+coordinates of the block, $W_H=S_a\times S_b$ and $\zeta$ is proportional to
+$(b^{(a)},(-a)^{(b)})$ (the entry $b$ repeated $a$ times, the entry $-a$
+repeated $b$ times). The involution $\varepsilon$ acts on the block by
+$d_i\mapsto -d_{m+1-i}$, so $\varepsilon(\zeta)$ is proportional to
+$(a^{(b)},(-b)^{(a)})$. As $W_L=S_m$ permutes the entries, $\varepsilon(\zeta)\in
+W_L\zeta$ if and only if $a=b$, i.e.\ $p=q$.
+
+DIII$(n)$, $n$ odd, $G=PSO_{2n}$: the black nodes are $1,3,\dots,n-2$, the arrow
+joins the two end nodes $n-1$ and $n$, and $\varepsilon$ exchanges them. The
+spherical roots $\gamma_i=\alpha_{2i-1}+2\alpha_{2i}+\alpha_{2i+1}$ and the last
+one, $\alpha_{n-2}+\alpha_{n-1}+\alpha_n$, are $\varepsilon$-invariant. A
+component missing the end nodes is of type A with black nodes at the odd
+positions (type AII, not of equal rank), so the orbits with fixed points are
+those of the tails $K_k$ of the spherical roots. Then $S_{K_k}$ consists of
+black nodes and the block $D_{n'}$ on the nodes $2k-1,\dots,n$, with $n'$
+odd and satellite DIII$(n')$. In the coordinates $e_{2k-1},\dots,e_n$ of the
+block, $\zeta$ spans the centre of $\mathfrak u(n')$, so it is proportional to a
+vector with all entries $\pm1$ (a weight of a half-spin representation), and
+$\varepsilon$ changes the sign of the last coordinate, hence the parity of the
+number of entries $-1$. $W(D_{n'})$ preserves this parity, and the
+reflections of the black nodes outside the block fix these coordinates, so
+$\varepsilon(\zeta)\notin W_L\zeta$.
+
+In both cases $\varepsilon$ fixes every spherical root, so it fixes $\gamma$,
+$K$ and $S_K$.
+\end{proof}
+
+\begin{computation}\label{comp:opposition}
+Among all complete symmetric varieties of the classical types up to rank $9$
+and all exceptional ones, unknowns beyond \textup{(R)} occur only for
+AIII$(p,q)$ with $2\le p<q$, DIII$(n)$ with $n$ odd, and EIII; the hypotheses of
+Theorem~\ref{thm:opposition} hold for EIII as well
+(\code{spherical.certify\_by\_symmetry}). This agrees with
+Computation~\ref{comp:certified}. The three families are the Hermitian
+symmetric spaces not of tube type, for which the component group of $H$
+does not negate the centre $\zeta$; for the others it does and (R) holds.
+\end{computation}
 
 % ===========================================================================
 \section{Cell counts without listing fixed points}\label{sec:large}
@@ -1209,9 +1255,10 @@ computations are reproduced by \code{paper/reproduce.py}.
 \item \emph{General Luna data.} Wonderful varieties whose satellites are not
 symmetric, starting with Wasserman's rank-two list \cite{Wasserman} and the
 primitive spherical systems of Bravi--Pezzini \cite{BravPez,BravPezPrimitive}.
-\item \emph{The hypotheses of Theorem~\ref{thm:opposition}} for all
-AIII$(p,q)$ and DIII$(n)$; normal weights beyond (R) for spherical varieties
-that are not symmetric, and certificates for two unknowns on one orbit.
+\item \emph{Normal weights beyond (R) for spherical varieties that are not
+symmetric}, and certificates for two unknowns on one orbit; a proof that
+unknowns beyond (R) occur only in the three families of
+Computation~\ref{comp:opposition}.
 \item \emph{The number of quadrics in $\PP^5$ tangent to $20$ general quadrics}
 (Remark after Computation~\ref{comp:characteristic}).
 \item \emph{An integral basis} of $H^*(X;\ZZ)$ adapted to the cells when
