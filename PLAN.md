@@ -236,9 +236,11 @@ release goes out together with the paper.
   e.g. $SL_n/SO_n$: fixed points over the wonderful model with the
   multiplicities of the finite covers. Oracle: point counts of the
   homogeneous spaces and branched-cover Euler characteristics.
-- [ ] **R5 EVIII.** The cell counts from the orbit decomposition (Brion–Peyre
-  and fibration formulas, cheap), and a BB confirmation on a random sample
-  of cosets, since a full BB run needs about $10^9$ fixed points.
+- [x] **R5 EVIII.** The cell counts from the orbit decomposition
+  (`symmetric.split_cell_counts`, `spherical.md` §10): 9297296775 cells in
+  dimension 128, palindromic, $\chi$ checked against $\sum|W|/|W_H|$; the
+  method agrees exactly with the streamed counts for ten split forms up to
+  $E_7$. Open: the decomposition for non-split forms.
 - [ ] **R6 Chow–Witt output** (`real.md` §7). Done without twist:
   $\widetilde{CH}^q = CH^q\times_{\mathrm{Ch}^q}H^q(X(\mathbb R);\mathbb Z)$ for flag and
   toric varieties (`bbcells.chowwitt`, `--chow-witt`). Open: twisted

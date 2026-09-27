@@ -10,6 +10,7 @@ Command line interface.
     python3 -m bbcells spherical complete-quadrics 5
     python3 -m bbcells symmetric AIII 2 3
     python3 -m bbcells symmetric AIII 2 5 --certify symmetry
+    python3 -m bbcells symmetric EVIII --counts-only --method orbits --processes 4
     python3 -m bbcells real A3 --parabolic 2
     python3 -m bbcells real-toric --named P1xF1
     python3 -m bbcells flag A3 --real-prediction
@@ -106,7 +107,13 @@ def _run_symmetric_counts(args):
     import json
     from bbcells.frontends import symmetric
     from bbcells.invariants import Invariants
-    counts = symmetric.cell_counts(args.kind, *args.parameters, processes=args.processes)
+    if args.method == "orbits":
+        D = symmetric.diagram(args.kind, *args.parameters)
+        if D.black or any(D.eps[i] != i for i in D.white):
+            raise ValueError("--method orbits needs a split form (no black nodes, no arrows)")
+        counts = symmetric.split_cell_counts(D.R.name, processes=args.processes)
+    else:
+        counts = symmetric.cell_counts(args.kind, *args.parameters, processes=args.processes)
     inv = Invariants(len(counts) - 1, counts)
     if args.format == "json":
         print(json.dumps({"name": "complete symmetric variety %s%s" % (args.kind, tuple(args.parameters)),
@@ -396,6 +403,9 @@ def build_parser():
                         "opposition symmetry, or by point counts of orbit closures")
     p.add_argument("--processes", type=int, default=1,
                    help="with --counts-only: count the orbits in this many processes")
+    p.add_argument("--method", choices=("stream", "orbits"), default="stream",
+                   help="with --counts-only: stream over the fixed points, or (split forms "
+                        "only) sum over the orbits with Brion-Peyre counts (EVIII)")
     p.add_argument("--counts-only", action="store_true",
                    help="stream the cell counts without listing fixed points (large E7/E8 cases)")
     _add_common(p)

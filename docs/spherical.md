@@ -487,6 +487,7 @@ Results (dimension, number of fixed points, time):
 | EVI | 64 | 758079 | 48 s |
 | EV | 70 | 28373976 | 30 min |
 | EIX ($E_8$) | 112 | 7445880 | 13 min |
+| EVIII ($E_8$) | 128 | 9297296775 | 3 min (orbit decomposition, below) |
 
 For example, EVI has cell counts
 1, 4, 11, 26, 54, 105, 189, 321, 516, 794, 1176, …, 33607, 33805, 33607, …, 1.
@@ -509,7 +510,12 @@ $$E(X)=\sum_{I\subseteq S}|G/P_I|(q)\;e(I),\qquad e(I)=\prod_{\text{factors }F\t
 - EVIII ($E_8/\mathrm{Spin}_{16}$, dimension 128) needs only the complete
   symmetric varieties of the Levi factors $A_2,\dots,A_7$, $D_5$, $D_7$ and
   $E_6$ whose split symmetric spaces have smaller rank; its closed orbit alone
-  has $|W(E_8)|=696729600$ fixed points.
+  has $|W(E_8)|=696729600$ fixed points. Result (3 min on 4 cores): 9297296775
+  cells, palindromic, with counts 1, 8, 36, 126, 372, 970, 2286, 4952, 9984,
+  18924, …, 240696815, 241169479, 240696815, …, 1. The Euler characteristic
+  agrees with $\sum|W|/|W_H|$ over the 64 orbits with fixed points. The
+  satellite $E_8/\mathrm{HalfSpin}_{16}$ has $W_H=W(D_8)$; its Brion–Peyre count
+  uses the degrees of $W_H$ instead of listing its 5160960 elements.
 
 ## 11. Open problems
 

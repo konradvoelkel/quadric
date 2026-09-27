@@ -95,6 +95,12 @@ class TestGolden(unittest.TestCase):
         code, out, err = run_cli("symmetric", "G", "--counts-only", "--format", "json")
         self.assertEqual(code, 0, err)
         self.assertEqual(json.loads(out)["counts"], [1, 2, 4, 4, 5, 4, 4, 2, 1])
+        code, out, err = run_cli("symmetric", "G", "--counts-only", "--method", "orbits",
+                                 "--format", "json")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(json.loads(out)["counts"], [1, 2, 4, 4, 5, 4, 4, 2, 1])
+        code, out, err = run_cli("symmetric", "AIII", "2", "3", "--counts-only", "--method", "orbits")
+        self.assertEqual(code, 2)
 
     def test_cli_toroidal_fan(self):
         import tempfile

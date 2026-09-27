@@ -170,6 +170,36 @@ for _kind, _value in LARGE.items():
     claim("comp:large/" + _kind, _value, slow=_kind != "EVII")(lambda kind=_kind: large(kind))
 
 
+@claim("comp:eviii", (128, 9297296775, True, [1, 8, 36, 126, 372, 970, 2286, 4952, 9984, 18924],
+                      241169479), slow=True)
+def _():
+    counts = symmetric.split_cell_counts("E8", processes=os.cpu_count() or 1)
+    return (len(counts) - 1, sum(counts), counts == counts[::-1], list(counts[:10]),
+            counts[len(counts) // 2])
+
+
+@claim("comp:eviii/orbits", 9297296775, slow=True)
+def _():
+    # the Euler characteristic as sum |W| / |W_H| over the orbits with fixed points
+    D = symmetric.diagram("EVIII")
+    R = RootSystem("E8")
+    total = 0
+    for o in D.orbits(strict=False):
+        reflections = list(o.generators) + list(o.component_reflections)
+        phi = spherical.root_subsystem(R, reflections) if reflections else set()
+        degrees, _ = spherical._subsystem_degrees(R, phi) if phi else ([], 0)
+        order = math.prod(degrees)
+        if o.component_elements:
+            order *= spherical._component_group_order(R, reflections, o.component_elements)
+        total += math.prod(R.degrees) // order
+    return total
+
+
+@claim("comp:split/E7", True, slow=True)
+def _():
+    return symmetric.split_cell_counts("E7") == cell_counts("EV")
+
+
 @claim("comp:large/EVII-counts", [1, 3, 7, 12, 19, 29, 44, 63, 87, 117, 155, 198, 248, 303, 366,
                                    432, 503, 575, 652, 724, 795, 858, 920, 970, 1013, 1041,
                                    1063, 1068])
