@@ -252,12 +252,12 @@ release goes out together with the paper.
 - [ ] **E3 Performance.** Modular arithmetic with rational reconstruction in
   `brion.volume_ring` and `canonical_classes` (complete quadrics in
   $\mathbb P^4$ take 33 min now); `multiprocessing` for the streaming counts.
-- [ ] **E4 Release 0.1.** License, version, changelog, `CITATION.cff`, tag,
+- [ ] **E4 Release 0.1.** Version, changelog, `CITATION.cff`, tag,
   and an archived copy with a DOI for the paper.
 
 ### 4.4 Decisions for KV
 
-- **License.** The repository has none yet; E4 needs one.
+- **License:** decided, GPL-3.0-only (`LICENSE`, `pyproject.toml`).
 - **Paper scope.** One paper (methods, software and results), or a software
   paper plus a separate research note on the real incidences (Track R1).
 - **Authorship and venue** of the paper (P5).

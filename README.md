@@ -64,3 +64,17 @@ The package `bbcells/` needs only Python ≥ 3.10 and its standard library.
 
 `quadric.py` is kept unchanged as the original script and serves as a
 regression oracle for the quadric front end.
+
+## How this was made
+
+Everything except `quadric.py` and the first section of this README (both
+from 2014) is 100% vibe coded: the package `bbcells/`, its tests and tools,
+the documentation, and the draft of the companion paper were written by
+[Claude Code](https://claude.com/claude-code), directed by prompts and
+without code written by hand. Correctness rests on the oracle tests;
+statements in `docs/` and `paper/` are labelled as proved, observed or
+conjectured accordingly.
+
+## License
+
+GNU General Public License, version 3 (GPL-3.0-only); see [LICENSE](LICENSE).
