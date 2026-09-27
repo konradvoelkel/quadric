@@ -472,15 +472,13 @@ def generated(n, classes):
                 e[j] += e[j - 1] * x
         return e[d]
     extra, degrees = [], [1] * (n - 1)
-    classes_degree = {(kind, k): d for kind, k, *rest in classes for d in rest}
-    classes = [(kind, k) for kind, k, *rest in classes]
-    for kind, k in classes:
+    for kind, k, *rest in classes:
         if kind == "c":
             extra.append({p: elementary([pair(w) for w in ws], k)
                           for p, ws in zip(X.points, X.weights)})
             degrees.append(k)
         else:
-            d = classes_degree.get((kind, k), 2)
+            d = rest[0] if rest else 2
             extra.append(brion.boundary_class(X, mu, k, d, lam))
             degrees.append(d + 1)
     values = {p: [pair(c[p]) for c in mu] + [e[p] for e in extra] for p in X.points}
