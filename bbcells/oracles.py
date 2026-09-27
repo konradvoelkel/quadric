@@ -538,3 +538,78 @@ def brion_peyre(group, dim, degrees):
     for k in range(dim + 1):
         E[dim - k] = int(coefficients[k])
     return IntPoly(tuple(E))
+
+
+def _weyl_dimension_sl(b):
+    """dim V(sum b_k omega_k) for sl_{n+1}, n = len(b) (Weyl's formula)"""
+    s = [0]
+    for x in b:
+        s.append(s[-1] + x + 1)
+    numerator = denominator = 1
+    for i in range(len(s)):
+        for j in range(i + 1, len(s)):
+            numerator *= s[j] - s[i]
+            denominator *= j - i
+    return numerator // denominator
+
+
+def complete_quadrics_sections(n, coefficients, m):
+    """dim H^0(X, L^m) for complete quadrics X in P^{n-1} and L = sum_k a_k mu_k
+    (mu_k the pullback of O(1) from P(Sym^2 Lambda^k V), k = 1..n-1), by De
+    Concini-Procesi: H^0(X, L_lambda) is the sum of the V(mu)^* over the
+    dominant mu with lambda - mu in N{2 alpha_i}; here lambda = 2 sum a_k omega_k
+    times m. So the sum runs over c in N^{n-1} with b = m a - A c >= 0 (A the
+    Cartan matrix of A_{n-1}), of dim V(2b).
+    >>> [complete_quadrics_sections(2, (1,), m) for m in range(4)]   # P^2 = P(Sym^2 k^2)
+    [1, 3, 6, 10]
+    """
+    r = n - 1
+    a = [m * x for x in coefficients]
+    if len(a) != r or any(x < 0 for x in a):
+        raise ValueError("need %d non-negative coefficients" % r)
+    total = 0
+    c = [0] * (r + 2)                      # c[0] = c[r+1] = 0
+
+    def b(k):                              # the k-th entry of m a - A c, 1 <= k <= r
+        return a[k - 1] - (2 * c[k] - c[k - 1] - c[k + 1])
+
+    def descend(k):
+        nonlocal total
+        if k > r:
+            if b(r) >= 0:
+                total += _weyl_dimension_sl([2 * b(j) for j in range(1, r + 1)])
+            return
+        # choosing c_k fixes the constraint b(k-1) >= 0: c_k >= 2c_{k-1} - c_{k-2} - a_{k-1}
+        low = max(0, 2 * c[k - 1] - c[k - 2] - a[k - 2]) if k >= 2 else 0
+        # and b(k) >= 0 with c_{k+1} <= bound[k+1]
+        high = (a[k - 1] + c[k - 1] + bound[k + 1]) // 2
+        for value in range(low, high + 1):
+            c[k] = value
+            descend(k + 1)
+        c[k] = 0
+
+    # c <= A^{-1} (m a) entrywise (A^{-1} has positive entries), as integers
+    bound = [0] * (r + 2)
+    for k in range(1, r + 1):
+        bound[k] = sum(min(k, j) * (r + 1 - max(k, j)) * a[j - 1] for j in range(1, r + 1)) // (r + 1)
+    descend(1)
+    return total
+
+
+def complete_quadrics_degree(n, coefficients):
+    """int_X L^N for complete quadrics X in P^{n-1} (N = dim X) and L = sum_k
+    a_k mu_k, with the a_k >= 0: the N-th finite difference of the Hilbert
+    function m -> dim H^0(X, L^m) at m = 0..N (complete_quadrics_sections),
+    which is a polynomial of degree at most N in m. Independent of fixed
+    points: De Concini-Procesi, Weyl's dimension formula and exact
+    interpolation only (a third computation of the P^5 number, PLAN P4).
+    >>> complete_quadrics_degree(3, (2, 2))            # Chasles: 3264 conics
+    3264
+    >>> complete_quadrics_degree(4, (2, 2, 2))         # Schubert: quadric surfaces
+    666841088
+    """
+    N = n * (n + 1) // 2 - 1
+    values = [complete_quadrics_sections(n, coefficients, m) for m in range(N + 1)]
+    for _ in range(N):
+        values = [y - x for x, y in zip(values, values[1:])]
+    return values[0]

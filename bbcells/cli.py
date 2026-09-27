@@ -9,7 +9,11 @@ Command line interface.
     python3 -m bbcells two-orbit HP 2
     python3 -m bbcells spherical complete-quadrics 5
     python3 -m bbcells symmetric AIII 2 3
+    python3 -m bbcells symmetric AIII 2 5 --certify symmetry
     python3 -m bbcells real A3 --parabolic 2
+    python3 -m bbcells real-toric --named P1xF1
+    python3 -m bbcells flag A3 --real-prediction
+    python3 -m bbcells characteristic 3 --tangency     # 3264 conics
     python3 -m bbcells toric fan.json --cocharacter 1,5,25 --format latex
     python3 -m bbcells raw fixed_points.json --format json
 """
@@ -195,6 +199,99 @@ def _run_real(args):
     return 0
 
 
+def _run_symmetric_certify(args):
+    """how the normal weights beyond condition (R) are decided"""
+    import json
+    from bbcells.frontends import spherical, symmetric
+    D = symmetric.diagram(args.kind, *args.parameters)
+    orbits = D.orbits(strict=False)
+    unknowns = sorted((o.name, g) for o in orbits if o.note == spherical.BEYOND_R
+                      for g in o.normal_roots)
+    if args.certify == "symmetry":
+        decided = spherical.certify_by_symmetry(D.R.name, orbits, D.spherical_roots)
+        methods = {u: ("opposition symmetry", ()) for u in decided}
+    else:
+        methods = {}
+        decided = spherical.certify_by_closures(D.R.name, orbits, methods=methods)
+    rows = [{"orbit": name, "spherical_root": gamma,
+             "admissible_c": decided.get((name, gamma)),
+             "method": methods.get((name, gamma), ("undecided", ()))[0],
+             "closure": list(methods.get((name, gamma), (None, ()))[1])}
+            for name, gamma in unknowns]
+    if args.format == "json":
+        print(json.dumps({"name": D.name, "unknowns": rows}, indent=1))
+        return 0
+    if not rows:
+        print("%s: condition (R) holds, no unknown normal weights" % D.name)
+        return 0
+    print("%s: %d unknown normal weight%s beyond condition (R), chi = pr(-gamma) + c zeta"
+          % (D.name, len(rows), "" if len(rows) == 1 else "s"))
+    for row in rows:
+        where = " on the closure %s" % row["closure"] if row["closure"] else ""
+        print("  orbit %s, gamma_%d: c in %s (%s%s)" % (row["orbit"], row["spherical_root"],
+                                                      row["admissible_c"], row["method"], where))
+    return 0
+
+
+def _run_characteristic(args):
+    from bbcells import brion, oracles
+    n = args.n
+    if n < 2:
+        raise ValueError("n must be at least 2 (complete quadrics in P^{n-1})")
+    given = [x is not None for x in (args.monomial, args.divisor)] + [args.tangency]
+    if sum(given) != 1:
+        raise ValueError("give exactly one of --monomial, --divisor, --tangency")
+    coefficients = (2,) * (n - 1) if args.tangency else args.divisor
+    if args.method == "sections":
+        if coefficients is None:
+            raise ValueError("--method sections needs --divisor or --tangency")
+        if len(coefficients) != n - 1:
+            raise ValueError("need %d coefficients" % (n - 1))
+        value = oracles.complete_quadrics_degree(n, coefficients)
+    else:
+        value = brion.characteristic_number(n, exponents=args.monomial,
+                                            coefficients=coefficients)
+    print(value)
+    return 0
+
+
+def _run_real_toric(args):
+    import json
+    from bbcells.frontends import toric
+    from bbcells.realtoric import RealToricComplex
+    if (args.file is None) == (args.named is None):
+        raise ValueError("give either a fan file or --named")
+    fan = toric.load(args.file) if args.file else _named_fan(args.named)
+    cells = bb_cells(toric.fixed_point_data(fan), args.cocharacter)
+    X = RealToricComplex(fan, cells.cocharacter)
+    homology, betti = X.integral_homology(), X.betti()
+    if args.format == "json":
+        print(json.dumps({"name": fan.name, "cocharacter": list(cells.cocharacter),
+                          "incidences": [[x, y, v] for (x, y), v in sorted(X.incidences().items())],
+                          "homology": homology, "rational_betti": betti}, indent=1))
+        return 0
+    print("%s(R): exact real BB incidences (discrete Morse theory), cocharacter %s"
+          % (fan.name, ",".join(map(str, cells.cocharacter))))
+    for d, summands in enumerate(homology):
+        free = summands.count(0)
+        parts = (["Z^%d" % free if free > 1 else "Z"] if free else []) + \
+                ["Z/%d" % t for t in summands if t]
+        print("  H_%d = %s" % (d, " + ".join(parts) if parts else "0"))
+    print("  rational Betti numbers: %s" % ", ".join(map(str, betti)))
+    return 0
+
+
+def _real_prediction(data, cells):
+    """(rule, set of rational Betti vectors of X(R)) under hypothesis H1"""
+    from bbcells import brion, h1
+    try:
+        return "the GKM rule", h1.real_prediction(cells)
+    except (TypeError, KeyError):
+        pass
+    curves = brion.with_invariant_curves(data)
+    return "the rule on the Brion curves", h1.brion_prediction(bb_cells(curves, cells.cocharacter))
+
+
 def _data_raw(args):
     from bbcells.frontends import raw
     return raw.load(args.file)
@@ -207,6 +304,9 @@ def _add_common(parser):
     parser.add_argument("--format", choices=("text", "latex", "json"), default="text")
     parser.add_argument("--weights", action="store_true",
                         help="show tangent weights and their signs (text format)")
+    parser.add_argument("--real-prediction", action="store_true",
+                        help="also print the rational Betti numbers of X(R) predicted under "
+                             "hypothesis H1 (experimental; graded decompositions only)")
     parser.add_argument("--no-check", action="store_true",
                         help="skip the consistency checks")
 
@@ -270,6 +370,9 @@ def build_parser():
     p.add_argument("--fan", help="JSON {\"cones\": [...]}: a smooth fan subdividing the valuation "
                    "cone, rays in the coordinates <gamma_i, n> (all <= 0); gives the toroidal "
                    "variety over the complete symmetric variety")
+    p.add_argument("--certify", choices=("symmetry", "points"), default=None,
+                   help="show how the normal weights beyond condition (R) are decided: by the "
+                        "opposition symmetry, or by point counts of orbit closures")
     p.add_argument("--counts-only", action="store_true",
                    help="stream the cell counts without listing fixed points (large E7/E8 cases)")
     _add_common(p)
@@ -288,6 +391,28 @@ def build_parser():
     p.add_argument("--parabolic", type=_parse_vector, default=None)
     p.add_argument("--format", choices=("text", "json"), default="text")
     p.set_defaults(run=_run_real)
+
+    p = commands.add_parser("real-toric",
+                            help="H_*(X(R); Z) of a smooth complete toric variety, exactly")
+    p.add_argument("file", nargs="?", help="fan as JSON")
+    p.add_argument("--named", help="P<n>, F<a>, dP6, or products like P1xF2")
+    p.add_argument("--cocharacter", type=_parse_vector, default=None)
+    p.add_argument("--format", choices=("text", "json"), default="text")
+    p.set_defaults(run=_run_real_toric)
+
+    p = commands.add_parser("characteristic",
+                            help="characteristic numbers of complete quadrics in P^{n-1}")
+    p.add_argument("n", type=int, help="size of the symmetric matrices (3: conics)")
+    p.add_argument("--monomial", type=_parse_vector, default=None,
+                   help="exponents e_1,...,e_{n-1}: the integral of prod mu_k^e_k")
+    p.add_argument("--divisor", type=_parse_vector, default=None,
+                   help="coefficients a_1,...,a_{n-1}: the integral of (sum a_k mu_k)^dim")
+    p.add_argument("--tangency", action="store_true",
+                   help="the number of quadrics tangent to dim general quadrics")
+    p.add_argument("--method", choices=("localization", "sections"), default="localization",
+                   help="localization at the fixed points, or the Hilbert function of "
+                        "De Concini-Procesi (independent, slower)")
+    p.set_defaults(run=_run_characteristic)
 
     p = commands.add_parser("raw", help="fixed points and tangent weights as JSON")
     p.add_argument("file")
@@ -314,12 +439,20 @@ def main(argv=None):
     try:
         if hasattr(args, "run"):
             return args.run(args)
+        if getattr(args, "certify", None):
+            return _run_symmetric_certify(args)
         if getattr(args, "counts_only", False):
             return _run_symmetric_counts(args)
         data = args.build(args)
         cells = bb_cells(data, args.cocharacter)
+        prediction = _real_prediction(data, cells) if args.real_prediction else None
     except (ValueError, OSError) as error:
         print("bbcells: error: %s" % error, file=sys.stderr)
         return 2
     print(render(cells, args.format, show_weights=args.weights, checks=not args.no_check))
+    if prediction is not None:
+        rule, bettis = prediction
+        print("real points, predicted by %s (conditional on H1, experimental):" % rule)
+        for betti in sorted(bettis):
+            print("  rational Betti numbers of X(R): %s" % ", ".join(map(str, betti)))
     return 0

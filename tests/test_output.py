@@ -113,6 +113,32 @@ class TestGolden(unittest.TestCase):
         code, out, err = run_cli("real", "C3")
         self.assertIn("H^9 = Z", out)
 
+    def test_cli_certify(self):
+        code, out, err = run_cli("symmetric", "AIII", "2", "5", "--certify", "symmetry")
+        self.assertEqual(code, 0, err)
+        self.assertIn("orbit O2, gamma_0: c in [0] (opposition symmetry)", out)
+        code, out, err = run_cli("symmetric", "AIII", "2", "3", "--certify", "points",
+                                 "--format", "json")
+        self.assertEqual(code, 0, err)
+        (row,) = json.loads(out)["unknowns"]
+        self.assertEqual((row["admissible_c"], row["method"]), ([0], "point count"))
+
+    def test_cli_characteristic(self):
+        self.assertEqual(run_cli("characteristic", "3", "--tangency")[1], "3264\n")
+        self.assertEqual(run_cli("characteristic", "3", "--tangency", "--method",
+                                 "sections")[1], "3264\n")
+        self.assertEqual(run_cli("characteristic", "4", "--monomial", "2,5,2")[1], "128\n")
+        code, out, err = run_cli("characteristic", "3", "--monomial", "1,1")
+        self.assertEqual(code, 2)
+
+    def test_cli_real_toric_and_prediction(self):
+        code, out, err = run_cli("real-toric", "--named", "P2")
+        self.assertEqual(code, 0, err)
+        self.assertIn("H_1 = Z/2", out)
+        code, out, err = run_cli("flag", "A2", "--real-prediction", "--no-check")
+        self.assertEqual(code, 0, err)
+        self.assertIn("rational Betti numbers of X(R): 1, 0, 0, 1", out)
+
     def test_cli_errors_are_reported(self):
         code, out, err = run_cli("toric", "--named", "P2", "--cocharacter", "1,1")
         self.assertEqual(code, 2)

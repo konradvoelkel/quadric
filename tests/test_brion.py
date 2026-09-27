@@ -93,6 +93,23 @@ class TestCharacteristicNumbers(unittest.TestCase):
         self.assertEqual(brion.integrate_monomial(X, [classes[1]], [14], lam), 7703)
 
 
+class TestCharacteristicNumbersBySections(unittest.TestCase):
+    """the same numbers without fixed points: De Concini-Procesi's decomposition
+    of H^0(X, L^m), Weyl's dimension formula and exact interpolation"""
+
+    def test_agree_with_localization(self):
+        from bbcells import oracles
+        for n, coefficients in [(3, (1, 0)), (3, (1, 1)), (3, (2, 3)), (4, (1, 2, 1)),
+                                (4, (0, 1, 0))]:
+            self.assertEqual(oracles.complete_quadrics_degree(n, coefficients),
+                             brion.characteristic_number(n, coefficients=coefficients),
+                             (n, coefficients))
+
+    def test_quadric_threefolds(self):
+        from bbcells import oracles
+        self.assertEqual(oracles.complete_quadrics_degree(5, (2, 2, 2, 2)), 48942189946470400)
+
+
 class TestCanonicalClasses(unittest.TestCase):
     """Goldin-Tolman classes by interpolation over Brion components"""
 

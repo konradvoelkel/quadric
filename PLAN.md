@@ -246,9 +246,11 @@ release goes out together with the paper.
 - [ ] **E1 API pass.** Doctests for every public function (rule 5); mark
   experimental functions (`h1.surface_prediction`, `h1.brion_prediction`,
   `brion.volume_ring`) as such in their docstrings and in the README.
-- [ ] **E2 Command line** for the new features: certificates
-  (`symmetric … --certify`), characteristic numbers, `real --toric` with
-  exact incidences, and real predictions beyond GKM.
+- [x] **E2 Command line** for the new features: `symmetric … --certify
+  symmetry|points`, `characteristic n --monomial|--divisor|--tangency
+  [--method sections]`, `real-toric`, and `--real-prediction` on every data
+  command (GKM rule, else the rule on the Brion curves; experimental).
+
 - [ ] **E3 Performance.** Modular arithmetic with rational reconstruction in
   `brion.volume_ring` and `canonical_classes` (complete quadrics in
   $\mathbb P^4$ take 33 min now); `multiprocessing` for the streaming counts.

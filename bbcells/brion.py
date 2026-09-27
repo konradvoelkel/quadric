@@ -390,6 +390,54 @@ def line_bundle_class(data, components, cartan_type, weight, orbit="closed"):
     return degree_one_class(data, components, prescribed)
 
 
+def complete_quadric_colours(n):
+    """(X, [mu_1, ..., mu_{n-1}]): the fixed-point data of complete quadrics in
+    P^{n-1} and the equivariant classes of the colours mu_k, the pullbacks of
+    O(1) from P(Sym^2 Lambda^k V)
+    >>> X, (mu, nu) = complete_quadric_colours(3)
+    >>> len(X), integrate_monomial(X, [mu, nu], [2, 3], (3, 7))
+    (12, Fraction(4, 1))
+    """
+    from bbcells.frontends.spherical import complete_quadrics
+    from bbcells.rootsystem import RootSystem
+    X = complete_quadrics(n)
+    cartan_type = "A%d" % (n - 1)
+    R = RootSystem(cartan_type)
+    components = fixed_components(X)
+    return X, [line_bundle_class(X, components, cartan_type,
+                                 tuple(-2 * x for x in R.fundamental_weight(k)))
+               for k in range(R.rank)]
+
+
+def characteristic_number(n, exponents=None, coefficients=None, lam=None):
+    """a characteristic number of complete quadrics in P^{n-1}: the integral
+    of prod mu_k^{e_k} (exponents), or of (sum a_k mu_k)^N (coefficients), by
+    localization at a generic cocharacter; checked to be an integer.
+    >>> characteristic_number(3, coefficients=(2, 2))       # Chasles
+    3264
+    >>> characteristic_number(4, exponents=(3, 3, 3))       # Schubert's triangle
+    104
+    """
+    X, mu = complete_quadric_colours(n)
+    if lam is None:
+        lam = tuple(7 ** (k + 1) + 3 * k for k in range(n - 1))
+    if exponents is not None:
+        if len(exponents) != n - 1 or sum(exponents) != X.dim:
+            raise ValueError("need %d exponents with sum %d" % (n - 1, X.dim))
+        value = integrate_monomial(X, mu, exponents, lam)
+    elif coefficients is not None:
+        if len(coefficients) != n - 1:
+            raise ValueError("need %d coefficients" % (n - 1))
+        L = {p: tuple(sum(a * c[p][i] for a, c in zip(coefficients, mu))
+                      for i in range(n - 1)) for p in X.points}
+        value = integrate_monomial(X, [L], [X.dim], lam)
+    else:
+        raise ValueError("give exponents or coefficients")
+    if value.denominator != 1:
+        raise ValueError("the cocharacter %r is not generic" % (lam,))
+    return int(value)
+
+
 # -- canonical classes and the integral cohomology ring (PLAN.md S7.3b) -------
 
 def _negative_multiplicities(data, components, lam):
