@@ -495,6 +495,27 @@
     "abstract": "In this paper we prove a new formula for the coefficients of the cellular homology of real flag manifolds in terms of the height of certain roots. In particular, for flag manifolds of type A, we get a very simple formula for these coefficients and an explicit expression for the first and second homology groups with integer coefficients.",
     "metadata_source": "abs-page"
   },
+  "2011.08791": {
+    "id": "2011.08791",
+    "latest_version": "2011.08791v2",
+    "title": "Complete quadrics: Schubert calculus for Gaussian models and semidefinite programming",
+    "authors": [
+      "Laurent Manivel",
+      "Mateusz Michałek",
+      "Leonid Monin",
+      "Tim Seynnaeve",
+      "Martin Vodička"
+    ],
+    "published": "Tue, 17 Nov 2020",
+    "updated": "Fri, 27 Nov 2020",
+    "journal_ref": null,
+    "doi": null,
+    "primary_category": null,
+    "msc_classes": "Primary: 62R01, 14M17, 14N10, Secondary: 05E05, 14C17, 14E05, 14M15, 14Q15, 60G15",
+    "comments": "35 pages, comments welcome",
+    "abstract": "We establish connections between: the maximum likelihood degree (ML-degree) for linear concentration models, the algebraic degree of semidefinite programming (SDP), and Schubert calculus for complete quadrics. We prove a conjecture by Sturmfels and Uhler on the polynomiality of the ML-degree. We also prove a conjecture by Nie, Ranestad and Sturmfels providing an explicit formula for the degree of SDP. The interactions between the three fields shed new light on the asymptotic behaviour of enumerative invariants for the variety of complete quadrics. We also extend these results to spaces of general matrices and of skew-symmetric matrices.",
+    "metadata_source": "abs-page"
+  },
   "2302.11003": {
     "id": "2302.11003",
     "latest_version": "2302.11003v2",
