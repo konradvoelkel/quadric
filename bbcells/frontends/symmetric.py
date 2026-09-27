@@ -209,17 +209,23 @@ class SatakeDiagram(object):
 
     def fixed_point_data(self, strict=False, certify=True):
         """the fixed-point data. Orbits beyond condition (R) (Hermitian
-        satellites) get the W_L-average as normal weights. This is certified
-        by spherical.certify_by_closures when the point counts (or the
-        localization identities) of orbit closures bound the unknowns (the
-        orbits are then marked CERTIFIED), and
-        otherwise accepted only if the result passes all checks (cocharacter
-        independence, holomorphic Lefschetz, Poincare duality)."""
+        satellites) get the W_L-average as normal weights. This is proved by
+        the opposition symmetry (spherical.certify_by_symmetry) when it
+        decides every unknown, else certified by spherical.certify_by_closures
+        when the point counts (or the localization identities) of orbit
+        closures bound the unknowns (the orbits are then marked CERTIFIED),
+        and otherwise accepted only if the result passes all checks
+        (cocharacter independence, holomorphic Lefschetz, Poincare duality)."""
         from dataclasses import replace
         orbits = self.orbits(strict)
         if any(orbit.note for orbit in orbits):
             certified = False
-            if certify:
+            unknowns = {(o.name, g) for o in orbits if o.note == spherical.BEYOND_R
+                        for g in o.normal_roots}
+            if certify and set(spherical.certify_by_symmetry(
+                    self.R.name, orbits, self.spherical_roots)) == unknowns:
+                certified = True
+            elif certify:
                 try:
                     admissible = spherical.certify_by_closures(self.R.name, orbits)
                 except ValueError as error:
@@ -245,8 +251,8 @@ class SatakeDiagram(object):
         return X
 
 
-CERTIFIED = ("normal weights beyond condition (R), certified by point counts of orbit "
-             "closures")
+CERTIFIED = ("normal weights beyond condition (R), proved by the opposition symmetry or "
+             "certified by point counts of orbit closures")
 
 
 class _NotEqualRank(Exception):

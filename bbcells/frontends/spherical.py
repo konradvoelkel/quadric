@@ -957,6 +957,88 @@ def _restrict(orbits, J, *unknowns):
     return restricted
 
 
+def opposition(R):
+    """the opposition involution epsilon = -w_0, as a map on vectors in
+    simple-root coordinates
+    >>> eps = opposition(RootSystem("A3"))
+    >>> eps((1, 0, 0)), eps((1, 2, 3))
+    ((0, 0, 1), (3, 2, 1))
+    """
+    total = [0] * R.rank
+    for b in R.positive_roots:
+        total = [x + y for x, y in zip(total, b)]
+    word, v = [], tuple(total)
+    while True:
+        i = next((i for i in range(R.rank) if _pairing(R, v, i) > 0), None)
+        if i is None:
+            break
+        v = R.reflect(i, v)
+        word.append(i)
+    return lambda v: tuple(-x for x in R.apply_word(word, tuple(v)))
+
+
+def _pairing(R, v, i):
+    """<v, alpha_i^vee> for v in simple-root coordinates"""
+    return sum(b * R.cartan[i][j] for j, b in enumerate(v))
+
+
+def _dominant_in(R, v, levi):
+    """the representative of W_L v that is dominant for the simple roots in levi"""
+    v = tuple(v)
+    while True:
+        i = next((i for i in levi if _pairing(R, v, i) < 0), None)
+        if i is None:
+            return v
+        v = R.reflect(i, v)
+
+
+def certify_by_symmetry(cartan_type, orbits, spherical_roots):
+    """decide unknown normal weights beyond (R) by the opposition symmetry
+    (docs/spherical.md section 7; paper, Theorem "opposition").
+
+    If the open orbit has T-fixed points, its stabilizer is G^{Ad t} (up to
+    normalizer) with t in T, so the Chevalley involution C_0 pinned to (T, B)
+    preserves it; w_0 composed with C_0 is then an automorphism of X,
+    twisted by an automorphism of G that preserves T and B and acts on
+    characters by epsilon = -w_0. For an unknown (K, gamma), chi_gamma =
+    pr(-gamma) + c zeta, with epsilon fixing gamma, K and S_K, it maps x_K
+    to a point u x_K with u in W_{L_K}, whence epsilon(chi_gamma) =
+    u(chi_gamma) and c (epsilon(zeta) - u(zeta)) = 0. So c = 0 whenever
+    epsilon(zeta) is not in W_{L_K} zeta. Returns {(orbit, gamma): [0]} for
+    the unknowns decided this way (gamma an index into spherical_roots).
+    >>> from bbcells.frontends import symmetric
+    >>> D = symmetric.diagram("AIII", 2, 3)
+    >>> certify_by_symmetry(D.R.name, D.orbits(strict=False), D.spherical_roots)
+    {('O2', 0): [0]}
+    """
+    R = RootSystem(cartan_type)
+    Sigma = [tuple(g) for g in spherical_roots]
+    if not any(len(o.roots) == len(Sigma) for o in orbits):
+        return {}                       # the open orbit has no T-fixed points
+    eps = opposition(R)
+    unit = lambda i: tuple(int(k == i) for k in range(R.rank))
+    image = {i: next(k for k in range(R.rank) if eps(unit(i)) == unit(k))
+             for i in range(R.rank)}
+    result = {}
+    for o in orbits:
+        if o.note != BEYOND_R:
+            continue
+        basis = invariant_basis(R, o.levi, list(o.generators) + list(o.component_reflections),
+                                o.component_elements)
+        if len(basis) != 1:
+            continue
+        zeta, levi = basis[0], sorted(o.levi)
+        K = {Sigma[i] for i in o.roots}
+        if {image[i] for i in levi} != set(levi) or {eps(g) for g in K} != K:
+            continue
+        if _dominant_in(R, eps(zeta), levi) == _dominant_in(R, zeta, levi):
+            continue
+        for g in o.normal_roots:
+            if eps(Sigma[g]) == Sigma[g]:
+                result[(o.name, g)] = [0]
+    return result
+
+
 def certify_by_closures(cartan_type, orbits, trials=3, seed=0, methods=None):
     """certify all normal weights beyond (R) one at a time, on orbit closures.
 

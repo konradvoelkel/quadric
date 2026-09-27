@@ -150,6 +150,27 @@ class TestNewCases(unittest.TestCase):
         self.assertEqual(spherical.certify_by_point_count(D.R.name, restricted)[0],
                          {"O3": [0]})
 
+    def test_opposition_symmetry_decides_every_hermitian_unknown(self):
+        # the opposition involution -w_0 fixes every unknown (K, gamma) and moves
+        # zeta out of its W_{L_K}-orbit, so c = 0 (paper, Theorem "opposition");
+        # this includes cases beyond the point-count certificates
+        for case in [("AIII", 2, 3), ("AIII", 2, 6), ("AIII", 3, 4), ("AIII", 4, 5),
+                     ("DIII", 5), ("DIII", 7), ("DIII", 9), ("EIII",)]:
+            D = symmetric.diagram(*case)
+            orbits = D.orbits(strict=False)
+            unknowns = {(o.name, g) for o in orbits if o.note == spherical.BEYOND_R
+                        for g in o.normal_roots}
+            decided = spherical.certify_by_symmetry(D.R.name, orbits, D.spherical_roots)
+            self.assertTrue(unknowns, case)
+            self.assertEqual(decided, {u: [0] for u in unknowns}, case)
+
+    def test_opposition_symmetry_and_point_counts_agree(self):
+        for case in [("AIII", 2, 4), ("DIII", 5), ("EIII",)]:
+            D = symmetric.diagram(*case)
+            orbits = D.orbits(strict=False)
+            self.assertEqual(spherical.certify_by_symmetry(D.R.name, orbits, D.spherical_roots),
+                             spherical.certify_by_closures(D.R.name, orbits))
+
     def test_certificate_by_orbit_closures(self):
         for case, expected in [(("AIII", 2, 3), {("O2", 0): [0]}), (("EIII",), {("O1", 1): [0]})]:
             D = symmetric.diagram(*case)

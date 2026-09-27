@@ -73,8 +73,9 @@ points of the orbits, and derive all satellites of complete symmetric
 varieties from their Satake diagrams, for every real form including
 $E_6$, $E_7$, $E_8$.
 (2) Where the formula leaves an unknown, a certificate based on point
-counts of orbit closures decides it; all Hermitian cases we tested are
-certified.
+counts of orbit closures decides it, and a symmetry argument proves that
+the normal weights are the $W_L$-averages in all Hermitian cases we
+checked.
 (3) Cell counts of complete symmetric varieties of type $E_7$ and $E_8$
 are computed without listing fixed points, up to $2.8\cdot 10^7$ fixed
 points.
@@ -137,7 +138,10 @@ closure (Lemma~\ref{lem:openorbit}); it is a step function of $c$ and must
 equal the Brion--Peyre count, or else the BB counts of the closure must be
 palindromic. This certifies $c=0$ in
 all Hermitian cases we tested, including those where the
-Atiyah--Bott--Berline--Vergne identities degenerate.
+Atiyah--Bott--Berline--Vergne identities degenerate. For inner involutions
+an automorphism built from the Chevalley involution proves $c=0$ under a
+combinatorial condition (Theorem~\ref{thm:opposition}), which holds in all
+Hermitian cases we checked, up to AIII$(p,q)$ with $p+q\le12$ and DIII(11).
 \item \emph{Large Euler characteristics} (Section~\ref{sec:large}).
 Streaming over cosets gives the cell counts of the complete symmetric
 varieties EI, EII, EV, EVI, EVII and EIX, up to $28\,373\,976$ fixed points.
@@ -603,15 +607,68 @@ $\int c_1^T(TX)^k$ give bounds beyond reach. This degeneracy motivated
 Theorem~\ref{thm:certificate}.
 \end{remark}
 
-\begin{question}
-Is $c=0$ for every Hermitian satellite, i.e.\ is the normal weight always the
-$W_L$-average for complete symmetric varieties? A sketch: the Satake
-involution fixes every spherical root and swaps the two end colours of a
-Hermitian block, so the colour coefficients $c(D,\gamma)$ are invariant, and
-the class measuring $c$ vanishes. Making this rigorous requires the sign
-of $\operatorname{div} f_\gamma$, the reducedness of $D\cap F$, and that
-colours not moved by $S_I$ miss the localization.
-\end{question}
+\subsection{The opposition symmetry}
+The certificates are case by case. The following argument decides all
+unknowns of the Hermitian cases at once. Let $\varepsilon=-w_0$ be the
+opposition involution; it preserves $\Phi^+$ and permutes the simple roots.
+For an unknown $(K,\gamma)$ let $L_K=L_{S_K}$ and $V=\QQ\zeta$ as above.
+
+\begin{theorem}\label{thm:opposition}
+Let $X$ be a complete symmetric variety whose open orbit has $T$-fixed
+points (i.e.\ $\theta$ is inner), and let $(K,\gamma)$ be an unknown beyond
+\textup{(R)} with $\dim V=1$. If $\varepsilon$ fixes $\gamma$, permutes $K$ and
+$S_K$, and $\varepsilon(\zeta)\notin W_{L_K}\zeta$, then $c=0$, i.e.\
+$\chi_\gamma = \pr(-\gamma)$.
+\end{theorem}
+\begin{proof}
+Let $x$ be a $T$-fixed point of the open orbit and $H'$ its stabilizer. It
+is the normalizer of $G^{\theta'}$ for an involution $\theta'$ conjugate to
+$\theta$ \cite{DCP83}, and $T\subseteq (G^{\theta'})^\circ$, so $\theta'$ is
+trivial on $T$ and $\theta'=\mathrm{Ad}(t)$ with $t\in T$. Let $C_0$ be the
+Chevalley involution pinned to $(T,B)$: it inverts $T$ and maps $B$ to
+$B^-$. Then $C_0\theta'C_0^{-1}=\mathrm{Ad}(t^{-1})=\theta'$, so $C_0(H')=H'$,
+and $gx\mapsto C_0(g)x$ extends to an automorphism $C_X$ of the wonderful
+compactification $X$ of $G/H'$ (the $C_0$-twist of $X$ is a wonderful
+embedding of $G/H'$, and such an embedding is unique). Put
+$\Psi=\dot w_0\circ C_X$. Then $\Psi(gy)=\tau(g)\Psi(y)$ with
+$\tau=\mathrm{Ad}(\dot w_0)\circ C_0$, which preserves $T$ and $B$ and acts on
+characters by $\varepsilon$: a tangent vector of weight $\chi$ at a fixed
+point $y$ goes to one of weight $\varepsilon(\chi)$ at $\Psi(y)$.
+
+$\Psi$ permutes the $G$-orbits and the boundary divisors. It fixes the
+unique $B$-fixed point $z$, where the normal line of $D_\delta$ has weight
+$-\delta$, so $\Psi(D_\delta)=D_{\varepsilon\delta}$ and $\Psi(O_K)=O_K$.
+The $T$-fixed points of $O_K$ are the $wx_K$, $w\in W$, and the orbit's
+tangent weights at $x_K$ are $(\Phi^-\smallsetminus\Phi_{L_K})\cup(\Phi_{L_K}
+\smallsetminus\Phi_{H})$. Let $Y$ be the set of fixed points of $O_K$ whose
+orbit tangent weights lie in $\Phi^-\cup\Phi_{L_K}$. Since $\varepsilon$
+preserves $\Phi^-$ and $\Phi_{L_K}$, $\Psi$ maps $Y$ to itself. We claim
+$Y=W_{L_K}x_K$. The inclusion $\supseteq$ is clear. Conversely, write $w=vu$
+with $u\in W_{L_K}$ and $v$ minimal in $vW_{L_K}$, so $v(\Phi^-_{L_K})\subseteq
+\Phi^-$. If $wx_K\in Y$, then $v(\Phi^-\smallsetminus\Phi_{L_K})\subseteq
+\Phi^-\cup\Phi_{L_K}$, hence every positive root in $v(\Phi^-)$ lies in
+$\Phi_{L_K}$. These are the inversions of $v^{-1}$, so $v^{-1}\in W_{L_K}$ and
+$v=e$.
+
+So $\Psi(x_K)=ux_K$ with $u\in W_{L_K}$, and since $\Psi(D_\gamma)=D_\gamma$,
+the normal weight of $D_\gamma$ at $ux_K$ is both $u(\chi_\gamma)$ and
+$\varepsilon(\chi_\gamma)$. Both $u$ and $\varepsilon$ fix $\pr(-\gamma)$ ($u$
+because $\pr(-\gamma)\perp\Phi_{L_K}$, and $\varepsilon$ because it fixes
+$\gamma$, preserves $\Phi_{L_K}$ and is an isometry). Hence
+$c\,\varepsilon(\zeta)=c\,u(\zeta)$, and $c=0$ since
+$\varepsilon(\zeta)\notin W_{L_K}\zeta$.
+\end{proof}
+
+\begin{computation}\label{comp:opposition}
+The hypotheses of Theorem~\ref{thm:opposition} hold for every unknown of
+AIII$(p,q)$, $2\le p<q$, $p+q\le12$, of DIII$(n)$, $n=5,7,9,11$, and of EIII
+(\code{spherical.certify\_by\_symmetry}); all these involutions are inner. So
+$c=0$ in all these cases, in agreement with Computation~\ref{comp:certified}
+and beyond its reach.
+\end{computation}
+
+For the families AIII and DIII, a proof for all $p,q$ and $n$ needs only
+this combinatorial check in general, which we have not written out.
 
 % ===========================================================================
 \section{Cell counts without listing fixed points}\label{sec:large}
@@ -1049,9 +1106,9 @@ less than a few seconds. The larger computations are reproduced by
 \item \emph{General Luna data.} Wonderful varieties whose satellites are not
 symmetric, starting with Wasserman's rank-two list \cite{Wasserman} and the
 primitive spherical systems of Bravi--Pezzini \cite{BravPez,BravPezPrimitive}.
-\item \emph{The Hermitian case in general} (the question in
-Section~\ref{sec:certificates}), and certificates for two unknowns on one
-orbit.
+\item \emph{The hypotheses of Theorem~\ref{thm:opposition}} for all
+AIII$(p,q)$ and DIII$(n)$; normal weights beyond (R) for spherical varieties
+that are not symmetric, and certificates for two unknowns on one orbit.
 \item \emph{The number of quadrics in $\PP^5$ tangent to $20$ general quadrics}
 (Remark after Computation~\ref{comp:characteristic}).
 \item \emph{An integral basis} of $H^*(X;\ZZ)$ adapted to the cells when

@@ -391,15 +391,30 @@ $c\in\mathbb Z$.
   E-polynomial computation (De Concini–Springer's method with Brion–Peyre
   fibres). It reproduces AIII(2,3) = 1,3,8,15,23,29,32,29,23,15,8,3,1, as well
   as Sp$_4$/GL$_2$ and $G_2$/SO$_4$.
-- **A general argument (sketch, not checked in full).**
-  - The Satake involution fixes every spherical root and swaps the two end
-    colours of the Hermitian block, so the colour coefficients
-    $c(D,\gamma)$ are invariant under it.
-  - The involution-invariant part of $\mathbb Q^{\Delta(F)}$ then equals the span of
-    the relations. So the class that measures $c$ vanishes, which gives
-    $c=0$.
-  - Gaps: the sign in $\operatorname{div} f_\gamma$; reducedness of $D\cap F$;
-    that colours not moved by $S_I$ miss the localization.
+- **Opposition symmetry** (`spherical.certify_by_symmetry`; proved in the
+  paper, Theorem "opposition"). It decides all unknowns without computation
+  when the involution is inner.
+  - If the open orbit has a $T$-fixed point $x$, its stabilizer is the
+    normalizer of $G^{\theta'}$ with $\theta'=\mathrm{Ad}(t)$, $t\in T$. The
+    Chevalley involution $C_0$ pinned to $(T,B)$ inverts $t$, so it
+    preserves the stabilizer and induces an automorphism $C_X$ of $X$.
+  - $\Psi=\dot w_0\circ C_X$ is twisted by an automorphism of $G$ that
+    preserves $T$ and $B$ and acts on characters by $\varepsilon=-w_0$. It
+    fixes the $B$-fixed point, so $\Psi(D_\delta)=D_{\varepsilon\delta}$.
+  - If $\varepsilon$ fixes $\gamma$ and permutes $K$ and $S_K$, then
+    $\Psi(x_K)=ux_K$ with $u\in W_{L_K}$. These are the fixed points of $O_K$
+    whose orbit tangent weights lie in $\Phi^-\cup\Phi_{L_K}$, by an
+    inversion-set argument. So
+    $\varepsilon(\chi_\gamma)=u(\chi_\gamma)$, i.e.
+    $c\,\varepsilon(\zeta)=c\,u(\zeta)$.
+  - Hence $c=0$ if $\varepsilon(\zeta)\notin W_{L_K}\zeta$.
+  - The hypotheses hold for every unknown of AIII$(p,q)$, $2\le p<q$,
+    $p+q\le12$, DIII$(n)$ for $n=5,7,9,11$, and EIII (tests). As a sanity
+    check, the data with $c=1$ violate the symmetry and the data with $c=0$
+    satisfy it, for AIII(2,3), AIII(2,4), AIII(3,4), DIII(5) and EIII.
+  - `symmetric.fixed_point_data` uses this first, and falls back to the
+    point-count certificates if it does not decide every unknown.
+  - Open: the combinatorial hypotheses for all $p,q$ and $n$.
 
 ## 8. Toroidal varieties over a wonderful model
 
@@ -508,8 +523,8 @@ For example, EVI has cell counts
    orbit closure. It remains to:
    - handle two unknowns on the same orbit (a line arrangement in the
      $(c_1,c_2)$-plane), or three unknowns that meet only on one closure;
-   - give a full proof of the proposition's Hermitian case, closing the gaps
-     listed in §7.
+   - prove the combinatorial hypotheses of the opposition symmetry (§7) for
+     all AIII$(p,q)$ and DIII$(n)$; checked up to $p+q\le12$ and $n\le11$.
 3. **Toroidal $X$ over $G/H$ with $\Lambda\supsetneq\mathbb Z\Sigma$.** Then
    $O_\tau\to O_J$ is a finite cover times a torus. Needs the lattice
    $\Lambda$ and the component group.
