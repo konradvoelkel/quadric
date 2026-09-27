@@ -260,6 +260,27 @@ for _case, _G, _K, _index, _cones, _chi, _slow in [
           slow=_slow)(_check)
 
 
+# -- Section 4.5: a non-symmetric family --------------------------------------------
+
+def symplectic_pairs(n, normalizer):
+    """(the admissible c, chi, the Betti numbers) of the wonderful variety of
+    Sp_2n > GL_1 x Sp_2n-2 (or its normalizer) from Luna data"""
+    from bbcells.frontends import luna
+    orbits = luna.symplectic_pair_orbits(n, normalizer, strict=False)
+    admissible = luna.decide_normal_weights("C%d" % n, orbits)
+    X = spherical.assemble("C%d" % n, admissible[0][1])
+    return [tuple(int(x) for x in c) for c, _ in admissible], len(X), list(bb_cells(X).counts)
+
+
+for _n, _normalizer, _value in [
+        (3, False, ([(0, -1)], 60, [1, 3, 5, 7, 9, 10, 9, 7, 5, 3, 1])),
+        (3, True, ([(-2,)], 45, [1, 2, 4, 5, 7, 7, 7, 5, 4, 2, 1])),
+        (4, False, ([(0, -1)], 112, [1, 3, 5, 7, 9, 11, 13, 14, 13, 11, 9, 7, 5, 3, 1])),
+        (4, True, ([(-2,)], 84, [1, 2, 4, 5, 7, 8, 10, 10, 10, 8, 7, 5, 4, 2, 1]))]:
+    claim("comp:nonsymmetric/C%d%s" % (_n, "N" if _normalizer else ""), _value)(
+        lambda n=_n, normalizer=_normalizer: symplectic_pairs(n, normalizer))
+
+
 # -- Section 6: equivariant cohomology beyond GKM ------------------------------------
 
 @claim("lem:components/conics", (12, 6))

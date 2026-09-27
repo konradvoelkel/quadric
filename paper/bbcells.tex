@@ -132,7 +132,8 @@ $W_H$-invariants $V$ of the Levi part of the satellite; under condition (R)
 ($V=0$, equivalently: the satellite has as many colours as its rank, by
 Knop) they are the $W_L$-averages $\pr(-\gamma)$. For complete symmetric
 varieties we derive all satellites from the Satake diagram, for every real
-form (Section~\ref{subsec:symmetric}).
+form (Section~\ref{subsec:symmetric}), and their toroidal embeddings, also
+for $G/G^\theta$ with its finer lattice (Section~\ref{subsec:covers}).
 \item \emph{Certificates} (Section~\ref{sec:certificates}). Beyond (R), the
 unknown normal weight is $\pr(-\gamma)+c\zeta$ with an integer $c$. The
 point count of an open orbit can be read off the fixed points of its
@@ -144,6 +145,7 @@ Atiyah--Bott--Berline--Vergne identities degenerate. For inner involutions
 an automorphism built from the Chevalley involution proves $c=0$ under a
 combinatorial condition (Theorem~\ref{thm:opposition}), which holds for all
 AIII$(p,q)$ and DIII$(n)$ (Proposition~\ref{prop:oppositionAD}) and for EIII.
+Outside the symmetric case $c\neq0$ occurs (Section~\ref{subsec:nonsymmetric}).
 \item \emph{Large Euler characteristics} (Section~\ref{sec:large}).
 Streaming over cosets gives the cell counts of the complete symmetric
 varieties EI, EII, EV, EVI, EVII and EIX, up to $28\,373\,976$ fixed points.
@@ -803,6 +805,32 @@ symmetric spaces not of tube type, for which the component group of $H$
 does not negate the centre $\zeta$; for the others it does and (R) holds.
 \end{computation}
 
+\subsection{A non-symmetric family}\label{subsec:nonsymmetric}
+Outside the symmetric case $c$ need not vanish, and $\pr(-\gamma)$ can be $0$.
+Take $G=Sp_{2n}$, $n\ge2$, and $H=GL_1\times Sp_{2n-2}$ or its normalizer, the
+entries of \cite[\S3]{BravPezReductive} with
+$\Sigma=\{\alpha_1,\ \varepsilon_1+\varepsilon_2\}$, resp.
+$\{2\alpha_1,\ \varepsilon_1+\varepsilon_2\}$, and $S^p=\{\alpha_3,\dots,\alpha_n\}$ (for
+$n=2$ this is $GL_2\subset SO_5$). The satellites are $H$ itself,
+$B_{Sp_2}\times Sp_{2n-2}$ for $O_{\{\varepsilon_1+\varepsilon_2\}}$ (where $L_I=G$), and
+$SL_2/T$, resp. $SL_2/N(T)$, times $Sp_{2n-4}$ for $O_{\{\gamma_1\}}$. On
+$O_{\{\varepsilon_1+\varepsilon_2\}}$ the invariants are spanned by $\zeta=2\varepsilon_1$ and
+$\pr(-\gamma_1)=0$, so the unknown weight $c\zeta$ has $\lambda$-thresholds $0$
+and the point counts only see the sign of $c$.
+
+\begin{computation}\label{comp:nonsymmetric}
+For $n=2,3,4$, a search over $|c-c_0|\le6$ for both unknowns
+(\code{luna.decide\_normal\_weights}) leaves exactly one choice that passes
+the checks of Section~\ref{subsec:checks}: $c=0$ on the $SL_2/T$ satellite
+and $c=-1$, resp. $c=-2$, on $O_{\{\varepsilon_1+\varepsilon_2\}}$, i.e.\ the normal
+weight is $-2\varepsilon_1$, resp. $-4\varepsilon_1$, and not the $W_L$-average.
+The wonderful variety is $\PP(S)\times_{Gr}\PP(S)$, resp. $\PP(\operatorname{Sym}^2S)$,
+over $Gr(2,2n)$ with $S$ the tautological bundle: a plane with an ordered,
+resp. unordered, pair of lines, the boundary divisors being the isotropic
+planes and the coinciding lines. Every tangent weight of the result agrees
+with this model, and the Brion--Peyre orbit counts agree.
+\end{computation}
+
 % ===========================================================================
 \section{Cell counts without listing fixed points}\label{sec:large}
 
@@ -1339,7 +1367,10 @@ computations are reproduced by \code{paper/reproduce.py}.
 \begin{enumerate}
 \item \emph{General Luna data.} Wonderful varieties whose satellites are not
 symmetric, starting with Wasserman's rank-two list \cite{Wasserman} and the
-primitive spherical systems of Bravi--Pezzini \cite{BravPez,BravPezPrimitive}.
+primitive spherical systems of Bravi--Pezzini \cite{BravPez,BravPezPrimitive}
+(Section~\ref{subsec:nonsymmetric} treats one family), with the satellites
+derived from the spherical system and a bound for $c$ that makes the search
+of Computation~\ref{comp:nonsymmetric} a certificate.
 \item \emph{Normal weights beyond (R) for spherical varieties that are not
 symmetric}, and certificates for two unknowns on one orbit; a proof that
 unknowns beyond (R) occur only in the three families of

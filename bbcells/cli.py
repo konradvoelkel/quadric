@@ -95,11 +95,15 @@ def _data_example(args):
 SPHERICAL = {
     "complete-quadrics": "complete_quadrics",
     "complete-skew-forms": "complete_skew_forms",
+    "symplectic-pairs": None,
+    "symplectic-pairs-n": None,
 }
 
 
 def _data_spherical(args):
-    from bbcells.frontends import spherical
+    from bbcells.frontends import luna, spherical
+    if args.family.startswith("symplectic-pairs"):
+        return luna.symplectic_pair_variety(args.n, normalizer=args.family.endswith("-n"))
     return getattr(spherical, SPHERICAL[args.family])(args.n)
 
 
@@ -391,7 +395,9 @@ def build_parser():
 
     p = commands.add_parser("spherical",
                             help="wonderful varieties assembled orbit by orbit: "
-                                 "complete-quadrics n (in P^{n-1}), complete-skew-forms n (on k^{2n})")
+                                 "complete-quadrics n (in P^{n-1}), complete-skew-forms n (on k^{2n}), "
+                                 "symplectic-pairs n (Sp_2n/GL_1 x Sp_2n-2, non-symmetric; -n: "
+                                 "its normalizer)")
     p.add_argument("family", choices=sorted(SPHERICAL))
     p.add_argument("n", type=int)
     _add_common(p)

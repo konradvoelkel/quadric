@@ -600,6 +600,25 @@ $$E(X)=\sum_{I\subseteq S}|G/P_I|(q)\;e(I),\qquad e(I)=\prod_{\text{factors }F\t
        and confirm them by §9.
    - **Oracles.** Wasserman's rank-two tables, and the non-symmetric
      reductive entries (#31–50 in arXiv:1109.6777).
+   - **First family done** (`frontends/luna.py`, `tests/test_luna.py`):
+     $Sp_{2n}\supset GL_1\times Sp_{2n-2}$ and its normalizer, $n\ge2$ (for $n=2$
+     this is $SO_5\supset GL_2$): $\Sigma=\{\alpha_1,\ \varepsilon_1+\varepsilon_2\}$, resp.
+     $\{2\alpha_1,\ \varepsilon_1+\varepsilon_2\}$, $S^p=\{\alpha_3,\dots,\alpha_n\}$. The satellites:
+     $GL_1\times Sp_{2n-2}$ (with $s_{2\varepsilon_1}$) for the open orbit,
+     $B_{Sp_2}\times Sp_{2n-2}$ for $O_{\{\varepsilon_1+\varepsilon_2\}}$ (here $L_I=G$), and
+     $SL_2/T$, resp. $SL_2/N(T)$, times $Sp_{2n-4}$ for $O_{\{\gamma_1\}}$. Two
+     orbits are beyond (R). On $O_{\{\varepsilon_1+\varepsilon_2\}}$ the $W_L$-average of
+     $-\gamma_1$ is $0$, so $\chi=c\,\zeta$ with $\zeta = 2\varepsilon_1$. The point counts of
+     §7 then see only the sign of $c$. `luna.decide_normal_weights` therefore
+     searches $|c-c_0|\le 6$ against the checks of the engine and finds exactly
+     one choice: $c=0$ on the $SL_2/T$ satellite and $c=-1$ (resp. $-2$) on
+     the other orbit, i.e. $\chi=-2\varepsilon_1$ (resp. $-4\varepsilon_1$), not the $W_L$-average.
+     The variety is $\mathbb P(S)\times_{Gr}\mathbb P(S)$, resp. $\mathbb P(\operatorname{Sym}^2S)$, over
+     $Gr(2,2n)$ (a plane with an ordered, resp. unordered, pair of lines;
+     boundary: isotropic planes and coinciding lines). Every tangent weight
+     agrees with this model for $n=2,3,4$, and the Brion–Peyre orbit counts
+     agree. Command line: `bbcells spherical symplectic-pairs n` (`-n` for
+     the normalizer).
 2. **Certificates beyond the Hermitian case.** The point-count
    certificate of §7 decides one unknown, or two on different orbits, on any
    orbit closure. It remains to:

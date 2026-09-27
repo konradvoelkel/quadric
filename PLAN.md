@@ -232,6 +232,12 @@ release goes out together with the paper.
   (Wasserman's list): satellites by parabolic induction from the rank-one
   data, normal weights by the certificates, Brion–Peyre orbit counts as the
   oracle. Then primitive spherical systems (Bravi–Pezzini).
+  Done: the first non-symmetric family, $Sp_{2n}\supset GL_1\times Sp_{2n-2}$ and its
+  normalizer (`frontends/luna.py`), with a normal weight beyond (R) whose
+  $W_L$-average is $0$ ($c=-1$, resp. $-2$, found by `decide_normal_weights`),
+  confirmed weight by weight by the model $\mathbb P(S)\times_{Gr}\mathbb P(S)$, resp.
+  $\mathbb P(\operatorname{Sym}^2S)$, over $Gr(2,2n)$. Open: the other entries, and the
+  satellites from the spherical system alone (colour calculus).
 - [ ] **R3 The ring of complete quadrics** (S7.3c, `cohomology.md` §§5–6).
   Done: for $\mathbb P^4$ the colours and $c_3(T_X)$ generate $H^*(X;\mathbb Q)$
   (`brion.subalgebra`). Open: $\mathbb P^5$ and beyond, the comparison with
@@ -294,8 +300,9 @@ release goes out together with the paper.
 ### 4.5 Order
 
 ```
-done:   P1, P2, P4; P3 (a-d) written; P5 bibliography; E1-E3; R4; R5; R6 without twist
-next:   R3 beyond P^4, R1 (a rule for the planes), R2
+done:   P1, P2, P4; P3 (a-d) written; P5 bibliography; E1-E3; R4; R5; R6 without twist;
+        R2 first family
+next:   R3 beyond P^4, R2 (more of Bravi-Pezzini's list), R1 (a rule for the planes)
 later:  E4 (release); R2 beyond rank two
 ```
 

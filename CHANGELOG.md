@@ -27,6 +27,9 @@ First release, to accompany the companion paper (`paper/`).
   varieties over a wonderful model, and over the finite covers $G/G^\theta$
   ($G$ simply connected) with the weight lattice from Helgason's theorem and
   fans resolved automatically (`symmetric ... --cover`).
+- A first non-symmetric family from Luna data, $Sp_{2n}\supset GL_1\times Sp_{2n-2}$
+  and its normalizer (`spherical symplectic-pairs n`), with normal weights
+  beyond (R) decided by a search against the engine's checks.
 - Point-count certificates for normal weights beyond condition (R), with the
   point count of an open orbit read off the fixed points; the opposition
   symmetry, which proves them in the inner Hermitian cases.
