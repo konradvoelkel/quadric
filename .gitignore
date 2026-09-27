@@ -3,3 +3,12 @@ __pycache__/
 *.pyc
 build/
 *.egg-info/
+# LaTeX build files of the companion paper
+paper/*.aux
+paper/*.log
+paper/*.bbl
+paper/*.blg
+paper/*.out
+paper/*.toc
+paper/*.pdf
+!paper/reproduce.log

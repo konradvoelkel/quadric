@@ -1,11 +1,17 @@
 # LITERATURE — annotated overview
 
-Status (2026-09-25): all papers cited here with an arXiv ID were downloaded
+Status (2026-09-27): all papers cited here with an arXiv ID were downloaded
 with `tools/fetch_arxiv.py`, and their titles and authors were matched
 against the arXiv metadata in `literature/arxiv_metadata.json`. Entries
 without an arXiv ID are checked against web search results only. Crossref and
 zbMATH are still unreachable, so journal data for entries without an arXiv
-journal-ref is not independently confirmed.
+journal-ref is not independently confirmed. The entries added on 2026-09-26
+and 2026-09-27 (characteristic numbers, Tchoudjem, Banerjee–Can–Joyce) were
+checked against their arXiv abstract pages instead of being downloaded.
+
+The companion paper's bibliography, `paper/references.bib`, uses these
+sources and marks every entry whose data could not be confirmed with a
+comment `% UNVERIFIED` (PLAN P5).
 
 Markers:
 
@@ -246,11 +252,13 @@ The numbers in brackets (§…) point to the relevant section of `SPEC.md`.
   *Infinite dimensional Lie algebras*, ch. 8 (automorphisms of finite order).
   Inner involutions as $\mathrm{Ad}(t_j)$ for one node $j$ of mark 1 or 2.
 
-- ✓ A. Tchoudjem, *Cohomologie des fibrés en droites sur les variétés
-  magnifiques de rang minimal* and related work; arXiv:0709.2584. Fixed
+- ✓a A. Tchoudjem, *Sur la cohomologie à support des fibrés en droites sur
+  les variétés symétriques complètes*, arXiv:0709.2584 (the title given here
+  before was that of related work on the minimal-rank case). Fixed
   points of complete symmetric varieties that are not of minimal rank,
   with the orbit part of their tangent weights.
-- ✓ M. Banerjee, M. B. Can, M. Joyce, arXiv:1610.02698. Complete quadrics:
+- ✓a S. Banerjee, M. B. Can, M. Joyce, *Combinatorial models for the variety
+  of complete quadrics*, arXiv:1610.02698. Complete quadrics:
   fixed points are "barred permutations" (1, 3, 12, 66, 450; OEIS A080599),
   with tangent weights and cell dimensions. Their cell counts agree with
   `spherical.complete_quadrics`.

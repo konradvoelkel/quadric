@@ -201,9 +201,9 @@ it rejects the flipped complete conics (`tests/test_invariants.py`).
 
 ## 6. Complete symmetric varieties from Satake diagrams
 
-`frontends/symmetric.py` derives the satellites for symmetric varieties,
-which settles the first open item of the previous version of this note for
-that class. The input is a Satake diagram (black nodes, arrows) of an involution $\theta$.
+`frontends/symmetric.py` derives the satellites of symmetric varieties, so
+that for this class no satellite has to be supplied by hand. The input is a
+Satake diagram (black nodes, arrows) of an involution $\theta$.
 The output is the complete symmetric variety of De Concini–Procesi, i.e.
 the wonderful compactification of $G_{\mathrm{ad}}/G_{\mathrm{ad}}^\theta$.
 

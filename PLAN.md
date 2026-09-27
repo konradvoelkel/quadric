@@ -179,7 +179,7 @@ release goes out together with the paper.
 
 ### 4.1 Track P — the companion paper (`paper/`)
 
-- [ ] **P1 Draft** (M). `paper/bbcells.tex` and `paper/references.bib`: the
+- [x] **P1 Draft** (M). `paper/bbcells.tex` and `paper/references.bib`: the
   methods and results, with *theorem* only for proved statements, and
   *computation*, *observation* or *conjecture* otherwise. **Done when:** it
   compiles, and every number in it is produced by a test or by the
@@ -187,7 +187,8 @@ release goes out together with the paper.
 - [ ] **P2 Reproduction script** (S). `paper/reproduce.py` recomputes every
   table of the paper, with a fast mode run by a test. **Done when:** the fast
   mode is in CI and the slow mode (EV, EIX, $\mathbb P^5$) is logged once
-  with timings.
+  with timings. *(Fast mode done: 32 claims in `tests/test_paper.py`; the
+  full run goes to `paper/reproduce.log`.)*
 - [ ] **P3 Proofs** (research). Write out in full:
   - (a) the normal-weight proposition (`spherical.md` §3);
   - (b) soundness of the point-count certificate: lattice, additivity of

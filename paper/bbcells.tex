@@ -1,0 +1,988 @@
+\documentclass[11pt]{amsart}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{amssymb,amsmath,mathtools}
+\usepackage{booktabs,longtable,array}
+\usepackage[hidelinks]{hyperref}
+
+
+% ---------------------------------------------------------------------------
+% Draft status (PLAN.md, track P). Authorship, venue and the acknowledgement
+% of tool use are decisions for the author (PLAN.md 4.4). Every number in
+% this text is produced by a test of the package or by paper/reproduce.py.
+% ---------------------------------------------------------------------------
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{computation}[theorem]{Computation}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{question}[theorem]{Question}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+\setlength{\emergencystretch}{3em}
+\newcommand{\bbcells}{\texttt{bbcells}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\RP}{\mathbb{RP}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\LL}{\mathbb{L}}
+\newcommand{\GW}{\mathrm{GW}}
+\newcommand{\pr}{\mathrm{pr}}
+\newcommand{\wt}{\mathrm{wt}}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\Stab}{Stab}
+\DeclareMathOperator{\Ann}{Ann}
+\DeclareMathOperator{\Gr}{Gr}
+\DeclareMathOperator{\Bl}{Bl}
+\DeclareMathOperator{\codim}{codim}
+
+\title[Bia{\l}ynicki-Birula cells of spherical varieties]{Bia{\l}ynicki-Birula
+cells of spherical varieties from combinatorial data:\\ a companion to the
+\bbcells\ package}
+
+% Authorship to be decided (PLAN.md 4.4).
+\author{Konrad Voelkel}
+\date{Draft, \today}
+
+\begin{document}
+
+\begin{abstract}
+We describe \bbcells, a pure-Python package that computes
+Bia{\l}ynicki-Birula decompositions of smooth projective varieties with a
+torus action from combinatorial data (fans, root data, Satake diagrams,
+spherical data), together with the invariants that only depend on the
+cells: Chow motives, Hodge numbers, classes in $K_0(\mathrm{Var})$, point
+counts and quadratic Euler characteristics. Every front end is tested
+against an independent oracle and against the holomorphic Lefschetz
+formula.
+
+The main new points are the following.
+(1) Fixed-point data of smooth complete spherical varieties are assembled
+orbit by orbit; we prove a formula for the normal weights at the base
+points of the orbits, and derive all satellites of complete symmetric
+varieties from their Satake diagrams, for every real form including
+$E_6$, $E_7$, $E_8$.
+(2) Where the formula leaves an unknown, a certificate based on point
+counts of orbit closures decides it; all Hermitian cases we tested are
+certified.
+(3) Cell counts of complete symmetric varieties of type $E_7$ and $E_8$
+are computed without listing fixed points, up to $2.8\cdot 10^7$ fixed
+points.
+(4) Beyond GKM theory, Brion's description of equivariant cohomology yields
+characteristic numbers (Chasles' $3264$, Schubert's $666841088$, and a value
+for quadrics in $\PP^5$ that differs from the published one), shows that
+complete conics admit no canonical (Goldin--Tolman) classes for any generic
+cocharacter, and that the divisors do not generate the cohomology of
+complete quadrics in $\PP^4$.
+(5) For the real points we compute the cellular chain complex of real toric
+varieties exactly by discrete Morse theory, confirm a GKM form of
+Kocherlakota's incidence rule entry by entry, and extend it to graded
+decompositions of non-GKM varieties.
+\end{abstract}
+
+\maketitle
+\tableofcontents
+
+% ===========================================================================
+\section{Introduction}\label{sec:intro}
+
+Let $X$ be a smooth projective variety over a field $k$ with an action of
+a split torus $T$ with finitely many fixed points. For a generic
+cocharacter $\lambda$, the Bia{\l}ynicki-Birula theorem \cite{BB73}
+decomposes $X$ into locally closed affine spaces, the plus-cells
+$C_p = \{x : \lim_{t\to 0}\lambda(t)x = p\}$, one for each fixed point $p$,
+of dimension the number of $\lambda$-positive tangent weights at $p$. The
+cell counts $c_d = \#\{p : \dim C_p = d\}$ determine the Chow motive
+\cite{Brosnan}, the Hodge numbers, the class in $K_0(\mathrm{Var}_k)$ and
+the point counts, and they are the first layer of the motivic cell
+structures studied in \cite{DuggerIsaksen,Wendt,VoelkelQuadrics,VoelkelSpherical}.
+
+All of this depends only on combinatorial data: the fixed points and the
+multisets of tangent weights (\emph{fixed-point data}). For toric and flag
+varieties these data are classical. For spherical varieties in general they
+are not: fixed points lie in non-closed orbits, and the tangent weights at
+such points involve the normal directions of the orbits. The package
+\bbcells{} computes fixed-point data for a range of spherical varieties and
+everything that can be read off from them. This paper documents the
+methods and the results that are new, as far as we know; the code, the
+tests and three technical notes (\code{docs/spherical.md},
+\code{docs/cohomology.md}, \code{docs/real.md}) contain the details.
+
+\subsection*{Results}
+\begin{enumerate}
+\item \emph{Spherical varieties orbit by orbit} (Section~\ref{sec:spherical}).
+The fixed points of a $G$-orbit $G/H$ are $W/W_H$ when $H$ contains a
+maximal torus (Lemma~\ref{lem:orbit}). For a wonderful variety the
+remaining unknowns are the normal weights at the base points of the
+orbits. Proposition~\ref{prop:normal} determines them up to the
+$W_H$-invariants $V$ of the Levi part of the satellite; under condition (R)
+($V=0$, equivalently: the satellite has as many colours as its rank, by
+Knop) they are the $W_L$-averages $\pr(-\gamma)$. For complete symmetric
+varieties we derive all satellites from the Satake diagram, for every real
+form (Section~\ref{subsec:symmetric}).
+\item \emph{Certificates} (Section~\ref{sec:certificates}). Beyond (R), the
+unknown normal weight is $\pr(-\gamma)+c\zeta$ with an integer $c$. The BB
+counts of an orbit closure are a step function of $c$ and must equal its
+E-polynomial, which is known independently (Brion--Peyre and
+inclusion--exclusion, or Poincar\'e duality). This certifies $c=0$ in
+all Hermitian cases we tested, including those where the
+Atiyah--Bott--Berline--Vergne identities degenerate.
+\item \emph{Large Euler characteristics} (Section~\ref{sec:large}).
+Streaming over cosets gives the cell counts of the complete symmetric
+varieties EI, EII, EV, EVI, EVII and EIX, up to $28\,373\,976$ fixed points.
+\item \emph{Equivariant cohomology beyond GKM} (Section~\ref{sec:cohomology}).
+From fixed-point data alone we reconstruct the components of $X^{\ker\chi}$
+that enter Brion's description of $H_T^*(X)$ \cite{Brion98}, compute
+equivariant classes of line bundles and characteristic numbers of complete
+quadrics, and study cell classes and the subalgebra generated by divisors.
+\item \emph{Real points} (Section~\ref{sec:real}). We compute the real cell
+complex of toric varieties exactly by discrete Morse theory and use it,
+together with known real loci of non-GKM varieties, to test an incidence
+rule predicted by the $\eta$-attaching maps of motivic cell structures.
+\end{enumerate}
+
+\subsection*{Conventions}
+Characters and cocharacters are integer vectors paired by the dot product;
+for root data the characters are written in the basis of simple roots
+(the torus of the adjoint group). A statement called \emph{theorem},
+\emph{proposition} or \emph{lemma} is proved here or in the cited source. A
+\emph{computation} reports the output of the package, reproducible with
+\code{paper/reproduce.py}; an \emph{observation} is a pattern found in
+computations; a \emph{conjecture} is stated as such.
+
+% ===========================================================================
+\section{Fixed-point data and cell invariants}\label{sec:basics}
+
+\begin{definition}
+\emph{Fixed-point data} of rank $r$ and dimension $n$ consist of a finite
+set $F$ and, for each $p\in F$, a multiset $\wt(p)$ of $n$ nonzero vectors in
+$\ZZ^r$, the tangent weights. A cocharacter $\lambda\in\ZZ^r$ is
+\emph{generic} if $\langle\lambda,w\rangle\ne 0$ for all weights. The
+\emph{cell dimension} of $p$ is $d_\lambda(p) = \#\{w\in\wt(p) :
+\langle\lambda,w\rangle>0\}$, and the \emph{cell counts} are
+$c_d = \#\{p : d_\lambda(p)=d\}$.
+\end{definition}
+
+For the fixed-point data of a smooth projective $T$-variety with isolated
+fixed points, the plus-cells form a filtrable decomposition into affine
+spaces \cite{BB73}, and hence
+\begin{gather*}
+[X] = \sum_d c_d\,\LL^d \in K_0(\mathrm{Var}_k),\qquad
+M(X) = \bigoplus_d \ZZ(d)[2d]^{\oplus c_d},\\
+h^{p,q}(X) = \delta_{pq}\,c_p ,
+\end{gather*}
+the point count over $\mathbb F_q$ is $\sum_d c_d q^d$, and the quadratic
+Euler characteristic is $\chi^{\mathbb A^1}(X) = \sum_d c_d\langle -1\rangle^d
+\in \GW(k)$ \cite{Levine,Hoyois}, whose signature is $\chi(X(\RR))$.
+
+\subsection{Consistency checks}\label{subsec:checks}
+Wrong fixed-point data often still produce plausible numbers, so every
+computation is checked in three ways.
+\begin{enumerate}
+\item The cell counts do not depend on the generic cocharacter.
+\item They are palindromic (Poincar\'e duality).
+\item The holomorphic Lefschetz formula \cite{AtiyahBottLefschetz}: the
+rational function
+\[
+\sum_{p\in F}\ \prod_{w\in\wt(p)} \frac{1+y\,e^{-w}}{1-e^{-w}}
+\]
+on $T$ must be the constant $\chi_y(X) = \sum_d c_d(-y)^d$. It is evaluated
+modulo a large prime at pseudo-random points of $T$.
+\end{enumerate}
+The third check is much stronger than the first two for data assembled
+orbit by orbit: flipping the signs of the normal weights of both
+intermediate orbits of complete conics keeps (1) and (2) intact but fails
+(3).
+
+\subsection{Front ends and oracles}\label{subsec:frontends}
+Table~\ref{tab:frontends} lists the front ends that produce fixed-point
+data, and the independent oracle each one is tested against.
+
+\begin{table}[ht]
+\caption{Front ends and their oracles.}\label{tab:frontends}
+\begin{tabular}{p{0.38\textwidth}p{0.55\textwidth}}
+\toprule
+front end & oracle \\
+\midrule
+smooth complete toric varieties (fans) & $h$-vector of the fan \\
+$G/P$, all Cartan types & $\prod[d_i]_q/\prod[d_i^L]_q$ from the degrees of $W$ and $W_L$ \\
+quadrics $Q_n$ & the original script \code{quadric.py}; $\sum q^i$ (+$q^{n/2}$) \\
+wonderful compactifications of $G_{\mathrm{ad}}$ & orbit decomposition, $|X(\mathbb F_q)|=\sum_I |G/P_I|^2 q^{N_I}(q-1)^{|I|}\sum_{W_I}q^{\ell(w)}$ \\
+toroidal horospherical varieties & Batyrev--Moreau \cite{BatyrevMoreau} \\
+rank-one two-orbit completions (Knop's table) & $[X]=[\overline X]-[D]$, e.g.\ $[\mathbb{OP}^2]=\LL^8+\LL^{12}+\LL^{16}$ \\
+blow-ups along $T$-stable centres & blow-up formula; complete conics $=\Bl_{v_2(\PP^2)}\PP^5$ \\
+wonderful and symmetric varieties & Brion--Peyre orbit counts (Section~\ref{subsec:orbitcounts}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two technical points recur. First, $G/P$ is never enumerated through all of
+$W$: the orbit $W\cdot\omega_I$ is found by breadth-first search. Second, a
+subtorus $T'\subset T$ has the same fixed points as $T$ as long as no
+tangent weight restricts to zero; this is how rank-one completions
+$\overline X = G'/P'$ are restricted from a larger group.
+
+% ===========================================================================
+\section{Spherical varieties orbit by orbit}\label{sec:spherical}
+
+\subsection{Fixed points of orbits}
+\begin{lemma}\label{lem:orbit}
+Let $O = G/H$ be an orbit of a connected reductive group $G$ with maximal
+torus $T$.
+\begin{enumerate}
+\item $O^T\ne\emptyset$ if and only if $H$ contains a maximal torus of $G$.
+\item If $T\subset H$, then $O^T = N_G(T)H/H\cong W/W_H$ with
+$W_H = N_H(T)/T$.
+\item If $T\subset H$, the tangent weights at $wH$ are
+$w(\Phi\smallsetminus\Phi_H)$.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+If $gH\in O^T$, then $g^{-1}Tg$ and $T$ are maximal tori of $H$, so
+$g^{-1}Tg = hTh^{-1}$ for some $h\in H$ and $gh\in N_G(T)$. This gives (1)
+and (2). The weights of $\mathfrak g/\mathfrak h$ are
+$\Phi\smallsetminus\Phi_H$, and $0$ does not occur since
+$\mathfrak t\subset\mathfrak h$.
+\end{proof}
+
+For a smooth complete $G$-variety $X$ it follows that
+\[
+X^T = \bigsqcup_{O :\, O^T\ne\emptyset} W/W_{H_O},\qquad
+\wt(w x_O) = w(\Phi\smallsetminus\Phi_{H_O}) \cup w(N_O),
+\]
+where $x_O$ is a base point of $O$ fixed by $T$ and $N_O$ is the multiset of
+$T$-weights of the normal space to $O$ at $x_O$, which is $W_{H_O}$-invariant.
+So the fixed-point data are determined by one datum
+$(\Phi_{H_O}, W_{H_O}, N_O)$ per orbit with fixed points.
+
+\subsection{Cosets without enumerating the Weyl group}
+The group $W_H$ is generated by the reflections in the roots of $H$ and
+possibly by further elements; for $\mathrm{AIII}(p,p)$ it contains the
+swap of the two blocks. For a reflection subgroup $W'\subset W$, Dyer
+\cite{Dyer} shows that every coset $wW'$ contains a unique element of
+minimal length, characterized by $w(\beta)>0$ for all positive roots
+$\beta$ of $W'$. The following version of Deodhar's lemma \cite{Deodhar}
+holds for reflection subgroups by the same criterion: if $w$ is minimal in
+$wW'$, then either $s_iw$ is minimal in $s_iwW'$, or $w^{-1}\alpha_i$ is a
+positive root of $W'$ and $s_iwW' = wW'$. A breadth-first search by length
+over the inverse permutations of the roots therefore produces all minimal
+representatives together with reduced words, without listing $W$. Further
+generators of $W_H$ then glue these cosets. This is what makes $E_7$ and
+$E_8$ accessible (Section~\ref{sec:large}).
+
+\subsection{Wonderful varieties}\label{subsec:wonderful}
+Let $X$ be a wonderful $G$-variety with spherical roots $\Sigma$, and let
+$S^p$ be the set of simple roots of the parabolic subgroup $P(X)$ (the
+stabilizer of the open $B$-orbit) \cite{Luna01,Timashev,Perrin}. The $G$-orbits of $X$
+are the $O_I$, $I\subseteq\Sigma$, where $O_I$ is the open orbit of the
+wonderful subvariety with spherical roots $I$. With
+$S_I = S^p\cup\supp I$, the orbit $O_I$ is parabolically induced,
+\[
+O_I = G\times^{P_{S_I}} \bigl(L_{S_I}/H_{L,I}\bigr),
+\]
+where the \emph{satellite} $L_{S_I}/H_{L,I}$ is a cuspidal spherical
+homogeneous space with spherical roots $I$. By Lemma~\ref{lem:orbit}, $O_I$
+has fixed points if and only if $H_{L,I}$ has full rank in $L_{S_I}$. The
+roots of the stabilizer of the base point $x_I$ in the fibre over
+$eP_{S_I}$ are then $(\Phi^+\smallsetminus\Phi_{L_{S_I}})\cup\Phi_{H_{L,I}}$,
+and $W_{H} = W_{H_{L,I}}$. The normal space at $x_I$ is the sum of the normal
+lines $\chi_\gamma$ of the boundary divisors $D_\gamma$,
+$\gamma\in\Sigma\smallsetminus I$.
+
+\begin{proposition}\label{prop:normal}
+Let $Z = Z(L_{S_I})^\circ$, let $\pr$ be the orthogonal projection onto
+$\Phi_{L_{S_I}}^{\perp}$ (the average over $W_{L_{S_I}}$), and let $V$ be the
+space of $W_H$-invariants in $\operatorname{span}_\QQ\Phi_{L_{S_I}}$. Then
+for every $\gamma\in\Sigma\smallsetminus I$:
+\begin{enumerate}
+\item $\chi_\gamma|_Z = -\gamma|_Z$;
+\item $\chi_\gamma$ is $W_H$-invariant;
+\item hence $\chi_\gamma\in\pr(-\gamma)+V$. In particular, if $V=0$
+(condition \textup{(R)}), then $\chi_\gamma = \pr(-\gamma)$.
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+(2) The group $N_H(T)$ acts on the normal line of $D_\gamma$ at $x_I$.
+
+(1) The fibre $F = L_{S_I}\cdot x_I$ over $eP_{S_I}$ is fixed pointwise by
+$Z$, because $Z$ is central in $L_{S_I}$ and contained in
+$T\subset H$. Its closure $\overline F$ is stable under $P_{S_I}$, since the
+unipotent radical of $P_{S_I}$ acts trivially on $F$. Hence $\overline F$
+contains a $B$-fixed point, and the only $B$-fixed point of a wonderful
+variety is the base point $z$ of the closed orbit. So $x_I$ and $z$ lie in
+one connected component of $X^Z$. Along this component, $Z$ acts on the
+fibres of the $G$-linearized line bundle $\mathcal O(D_\gamma)$ by a single
+character. At a point of $D_\gamma$ the fibre is the normal line of
+$D_\gamma$; at $z$ the character is $-\gamma|_Z$, the $T$-weight of the
+coordinate of the slice through $z$ that cuts out $D_\gamma$ (this
+orientation agrees with \cite[\S1.3]{BrionJoshua}, where the weight is
+$+\gamma$ at the $B^-$-fixed point).
+
+(3) By (2), $\chi_\gamma - \pr(\chi_\gamma)$ lies in $V$, and by (1),
+$\pr(\chi_\gamma) = \pr(-\gamma)$, since $\pr$ is determined by the
+restriction to $Z$.
+\end{proof}
+
+By Knop \cite[Prop.~2.1]{KnopRoots}, $\dim V$ is the number of colours of
+the satellite minus its rank; so (R) says that the satellite has exactly
+$|I|$ colours.
+
+\begin{remark}
+Beyond (R) the $W_L$-average is wrong in general. For a satellite $GL_2/T$
+with root $\alpha$, the two fixed points have normal weights
+$-\gamma+a\alpha$ and $-\gamma+(\langle\gamma,\alpha^\vee\rangle-a)\alpha$,
+where $a$ is the Cartan pairing of one of the two colours with $\gamma$,
+and these differ in general. The package refuses such orbits unless the
+remaining unknown is certified (Section~\ref{sec:certificates}).
+\end{remark}
+
+\begin{example}[Complete quadrics]
+For complete quadrics in $\PP^{n-1}$ ($PGL_n/PO_n$), $\Sigma = \{2\alpha_i\}$
+and $S^p=\emptyset$. The orbit of type $I$ has $L_{S_I}=S(\prod GL_{k_j})$
+over the blocks of $I$ and $H_{L,I}=S(\prod O_{k_j})$, which has full rank
+if and only if all $k_j\le 2$. So $\chi(X)=\sum n!/2^{\#\{j:k_j=2\}}$ over the
+compositions of $n$ into parts $1$ and $2$: $3, 12, 66, 450, 3690$ for
+$n=2,\dots,6$; these are the ``barred permutations'' of
+\cite{BanerjeeCanJoyce}. The fixed-point data agree exactly, as multisets of
+weight multisets, with independent constructions: complete conics as a
+blow-up of $\PP^5$, and complete quadrics in $\PP^3$ as Vainsencher's two
+blow-ups \cite{Vainsencher}.
+\end{example}
+
+\subsection{Complete symmetric varieties}\label{subsec:symmetric}
+Let $\theta$ be an involution of $G$, given by its Satake diagram (black
+nodes $S_\bullet$, arrows) \cite{Araki}. The complete symmetric variety of
+De Concini--Procesi \cite{DCP83} is the wonderful compactification of
+$G_{\mathrm{ad}}/G_{\mathrm{ad}}^\theta$. The package derives all its
+fixed-point data from the diagram.
+\begin{enumerate}
+\item On characters $\theta = -w_\bullet\circ\varepsilon$, where $\varepsilon$
+follows the arrows on white nodes and acts on black nodes by the opposition
+involution of $S_\bullet$, and $w_\bullet$ is the longest element of
+$W_{S_\bullet}$. The spherical roots are the $\alpha-\theta(\alpha)$, one for
+each arrow orbit of white simple roots, and $S^p = S_\bullet$.
+\item The satellite of $I$ is the symmetric pair on the subdiagram
+$S_\bullet\cup\supp I$. It has fixed points if and only if every component
+of this subdiagram is $\theta$-stable of equal rank, i.e.\ $\varepsilon=-w_0$
+on it.
+\item An equal-rank involution is $\mathrm{Ad}(t_j)$ with $\alpha_j(t_j)=-1$
+for a Borel--de Siebenthal node $j$ \cite{BorelDeSiebenthal} and
+$\alpha_i(t_j)=1$ otherwise. The node is found by recognizing the
+subdiagram up to diagram automorphisms (so $D_4$ triality is handled),
+and the recognition is checked against $\dim K$ computed from the Satake
+diagram.
+\item $W_H = \Stab_{W_L}(t_j)$ in the adjoint torus, computed by
+orbit--stabilizer with Schreier generators; it need not be a reflection
+group.
+\end{enumerate}
+
+\begin{computation}\label{comp:symmetric}
+For all real forms of types A--D (in small rank), $E_6$--$E_8$, $F_4$ and
+$G_2$ the construction passes all checks of
+Section~\ref{subsec:checks} and the orbit counts of
+Section~\ref{subsec:orbitcounts}. Exceptional isomorphisms
+($B_2=C_2$, $D_3=A_3$, triality) give identical data from different
+diagrams, and rank-one cases agree with the two-orbit front end. Some
+dimensions and Euler characteristics:
+\begin{center}
+\begin{tabular}{lrr@{\qquad}lrr}
+\toprule
+form & $\dim$ & $\chi$ & form & $\dim$ & $\chi$\\
+\midrule
+AIII(2,2) & 8 & 39 & DIII(6) & 30 & 4576\\
+AIII(3,3) & 18 & 1180 & $G$ & 8 & 27\\
+CI(3) & 12 & 148 & FI & 28 & 4788\\
+CI(4) & 20 & 1624 & EIV & 26 & 270\\
+CII(2,2) & 16 & 123 & EIII & 32 & 2619\\
+BI(3,4) & 12 & 147 & AIII(3,4) & 24 & 8015\\
+DI(4,4) & 16 & 747 & DIII(7) & 42 & 55168\\
+\bottomrule
+\end{tabular}
+\end{center}
+For $G_2/SO_4$, $\chi = 27 = 12+6+6+3$ can be checked by hand.
+\end{computation}
+
+\subsection{Toroidal varieties}\label{subsec:toroidal}
+Let $X_w$ be wonderful with $\ZZ\Sigma$ as lattice, so that its valuation
+cone is the negative orthant in $N=\operatorname{Hom}(\ZZ\Sigma,\ZZ)$ and
+the orbit $O_J$ corresponds to the face $F_J$. A smooth fan subdividing the
+orthant gives a smooth complete toroidal $X\to X_w$. Its fixed points are
+the pairs $(x,\tau)$ with $x\in O_J^T$ and $\tau\subseteq F_J$ a cone of
+dimension $\dim F_J$, and near $x_J$ the morphism is the toric modification
+of the normal slice, on which $T$ acts through $-\gamma\mapsto\chi_\gamma$.
+So the tangent weights at $(w x_J,\tau)$ are $w(\Phi\smallsetminus\Phi_H)$ and
+$w(\pr_J(\tau^\vee))$, with $\tau^\vee$ the dual basis. Star subdivisions agree
+exactly with the blow-up front end.
+
+\subsection{Orbit counts}\label{subsec:orbitcounts}
+Brion and Peyre \cite{BrionPeyre} express the virtual Poincar\'e polynomial
+of $G/H$, for $H$ containing a maximal torus, through the Molien series
+$F_H$ of $N_H(T)/T$ acting on $\operatorname{Lie}T$:
+$|G/H|(q) = q^{\dim G/H}F_H(1/q)/F_G(1/q)$. For each orbit $O_I$ with fixed
+points the package compares $|G/P_{S_I}|(q)\cdot|L_{S_I}/H_{L,I}|(q)$ with the
+count obtained from the BB cells of the orbit closures by M\"obius
+inversion. They agree in all cases tested, including those beyond (R).
+
+% ===========================================================================
+\section{Certificates beyond condition (R)}\label{sec:certificates}
+
+For symmetric varieties, $V\ne0$ only for satellites with a Hermitian
+factor, and in the cases below $V = \QQ\zeta$ is spanned by the centre of the
+Hermitian subgroup. This happens for AIII$(p,q)$ with $p\ne q$, $p\ge2$, for
+DIII$(n)$ with $n$ odd, and for EIII; for AIII$(p,p)$ and DIII$(n)$ with $n$
+even the component group of $W_H$ negates the centre, and (R) holds. By Proposition~\ref{prop:normal}, the normal weight of
+$D_\gamma$ at $x_K$ is $\chi = \pr(-\gamma)+c\,\zeta$ for an unknown rational
+$c$. Since all $T$-weights lie in the root lattice, $c$ lies in a coset
+$c_0+\ZZ$ that is computed from $\pr(-\gamma)$ and a primitive $\zeta$
+(here $c_0=0$). The package uses $c=0$ and certifies it.
+
+\subsection{The point-count certificate}
+Let $X^J$ be the closure of an orbit $O_J$ (itself a smooth wonderful
+variety), and suppose that all normal weights occurring in $X^J$ are known
+except the one of $D_\gamma$ at $x_K$, $K\cup\{\gamma\}\subseteq J$. For a
+generic cocharacter $\lambda$ and a fixed point $w x_K$ put
+$a_w = \langle w\,\pr(-\gamma),\lambda\rangle$ and
+$b_w = \langle w\zeta,\lambda\rangle$. The unknown weight at $wx_K$ pairs to
+$a_w+c\,b_w$, so the BB counts $P_\lambda(c)$ of the data with parameter $c$
+form a step function of $c$ that jumps only at the thresholds $-a_w/b_w$.
+
+\begin{theorem}\label{thm:certificate}
+Let $E(X^J)$ be the E-polynomial of $X^J$, and let $c^*$ be the true value.
+\begin{enumerate}
+\item If $\lambda$ is generic for the true data (i.e.\ $c^*$ is not a
+threshold of $\lambda$), then $P_\lambda(c^*) = E(X^J)$.
+\item If $O_J$ has $T$-fixed points, then
+\[
+E(X^J) = |G/P_{S_J}|(q)\,|L_{S_J}/H_{L,J}|(q) + \sum_{\emptyset\ne S\subseteq J}(-1)^{|S|+1}E(X^{J\smallsetminus S}),
+\]
+where the first term is given by the Brion--Peyre formula and the others
+by the BB counts of closures that do not involve the unknown.
+\item In any case $P_\lambda(c^*)$ is palindromic of degree $\dim X^J$.
+\end{enumerate}
+Consequently, if $\lambda_1,\dots,\lambda_m$ have pairwise disjoint
+threshold sets, $m\ge 2$, then $c^*$ lies in
+$\bigcap_i\bigl(A_{\lambda_i}\cup T_{\lambda_i}\bigr)$, where $T_\lambda$ is the
+set of thresholds and $A_\lambda$ the union of the open intervals between
+thresholds on which $P_\lambda$ equals $E(X^J)$ (resp.\ is palindromic).
+\end{theorem}
+\begin{proof}
+(1) With the true weights, the data are the fixed-point data of $X^J$, and
+$\lambda$ is generic for them; the BB decomposition of the smooth projective
+$X^J$ into affine spaces gives $E(X^J)=\sum_d c_d q^d$.
+(2) The orbits of $X^J$ stratify it into the open orbit $O_J$ and the
+boundary $\bigcup_{\gamma\in J}X^{J\smallsetminus\{\gamma\}}$, with
+$X^{J\smallsetminus S}\cap X^{J\smallsetminus S'}=X^{J\smallsetminus(S\cup S')}$;
+the E-polynomial is additive, which gives the inclusion--exclusion. The
+orbit $O_J$ fibres Zariski-locally trivially over $G/P_{S_J}$ with fibre
+the satellite, and $E(L/H_L)$ is the Brion--Peyre count. The orbit $O_K$
+lies in $X^{J\smallsetminus S}$ only if $S\subseteq\{\gamma\}$, and
+$X^{K}$ has no normal direction $\gamma$, so no term with $S\ne\emptyset$
+involves the unknown.
+(3) Poincar\'e duality. For the last statement: every $c$ that is not a
+threshold of some $\lambda_i$ with $P_{\lambda_i}(c)\ne E(X^J)$ is excluded by
+(1); since the threshold sets are disjoint, $c^*$ is a threshold of at most
+one $\lambda_i$, so it is decided by the others.
+\end{proof}
+
+Intersecting with $c_0+\ZZ$ gives a finite list of candidates when every
+admissible interval is bounded; if only $c=0$ remains, $c=0$ is proved,
+given the fixed-point data of the known orbits. In practice the admissible
+set at each $\lambda$ is a single interval around $0$ of half-width below
+$0.1$.
+
+Two unknowns on different orbits are handled jointly: every fixed point
+sees at most one of them, so $P_\lambda = P_0+F_1(c_1)+F_2(c_2)$, and the
+admissible boxes are found by matching the values of $F_2$ against
+$E-P_0-F_1$ in a hash table.
+
+\subsection{Induction over orbit closures}
+The unknowns $(K,\gamma)$ are decided one at a time, each on the smallest
+closure $X^J\supseteq X^{K\cup\{\gamma\}}$ whose other normal weights are
+proved or already certified, preferring closures whose open orbit has fixed
+points. If the palindromic condition leaves $c$ unbounded, the next larger
+closure is tried; if no single unknown can be decided, pairs are decided
+jointly.
+
+\begin{computation}\label{comp:certified}
+The certificate leaves exactly $c=0$ for every unknown normal weight of the
+complete symmetric varieties AIII(2,3), AIII(2,4), AIII(2,5), AIII(3,4),
+AIII(3,5), AIII(3,6), AIII(4,5), DIII(5), DIII(7) and EIII.
+For AIII$(3,4)$ the orbit $O_{13}$ has no fixed points, and the unknown
+$(O_3,\gamma_0)$ is decided on $X^{\{0,2\}}$ by palindromy alone. For
+DIII$(7)$ palindromy leaves $c$ unbounded there, and $(O_3,\gamma_0)$,
+$(O_{23},\gamma_0)$ are decided jointly on $X$. For AIII$(4,5)$ all six
+unknowns are decided one at a time.
+\end{computation}
+
+\begin{remark}
+A first certificate used the Atiyah--Bott--Berline--Vergne identity
+$\sum_p 1/e_p(\lambda)=0$ \cite{AtiyahBott84,BerlineVergne} as a rational
+function of $c$: an explicit bound excludes large $|c|$, and all integers
+below it are screened modulo a large prime. It certifies the cases
+AIII$(2,q)$, DIII$(5)$ and EIII, but for AIII$(3,4)$ and DIII$(7)$ the
+coefficients of the expansion in $1/c$ vanish identically and the moments
+$\int c_1^T(TX)^k$ give bounds beyond reach. This degeneracy motivated
+Theorem~\ref{thm:certificate}.
+\end{remark}
+
+\begin{question}
+Is $c=0$ for every Hermitian satellite, i.e.\ is the normal weight always the
+$W_L$-average for complete symmetric varieties? A sketch: the Satake
+involution fixes every spherical root and swaps the two end colours of a
+Hermitian block, so the colour coefficients $c(D,\gamma)$ are invariant, and
+the class measuring $c$ vanishes. Making this rigorous requires the sign
+of $\operatorname{div} f_\gamma$, the reducedness of $D\cap F$, and that
+colours not moved by $S_I$ miss the localization.
+\end{question}
+
+% ===========================================================================
+\section{Cell counts without listing fixed points}\label{sec:large}
+
+For a generic $\lambda$ the cell dimension of $w x_O$ is the number of
+$\lambda$-positive weights among $w(\Phi\smallsetminus\Phi_H)$ and $w(N_O)$.
+The coset search of Section~\ref{sec:spherical} enumerates the minimal
+representatives level by level, keeping only one length level of inverse
+permutations of the roots in memory. When $W_H$ is not generated by
+reflections, the counts over cosets of the reflection part are divided by
+$|W_H:W_{\mathrm{refl}}|$, and the division must be exact. Two
+pseudo-random cocharacters must give the same counts, and the counts must
+be palindromic.
+
+\begin{computation}\label{comp:large}
+The complete symmetric varieties of the following exceptional types have
+the stated dimension and Euler characteristic; the counts are
+$\lambda$-independent and palindromic (times on one core in pure Python):
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+form & $\dim$ & $\chi$ & time\\
+\midrule
+EII & 40 & 110\,916 & 4\,s\\
+EI & 42 & 370\,170 & 14\,s\\
+EVII & 54 & 23\,464 & 7\,s\\
+EVI & 64 & 758\,079 & 48\,s\\
+EV & 70 & 28\,373\,976 & 30\,min\\
+EIX & 112 & 7\,445\,880 & 13\,min\\
+\bottomrule
+\end{tabular}
+\end{center}
+For example, the cell counts of EVII are 1, 3, 7, 12, 19, 29, 44, 63, 87,
+117, 155, 198, 248, 303, 366, 432, 503, 575, 652, 724, 795, 858, 920, 970,
+1013, 1041, 1063, 1068, \dots, symmetric around the middle term 1068. EVIII is out of reach this way:
+its closed orbit alone has $|W(E_8)| = 696\,729\,600$ fixed points.
+\end{computation}
+
+% ===========================================================================
+\section{Equivariant cohomology beyond GKM}\label{sec:cohomology}
+
+For GKM varieties, $H_T^*(X;\QQ)$ is the ring of tuples of polynomials
+$(f_p)_{p\in X^T}$ with $f_p\equiv f_q\bmod\chi$ along every $T$-curve
+\cite{GKM}. Complete quadrics are not GKM: at a fixed point the weights
+$\alpha$ and $2\alpha$ can both occur, and there are infinitely many
+$T$-curves.
+
+\subsection{Brion's description}
+For a smooth complete spherical variety, Brion \cite[Thm.~6 and proof of
+Thm.~9]{Brion98} cuts out the image of $H_T^*(X)\to H_T^*(X^T)$ by
+conditions attached to the connected components $Y$ of $X^{\ker\chi}$ for
+primitive characters $\chi$. Such a $Y$ is a point, a $\PP^1$ (condition
+$f_y\equiv f_z\bmod\chi$), or a surface, namely $\PP(\mathfrak{sl}_2)$ or a
+rational ruled surface; for a surface all $f_p$, $p\in Y^T$, are congruent
+modulo $\chi$ and $\sum_{p\in Y^T} f_p/e_p$ is a polynomial, where $e_p$ is
+the product of the two weights of $T_pY$.
+
+\begin{lemma}\label{lem:components}
+The components can be read off the fixed-point data: points of one
+component of $X^{\ker\chi}$ have the same weights modulo $\ZZ\chi$, and the
+weights along $\chi$ form one of the patterns
+$\{k,-k\}$ (curve), $\{a,-a\},\{a,2a\},\{-a,-2a\}$ (plane), or
+$\{\pm a,\pm b\}$ (ruled surface).
+\end{lemma}
+The package raises when the grouping is ambiguous; it never was in the
+examples. On flag and toric varieties the inferred curves are the GKM
+edges; complete conics have $12$ curves and $6$ planes, complete quadrics
+in $\PP^3$ have $153$ curves and $48$ planes. In low degrees the ring cut
+out by these conditions has the dimension of a free module with the BB
+Poincar\'e series, while dropping the second-order condition gives too many
+classes.
+
+\subsection{Characteristic numbers}
+A degree-one class is determined by its values on the closed orbit:
+propagation along the components determines the other values, and all
+conditions are checked at the end. A $G$-linearized line bundle with weight
+$\mu$ at the base point $z$ of the closed orbit has value $w(\mu)$ at $wz$.
+For complete quadrics in $\PP^{n-1}$, the colours $\mu_k$ are the pullbacks of
+$\mathcal O(1)$ from $\PP(\mathrm{Sym}^2\Lambda^kV)$, of weight $-2\omega_k$.
+Monomials in these classes are integrated by the localization formula
+\cite{AtiyahBott84,BerlineVergne} in exact arithmetic; the result must be an
+integer independent of the cocharacter. The class of the condition to be
+tangent to a given quadric is $2(\mu_1+\dots+\mu_{n-1})$.
+
+\begin{computation}\label{comp:characteristic}
+The package reproduces the following numbers for complete conics,
+complete quadric surfaces and complete quadrics in $\PP^4$ and $\PP^5$;
+$\mu,\nu,\rho$ and $\mu_1,\dots,\mu_{n-1}$ are the colours.
+
+\smallskip
+\begin{center}
+\small
+\begin{tabular}{p{0.2\textwidth}p{0.33\textwidth}p{0.36\textwidth}}
+\toprule
+$X$ & number & value\\
+\midrule
+conics & $\mu^a\nu^{5-a}$, $a=5,\dots,0$ & 1, 2, 4, 4, 2, 1\\
+ & $(2\mu+2\nu)^5$ (Chasles \cite{Chasles}) & 3264\\
+quadric surfaces & $\mu^a\nu^{9-a}$, $a=9,\dots,0$ \cite{Schubert} & 1, 2, 4, 8, 16, 32, 56, 80, 92, 92\\
+ & $\rho^9$ & 1\\
+ & $(2\mu+2\nu+2\rho)^9$ & 666\,841\,088\\
+ & $\mu^3\nu^3\rho^3$, $\mu^2\nu^5\rho^2$ \cite{BFS} & 104, 128\\
+quadrics in $\PP^4$ & $(2\sum\mu_k)^{14}$ \cite{Sturmfels3264} & 48\,942\,189\,946\,470\,400\\
+ & $\mu_2^{14}$ & 7703\\
+quadrics in $\PP^5$ & $(2\sum\mu_k)^{20}$ & see below\\
+ & $\mu_k^{20}$, $k=1,\dots,5$ & 1, 803128, 61520094, 803128, 1\\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+
+\noindent It also reproduces the maximum likelihood degrees
+$\varphi(n,d)=\int\mu_1^{\binom{n+1}2-d}\mu_{n-1}^{d-1}$ of generic linear
+concentration models \cite[Prop.~3.5]{MMMSV}, as tabulated in
+\cite[\S2.2]{SturmfelsUhler}: $\varphi(4,d)$ = 1, 3, 9, 17, 21, 21, 17, 9, 3, 1;
+$\varphi(5,d)$ = 1, 4, 16, 44, 86, 137, 188, 212, \dots; and
+$\varphi(6,d)$ = 1, 5, 25, 90, 240, 528, 1016 for $d\le7$. For complete
+quadrics in $\PP^5$ ($3690$ fixed points, $28\,440$ components) the number of
+quadrics tangent to $20$ general quadrics comes out as
+\[
+\int_X \bigl(2(\mu_1+\dots+\mu_5)\bigr)^{20} = 1\,810\,718\,299\,257\,984\,458\,113\,941\,504 .
+\]
+\end{computation}
+
+\begin{remark}
+The list in \cite[Question~5]{Sturmfels3264} gives
+\[641\,211\,464\,734\,373\,953\,791\,690\,014\,720\]
+for this number. A
+second computation by a different method, not yet part of the package,
+gives our value, and so does the growth of the sequence: the decimal logarithms of the four numbers
+are $3.51$, $8.82$, $16.69$ and $27.26$ (ours), with differences $5.31$,
+$7.87$, $10.57$, whereas the listed value would give $29.81$. We have not
+resolved the discrepancy; a third computation is planned.
+\end{remark}
+
+\subsection{Cell classes}
+Call a class $\tau_p\in H_T^*(X)$ \emph{canonical} (after Goldin--Tolman
+\cite{GoldinTolman}) if $\tau_p(p)$ is the product $e^-_p$ of the
+$\lambda$-negative weights at $p$ and $\tau_p(q)=0$ for all $q\ne p$ with
+$\codim q\le\codim p$, where $\codim p$ is the number of negative weights.
+
+\begin{proposition}\label{prop:canonical}
+A canonical class for $p$ is unique if it exists. It exists if every
+fixed point $q\ne p$ in the closure of the plus-cell $C_p$ satisfies
+$\dim C_q<\dim C_p$; then it is the equivariant class of
+$\overline{C_p}$. Conversely, if the canonical class of $p$ does not exist,
+then $\overline{C_p}$ contains a fixed point $q\ne p$ with $\dim C_q\ge \dim C_p$.
+\end{proposition}
+\begin{proof}
+The class $[\overline{C_p}]$ restricts to $e^-_p$ at $p$, since $C_p$ is
+smooth there with normal space the negative weight space, and to zero at
+fixed points outside $\overline{C_p}$. If $\overline{C_p}$ contains no fixed
+point $q\ne p$ with $\codim q\le\codim p$, this class is canonical; this
+proves existence and, by contraposition, the last statement. Uniqueness:
+the difference $\delta$ of two canonical classes vanishes at $p$ and at all
+$q$ with $\codim q\le\codim p$. Order the fixed points by a Morse function of
+an ample class; if $\delta\ne0$, let $q$ be minimal with $\delta(q)\ne 0$. By
+the Atiyah--Bott lemma \cite{AtiyahBott84}, applied to the filtration by
+closed unions of plus-cells (whose open parts have affine pavings and are
+therefore equivariantly formal), $\delta(q)$ is divisible by $e^-_q$, which has degree $\codim q>\codim p=\deg\delta$,
+a contradiction.
+\end{proof}
+
+The package constructs canonical classes point by point in a Morse order.
+At $q$, each component $Y\ni q$ on which $q$ has $m\in\{1,2\}$ negative weights
+gives a congruence $\tau(q)\equiv L_Y\bmod\chi_Y^m$, with $L_Y$ the value at an
+earlier point ($m=1$) or obtained from the sum condition ($m=2$); the
+moduli multiply to $e^-_q$, and $\tau(q)$ is found by Newton interpolation
+using only restriction to hyperplanes and exact division. On flag varieties
+the result equals the GKM flow-up classes, and on the non-GKM examples
+CII$(1,2)$ and BI$(1,4)$ it equals a global linear solve.
+
+\begin{computation}\label{comp:nocanonical}
+For complete conics the line arrangement of the tangent weights has $12$
+chambers. In each chamber exactly two of the twelve fixed points have no
+canonical class. Hence, by Proposition~\ref{prop:canonical}, for every
+generic cocharacter two plus-cell closures contain fixed points of cells
+of at least their own dimension: the BB decomposition of complete conics is
+never a stratification by cell closures. Canonical classes also fail to exist
+for some points of AI(4), CI(2), CI(3), $G_2$, AIII(2,2), DI(2,4) and even of
+the GKM variety AII(3) for the default cocharacter, and they exist for all
+points of AIII(1,2), BI(1,4) and CII(1,2).
+\end{computation}
+
+\subsection{The divisor subalgebra}
+If $A = \bigoplus_{d=0}^n A^d$ is a graded Poincar\'e duality algebra over
+$\QQ$ generated by $A^1$, then $A\cong\QQ[x_1,\dots,x_k]/\Ann(V)$ with the
+volume polynomial $V(x) = \int(\sum_i x_iD_i)^n/n!$, acting by
+differentiation (Macaulay's inverse systems \cite{Macaulay}). For
+$D_i\in H^2(X;\QQ)$ the same construction yields the subalgebra generated by
+the $D_i$, whose Hilbert function is computed from the intersection numbers
+$\int D^a$: a form $f$ of degree $d$ vanishes in $H^*(X;\QQ)$ if and only if
+$\int fg=0$ for all $g$ of degree $n-d$.
+
+\begin{computation}\label{comp:divisors}
+\begin{enumerate}
+\item Complete conics: $H^*(X;\QQ)=\QQ[\mu,\nu]/(r_3,r_4)$ with one cubic
+relation $r_3 = 2\nu^3-3\mu\nu^2+3\mu^2\nu-2\mu^3$ and one further quartic
+relation.
+\item Complete quadric surfaces: $H^*(X;\QQ)$ is generated by $\mu,\nu,\rho$,
+with minimal relations in degrees $4,4,5,5,6$.
+\end{enumerate}
+\end{computation}
+
+\begin{proposition}\label{prop:notgenerated}
+The cohomology of complete quadrics in $\PP^4$ is not generated by divisor
+classes.
+\end{proposition}
+\begin{proof}
+The Picard rank is $4$, so $H^2$ has dimension $4$ and the degree-$6$ part of
+the subalgebra generated by $H^2$ has dimension at most $\binom{6}{3}=20$,
+whereas $b_6=21$ (the cell counts are $1,4,10,21,36,53,65,70,\dots$).
+\end{proof}
+The computation shows more: the subalgebra generated by the colours has
+Hilbert function $1,4,10,20,35,52,65,70,\dots$. The missing classes are the
+subject of \cite{DGMP}.
+
+% ===========================================================================
+\section{Real points}\label{sec:real}
+
+\subsection{The question}
+In the stable motivic homotopy category, the component of the attaching map
+from a cell of dimension $d+1$ to a cell of dimension $d$ of a motivic cell
+structure lies in $\pi_{1,1}=W\cdot\eta$ \cite{MorelVoevodsky,DuggerIsaksen}.
+For smooth projective varieties over $\ZZ$ with a BB decomposition we ask
+whether it comes from $W(\ZZ)\cdot\eta\cong\ZZ\cdot\eta$ (hypothesis H1 of the
+project). Under real realization $\eta$ has degree $\pm2$, so the incidence
+numbers of the real cell complex of $X(\RR)$ would be twice these
+coefficients; under complex realization $\eta$ is detected by $Sq^2$.
+
+\subsection{The rule}
+For a fixed point $p$ let $\sigma(p)$ be the sum of the $\lambda$-positive
+weights at $p$. For an invariant curve from $x$ to $y$ with
+$d_\lambda(x)=d_\lambda(y)+1$ and weight $\varphi$ at $x$, write
+$\sigma(x)-\sigma(y)=m\,\varphi$.
+
+\begin{conjecture}[H1${}'$]\label{conj:h1}
+Let $X$ be smooth projective over $\ZZ$ with a split torus action, and let
+$\lambda$ be a generic cocharacter whose decomposition is \emph{graded}:
+every invariant curve goes down in cell dimension. Then the
+$\eta$-component of the attaching map from $x$ to $y$ is $\pm\eta$ if $x$
+and $y$ are joined by an invariant curve with $m$ even, and $0$ otherwise.
+\end{conjecture}
+
+For $G/P$ with $\lambda$ dominant regular, $\sigma$ is Kocherlakota's
+$\sigma$ and the real statement is Kocherlakota's theorem \cite{Kocherlakota};
+the package checks the identification for every parabolic of
+$A_2,A_3,B_2,B_3,C_3,G_2,D_4$. For toric varieties the predicted
+incidences, completed by the unique signs (up to reorientation) with
+$\partial^2=0$, give the rational Betti numbers of $X(\RR)$ computed
+independently by the formula of Choi--Park and Suciu--Trevisan
+\cite{ChoiPark,SuciuTrevisan}. In the complex realization, the parity rule
+agrees with $(y^*)^2\bmod2$ computed in the GKM ring for all examples tested.
+
+\subsection{Exact incidences for toric varieties}
+The real points of a smooth complete toric variety with polytope $P$ are
+$X(\RR)=P\times(\ZZ/2)^n/\!\sim$ \cite{DavisJanuszkiewicz}. A face of $P$,
+i.e.\ a cone $\tau$ of the fan, contributes one cell of dimension
+$n-|\tau|$ for each class of $(\ZZ/2)^n$ modulo the span $\Lambda_\tau$ of
+the rays of $\tau$ modulo $2$. Orienting each cell by its face, the
+attaching maps are the identity on $P$ and
+\[
+\partial(\tau,e)=\sum_{r}(-1)^{\,n-|\tau|+\#\{i\in\tau:\,i<r\}}\,(\tau\cup\{r\},e),
+\]
+summed over the rays $r$ with $\tau\cup\{r\}$ a cone. The real BB cell of a
+vertex $v$ is the union of the cells of the faces whose $\lambda$-minimal
+vertex is $v$; in the ray coordinates of $v$ it is the set $\{+,-,0\}^{d_v}$
+of sign vectors.
+
+\begin{theorem}\label{thm:morse}
+Match a cell of the BB cell of $v$ whose first coordinate (in a fixed order)
+that is not $+$ equals $0$ with the cell obtained by replacing that
+coordinate by $-$. This is an acyclic matching of the Davis--Januszkiewicz
+complex whose critical cells are the positive orthants, one for each fixed
+point, of dimension $d_\lambda(v)$. Consequently the algebraic Morse complex
+\cite{Forman,Skoldberg,Kozlov} is a chain complex of free abelian groups with
+one generator of degree $d_\lambda(v)$ for each fixed point, whose homology is
+$H_*(X(\RR);\ZZ)$.
+\end{theorem}
+\begin{proof}
+Within one BB cell the matching is the standard lexicographic collapse of
+$\{+,-,0\}^d$ onto $(+,\dots,+)$, and matched cells are faces of each other
+of codimension one with incidence $\pm1$. Gradient paths leave the BB cell
+of $v$ only towards faces not containing $v$, whose minimal vertex has a
+larger value of $\langle\cdot,\lambda\rangle$; so a closed path would have to
+stay in one BB cell, where the matching is acyclic. The last statement is
+the main theorem of algebraic Morse theory.
+\end{proof}
+
+If the decomposition is graded, every vertex of $F_v$ other than $v$ is
+reached from $v$ by a monotone edge path, along which the cell dimension
+drops; hence $\overline{C_v(\RR)}\smallsetminus C_v(\RR)$ lies in cells of
+smaller dimension, the real BB cells form a CW structure, and the
+incidences can be compared entry by entry.
+
+\begin{observation}\label{obs:entrywise}
+On random smooth complete toric varieties with graded decompositions, the
+magnitude of every entry of the Morse complex equals the prediction of
+Conjecture~\ref{conj:h1} ($2$ if and only if the cells are joined by a curve
+with $m$ even): $14$ decompositions in dimension $2$, $42$ in dimension $3$
+and $40$ in dimension $4$, with $9$, $70$ and $151$ nonzero incidences, and no
+mismatch.
+\end{observation}
+
+\subsection{Beyond GKM}
+For non-GKM varieties we apply the rule to the invariant curves provided by
+the components of Lemma~\ref{lem:components}: every $\PP^1$ component, the
+two lines of weight $\pm a$ in each plane $\PP(\mathfrak{sl}_2)$ (the conics of
+weight $2a$ join cells two apart), and the four boundary curves of each
+ruled surface. The parity $m$ is computed after pairing the normal weights at
+the two ends of the curve; when normal weights are congruent modulo
+$\varphi$ the pairing is a choice, but flip-free pairings all give the same
+$m$.
+
+\begin{computation}\label{comp:beyondgkm}
+For each of the following varieties and $12$ random generic cocharacters,
+the decomposition is graded along these curves, the sign completion is
+unique, and the predicted rational Betti numbers of $X(\RR)$ equal the known
+ones:
+\begin{center}
+\small
+\begin{tabular}{lll}
+\toprule
+variety & torus & known $X(\RR)$\\
+\midrule
+$\PP^q\times\check\PP^q$, $q=2,3,4$ & $PGL_{q+1}$ & $\RP^q\times\RP^q$\\
+$\Gr(2,6)$, $\Gr(2,8)$ & $Sp_6$, $Sp_8$ & \cite{CasianKodama}\\
+$E_6/P_1$ & $F_4$ & \cite{Kocherlakota}, $E_6$-torus\\
+\bottomrule
+\end{tabular}
+\end{center}
+In each case $X(\RR)$ is the same real variety as for a larger torus with
+GKM data, where the answer is known. In the notation of symmetric varieties
+these are AIII$(1,q)$, CII$(1,2)$, CII$(1,3)$ and FII.
+\end{computation}
+
+\subsection{Non-graded decompositions}
+Every rank-two complete symmetric variety we tested (AI(3), AI(4), AII(3),
+AIII(2,2), AIII(2,3), BI(2,3), CI(2), CI(3), CII(2,2), DI(2,4), $G_2$) is
+non-graded along the invariant curves for all $576$ random cocharacters
+tried, and already the toric surface $dP_6$ has no graded cocharacter. With
+rational coefficients a chain complex on the BB cells still exists, but
+only up to filtered change of basis.
+
+\begin{observation}[surfaces]\label{obs:deflection}
+Let $a\to b$ be a curve between cells of equal dimension; exactly one normal
+direction $\psi$ changes sign along it, and put
+$m=(\sigma(a)-\sigma(b)+\psi_b)/\varphi$. Add to the direct terms of
+Conjecture~\ref{conj:h1} a term $\pm2$ in $\langle\partial c,b\rangle$ for
+every curve $c\to a$ with $d(c)=d(a)+1$, whenever $m$ is odd. Heuristically,
+each of the two real arcs from $b$ to $a$ is deflected into one ascending arc
+of $a$. For $dP_6$, four other non-graded fans and $144$ decompositions of
+$30$ random toric surfaces, every sign completion gives the Choi--Park Betti
+numbers. In dimension $3$ the rule fails, and the exact complexes of
+Theorem~\ref{thm:morse} have nonzero entries between cells that share no
+neighbour.
+\end{observation}
+
+\begin{proposition}\label{prop:realconics}
+For the variety $X$ of complete conics,
+$H^*(X(\RR);\QQ)\cong H^*(\RP^5;\QQ)$, so the rational Betti numbers of
+$X(\RR)$ are $1,0,0,0,0,1$.
+\end{proposition}
+\begin{proof}
+$X=\Bl_{v_2(\PP^2)}\PP^5$, so $X(\RR)$ is the real blow-up of $\RP^5$ along
+the Veronese $\RP^2$, with exceptional divisor $E$ an $\RP^2$-bundle over
+$\RP^2$. The blow-up square gives a Mayer--Vietoris sequence
+\[\cdots\to H^k(\RP^5)\to H^k(X(\RR))\oplus H^k(\RP^2)\to H^k(E)\to\cdots.\]
+Since $\RP^2$ is $\QQ$-acyclic, $E\to\RP^2$ induces an isomorphism in rational
+cohomology, and the five lemma gives the claim.
+\end{proof}
+
+\begin{observation}\label{obs:conics}
+For complete conics, the prediction of Conjecture~\ref{conj:h1} along the
+invariant curves admits no sign completion in any chamber. In each of $21$
+chambers tested, removing exactly one term gives a complex whose rational
+homology is that of Proposition~\ref{prop:realconics}, and this term is unique:
+it runs from the upper end of the curve between cells of equal dimension
+with $m$ even to the lower end of the one with $m$ odd (there are always
+exactly two such curves). Neither the rule of
+Observation~\ref{obs:deflection} nor a sum over paths of such curves
+explains this; the planes $\PP(\mathfrak{sl}_2)$ seem to need their own local
+model.
+\end{observation}
+
+% ===========================================================================
+\section{Software}\label{sec:software}
+
+\bbcells{} is written in Python ($\ge3.10$) with the standard library only;
+all arithmetic is exact (\code{int}, \code{Fraction}, and modular arithmetic
+for probabilistic identity tests). The core type is the fixed-point data;
+front ends produce them from fans, root data, Satake diagrams, spherical
+data or constructions (products, restriction to subtori, blow-ups), and the
+invariants, the equivariant cohomology and the real complexes are computed
+from them. The command line covers the front ends and invariants, for
+example
+\begin{verbatim}
+python3 -m bbcells symmetric AIII 2 3
+python3 -m bbcells symmetric EVI --counts-only
+python3 -m bbcells real A3
+\end{verbatim}
+The test suite has more than $300$ tests, including doctests, and runs in
+about a minute; it contains the oracle tests of
+Table~\ref{tab:frontends} and every computation of this paper that takes
+less than a few seconds. The larger computations are reproduced by
+\code{paper/reproduce.py}.
+
+% ===========================================================================
+\section{Open problems}\label{sec:open}
+
+\begin{enumerate}
+\item \emph{General Luna data.} Wonderful varieties whose satellites are not
+symmetric, starting with Wasserman's rank-two list \cite{Wasserman} and the
+primitive spherical systems of Bravi--Pezzini \cite{BravPez,BravPezPrimitive}.
+\item \emph{The Hermitian case in general} (the question in
+Section~\ref{sec:certificates}), and certificates for two unknowns on one
+orbit.
+\item \emph{The number of quadrics in $\PP^5$ tangent to $20$ general quadrics}
+(Remark after Computation~\ref{comp:characteristic}).
+\item \emph{An integral basis} of $H^*(X;\ZZ)$ adapted to the cells when
+canonical classes do not exist, as for complete conics; and the generators
+beyond the divisors for complete quadrics in $\PP^4$.
+\item \emph{Toroidal varieties with $\Lambda\supsetneq\ZZ\Sigma$}, which are
+finite covers of toroidal varieties over wonderful models.
+\item \emph{Non-graded real incidences} in dimension $\ge3$
+(Observations~\ref{obs:deflection} and~\ref{obs:conics}), and a proof of
+Conjecture~\ref{conj:h1} in $SH(\ZZ)$, for instance through the Thom-space cell
+structures of \cite{VoelkelSpherical} restricted to invariant curves.
+\item \emph{EVIII}, via the orbit decomposition rather than the fixed points.
+\end{enumerate}
+
+\subsection*{Acknowledgements}
+\emph{[To be written by the author; see the comment in the source.]}
+% To be decided by the author (PLAN.md 4.4): acknowledgement of tool use.
+% Parts of the software and a first draft of this text were written with
+% the help of an AI coding assistant (Claude Code); all statements are to be
+% checked by the author before submission.
+
+\bibliographystyle{amsplain}
+\bibliography{references}
+
+\end{document}
