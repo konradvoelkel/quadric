@@ -504,7 +504,8 @@ $$E(X)=\sum_{I\subseteq S}|G/P_I|(q)\;e(I),\qquad e(I)=\prod_{\text{factors }F\t
 - No fixed point of $X$ itself is visited. The results agree exactly with the
   streamed counts for $B_2,B_3,B_4,C_3,C_4,D_4,D_6,F_4,G_2$ (tests), whose
   Levis include factors of both kinds. For $E_7$ (EV) the method gives
-  $\chi=28373976$ in 2 minutes instead of 30, palindromic.
+  the whole vector of cell counts in 2 minutes; it agrees exactly with the
+  streamed counts over all 28373976 fixed points (15 min with 2 processes).
 - EVIII ($E_8/\mathrm{Spin}_{16}$, dimension 128) needs only the complete
   symmetric varieties of the Levi factors $A_2,\dots,A_7$, $D_5$, $D_7$ and
   $E_6$ whose split symmetric spaces have smaller rank; its closed orbit alone
