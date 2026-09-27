@@ -184,11 +184,10 @@ release goes out together with the paper.
   *computation*, *observation* or *conjecture* otherwise. **Done when:** it
   compiles, and every number in it is produced by a test or by the
   reproduction script (P2).
-- [ ] **P2 Reproduction script** (S). `paper/reproduce.py` recomputes every
-  table of the paper, with a fast mode run by a test. **Done when:** the fast
-  mode is in CI and the slow mode (EV, EIX, $\mathbb P^5$) is logged once
-  with timings. *(Fast mode done: 32 claims in `tests/test_paper.py`; the
-  full run goes to `paper/reproduce.log`.)*
+- [x] **P2 Reproduction script** (S). `paper/reproduce.py` recomputes every
+  number of the paper; the fast claims run in `tests/test_paper.py`, and the
+  full run (100 claims, all `ok`, about 70 min on 4 cores) is logged in
+  `paper/reproduce.log` with the commit it ran on.
 - [ ] **P3 Proofs** (research). Write out in full:
   - (a) the normal-weight proposition (`spherical.md` §3);
   - (b) soundness of the point-count certificate: lattice, additivity of
