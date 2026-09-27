@@ -161,9 +161,9 @@ Reproduced (`tests/test_brion.py`):
   $1,4,10,21,36,53,65,70,\dots$.
 - **The colours and $c_3(T_X)$ generate** $H^*(X;\mathbb Q)$ for complete
   quadrics in $\mathbb P^4$. The Poincaré duality quotient of the subalgebra
-  they generate has Hilbert function equal to the Betti numbers (the
-  intersection numbers are integers, and a second cocharacter is being
-  checked); since it is a quotient of the subalgebra, this proves
+  they generate has Hilbert function equal to the Betti numbers, with the
+  same minimal relations at two cocharacters; since it is a quotient of the
+  subalgebra, this proves
   generation. Its minimal relations: 3 in degree 4, 1 in degree 5, 6 in
   degree 6. The equivariant $c_3(T_X)$ is $e_3$ of the tangent weights. By
   contrast $c_2(T_X)$ lies in the divisor subalgebra (one relation in degree
