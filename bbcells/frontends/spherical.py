@@ -866,9 +866,9 @@ def certify_by_closures(cartan_type, orbits, trials=3, seed=0, methods=None):
     unknown (K, gamma), i.e. the normal weight of D_gamma on the marked orbit
     O_K, is decided on a closure X^J, J > K + gamma, in which every other
     normal weight is proved (condition (R)) or certified before:
-      * by certify_by_point_count on the smallest such J (against the
-        E-polynomial if the open orbit O_J has T-fixed points, else by
-        Poincare duality);
+      * by certify_by_point_count on the smallest such J that bounds the
+        unknown (against the E-polynomial if the open orbit O_J has T-fixed
+        points, else by Poincare duality, which can leave c unbounded);
       * if no unknown can be decided so, pairs of unknowns on different
         orbits are decided jointly by the point count on the smallest
         closure containing both;
@@ -892,7 +892,9 @@ def certify_by_closures(cartan_type, orbits, trials=3, seed=0, methods=None):
                    for o in orbits if o.name in marked and roots_of[o.name] <= J
                    for g in o.normal_roots if g in J)
 
-    def smallest_closure(unknowns):
+    def closures(unknowns):
+        """the closures on which the unknowns can be decided, smallest first,
+        an open orbit with fixed points (E-polynomial) first within a size"""
         base = set()
         for name, gamma in unknowns:
             base |= roots_of[name] | {gamma}
@@ -900,8 +902,21 @@ def certify_by_closures(cartan_type, orbits, trials=3, seed=0, methods=None):
         for size in range(len(rest) + 1):
             candidates = [base | set(extra) for extra in combinations(rest, size)]
             candidates = [J for J in candidates if others_known(J, unknowns)]
-            if candidates:          # prefer an open orbit with fixed points (E-polynomial)
-                return max(candidates, key=lambda J: frozenset(J) in with_points)
+            candidates.sort(key=lambda J: frozenset(J) not in with_points)
+            for J in candidates:
+                yield J
+
+    def by_point_count(unknowns):
+        """(admissible, J) from the first closure that bounds the unknowns"""
+        for J in closures(unknowns):
+            try:
+                admissible, _ = certify_by_point_count(
+                    cartan_type, _restrict(orbits, J, *unknowns), trials, seed)
+            except ValueError as error:
+                if not any(text in str(error) for text in ("unbounded", "too large")):
+                    raise
+                continue
+            return admissible, J
         return None
 
     def record(unknowns, admissible, method, J):
@@ -913,21 +928,17 @@ def certify_by_closures(cartan_type, orbits, trials=3, seed=0, methods=None):
     while pending:
         progress = []
         for unknown in pending:
-            J = smallest_closure([unknown])
-            if J is not None:
-                admissible, _ = certify_by_point_count(
-                    cartan_type, _restrict(orbits, J, unknown), trials, seed)
-                record([unknown], admissible, "point count", J)
+            found = by_point_count([unknown])
+            if found is not None:
+                record([unknown], found[0], "point count", found[1])
                 progress.append(unknown)
         if not progress:
             for first, second in combinations(pending, 2):
                 if first[0] == second[0]:
                     continue
-                J = smallest_closure([first, second])
-                if J is not None:
-                    admissible, _ = certify_by_point_count(
-                        cartan_type, _restrict(orbits, J, first, second), trials, seed)
-                    record([first, second], admissible, "joint point count", J)
+                found = by_point_count([first, second])
+                if found is not None:
+                    record([first, second], found[0], "joint point count", found[1])
                     progress = [first, second]
                     break
         if not progress:

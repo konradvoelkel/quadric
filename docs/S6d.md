@@ -298,7 +298,13 @@ $c\in\mathbb Z$.
     $T$-fixed points), then $(O_{23},\gamma_0)$ on $X$. The joint step,
     $(O_3,\gamma_0)$ and $(O_{23},\gamma_0)$ together on $X$, also gives
     $(0,0)$ and is tested separately.
-  - DIII(7), AIII(3,5) and AIII(3,6) follow the same pattern.
+  - AIII(3,5) and AIII(3,6) follow the same pattern.
+  - AIII(4,5): all six unknowns are decided one at a time, those on closures
+    without fixed points by Poincaré duality.
+  - DIII(7): on $X^{\{0,2\}}$ duality leaves $c$ unbounded. So
+    $(O_3,\gamma_0)$ and $(O_{23},\gamma_0)$ are decided jointly on $X$,
+    against the E-polynomial. When a closure fails to bound $c$, the next
+    larger one is tried.
 - **ABBV certificate** (`spherical.certify_normal_weights`), for a single
   unknown.
   - Take the ABBV identity $\sum_p 1/e_p(\lambda) = 0$ at random $\lambda$. It
