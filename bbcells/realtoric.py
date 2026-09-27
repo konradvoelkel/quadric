@@ -19,6 +19,15 @@ orthant, and is acyclic (paths leave a BB cell only towards larger lambda).
 Algebraic Morse theory then gives an integral chain complex with one
 generator per BB cell: the exact incidences of the real BB decomposition,
 graded or not. Its homology is H_*(X(R); Z).
+
+Twisted coefficients. For a divisor D = sum a_rho D_rho, the orientation
+local system Z(L) of the real line bundle L = O(D) is trivialized on the
+copies P x {e} by the section s_D, which changes sign across the facet of
+rho iff a_rho is odd. So the generator of the cell (tau, e) depends on the
+representative e: [tau, e + r_rho] = (-1)^a_rho [tau, e] for rho in tau, and
+the boundary formula above holds for any representative. With the canonical
+(reduced) representatives this puts a sign into each incidence; the Morse
+matching is unchanged, and the complex computes H_*(X(R); Z(L)).
 """
 
 from fractions import Fraction
@@ -62,11 +71,17 @@ class RealToricComplex(object):
     ([1, 0, 0], [1, 0, 0])
     >>> X.integral_homology()
     [[0], [2], []]
+    >>> RealToricComplex(toric.projective_space(2), (3, -7), twist=(1, 0, 0)).integral_homology()
+    [[2], [], [0]]
     """
 
-    def __init__(self, fan, cocharacter):
+    def __init__(self, fan, cocharacter, twist=None):
         self.fan, self.cocharacter, self.n = fan, tuple(cocharacter), fan.dim
         self._rays = [_bits(r) for r in fan.rays]
+        if twist is not None and len(twist) != len(fan.rays):
+            raise ValueError("the twist needs one coefficient per ray")
+        self.twist = tuple(a % 2 for a in twist) if twist is not None else None
+        self._signs = {}
         self.cones = {frozenset(sub) for c in fan.cones for k in range(self.n + 1)
                       for sub in combinations(c, k)}
         self._basis, self._coordinates = {}, {}
@@ -95,6 +110,27 @@ class RealToricComplex(object):
     def dim(self, cell):
         return self.n - len(cell[0])
 
+    def _twist_sign(self, tau, difference):
+        """(-1)^(sum of a_rho) for the rays rho of tau adding up to `difference`
+        modulo 2 (unique: the rays of a smooth cone are independent mod 2)"""
+        if not self.twist or not difference:
+            return 1
+        key = (tau, difference)
+        if key not in self._signs:
+            rays = sorted(tau)
+            for k in range(1 << len(rays)):
+                total, parity = 0, 0
+                for j, i in enumerate(rays):
+                    if k >> j & 1:
+                        total ^= self._rays[i]
+                        parity += self.twist[i]
+                if total == difference:
+                    self._signs[key] = -1 if parity % 2 else 1
+                    break
+            else:
+                raise AssertionError("not in the span of the rays of the cone")
+        return self._signs[key]
+
     def boundary(self, cell):
         tau, e = cell
         result = {}
@@ -103,6 +139,7 @@ class RealToricComplex(object):
                 continue
             sign = -1 if (self.n - len(tau) + sum(1 for i in tau if i < r)) % 2 else 1
             face = self.cell(tau | {r}, e)
+            sign *= self._twist_sign(face[0], face[1] ^ e)
             result[face] = result.get(face, 0) + sign
         return result
 

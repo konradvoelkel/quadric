@@ -112,6 +112,13 @@ class TestGolden(unittest.TestCase):
         self.assertEqual(code, 0, err)
         self.assertEqual(sum(json.loads(out)["counts"]), 18 + 8)
 
+    def test_cli_twisted_chow_witt(self):
+        code, out, err = run_cli("real-toric", "--named", "P2", "--chow-witt", "--twist", "1,0,0")
+        self.assertEqual(code, 0, err)
+        self.assertIn("CH~^2 = Z^2", out)
+        code, out, err = run_cli("real-toric", "--named", "P2", "--twist", "1,0,0")
+        self.assertIn("H_0 = Z/2", out)
+
     def test_cli_symplectic_pairs(self):
         code, out, err = run_cli("spherical", "symplectic-pairs-n", "3", "--format", "json")
         self.assertEqual(code, 0, err)

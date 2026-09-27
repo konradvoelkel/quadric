@@ -156,7 +156,7 @@ tools/fetch_arxiv.py            literature download
 | engine and invariants | `core`, `invariants`, `algebra` | cells, motive, Hodge, $K_0$, point counts, $\chi^{\mathbb A^1}$; checks by cocharacter independence, Poincaré duality and holomorphic Lefschetz | — |
 | toric, flag, quadrics, group compactifications | `frontends/*` | all smooth complete fans, $G/P$ of all types, $Q_n$, wonderful $\overline{G_{\mathrm{ad}}}$ | `history.md` M1–M4 |
 | horospherical, rank one | `horospherical`, `two_orbit` | toroidal horospherical (Batyrev–Moreau oracle), Knop's rank-one table | `history.md` S6a, S6b |
-| wonderful and symmetric | `spherical`, `symmetric` | orbit-by-orbit assembly; all Satake diagrams; normal weights beyond (R) proved by the opposition symmetry (inner Hermitian cases) and certified by point counts of open orbits | `spherical.md` §§3, 6, 7 |
+| wonderful and symmetric | `spherical`, `symmetric`, `luna` | orbit-by-orbit assembly; all Satake diagrams; normal weights beyond (R) proved by the opposition symmetry (inner Hermitian cases) and certified by point counts of open orbits; a first non-symmetric family from Luna data (with $c\ne0$); product root systems | `spherical.md` §§3, 6, 7, 11 |
 | toroidal | `toroidal` | smooth fans in the valuation cone, $\Lambda = \mathbb Z\Sigma$, and the finite covers $G/G^\theta$ with Helgason's lattice (fans resolved automatically) | `spherical.md` §8 |
 | large cases | `spherical.stream_cell_counts`, `symmetric.split_cell_counts` | all of $E_7$ and EIX by streaming (in parallel); split forms from the orbit decomposition, EVIII with 9297296775 cells | `spherical.md` §10 |
 | equivariant cohomology | `equivariant`, `brion`, `oracles` | GKM rings; Brion's description beyond GKM; characteristic numbers by localization and from the Hilbert function; canonical classes; subalgebras generated in any degree | `cohomology.md` |
@@ -261,8 +261,10 @@ release goes out together with the paper.
   $E_7$. Open: the decomposition for non-split forms.
 - [ ] **R6 Chow–Witt output** (`real.md` §7). Done without twist:
   $\widetilde{CH}^q = CH^q\times_{\mathrm{Ch}^q}H^q(X(\mathbb R);\mathbb Z)$ for flag and
-  toric varieties (`bbcells.chowwitt`, `--chow-witt`). Open: twisted
-  coefficients and the ring structure; later a sign rule.
+  toric varieties (`bbcells.chowwitt`, `--chow-witt`); with twists for toric
+  varieties (`real-toric --twist`, `real.md` §7.1; checked by twisted
+  Poincaré duality and on $\mathbb P^n$). Open: twists for flag varieties, the
+  ring structure; later a sign rule.
 
 ### 4.3 Track E — engineering and release
 

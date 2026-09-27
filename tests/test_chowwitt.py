@@ -20,6 +20,22 @@ class TestChowWitt(unittest.TestCase):
             flag = chowwitt.chow_witt(realcells.real_flag_variety("A%d" % n, {1}))
             self.assertEqual(flag, groups, n)
 
+    def test_twisted_projective_spaces(self):
+        # CH~^q(P^n, O(1)): Z in degree 0 (the W-part vanishes), Z in the middle,
+        # and the top is GW(R) iff n is even (O(1) = omega mod squares)
+        for n in range(1, 6):
+            fan = toric.projective_space(n)
+            X = realtoric.RealToricComplex(fan, tuple(range(1, n + 1)), twist=[1] + [0] * n)
+            self.assertEqual(chowwitt.chow_witt(X),
+                             [(1, [])] * n + [(1 if n % 2 else 2, [])], n)
+
+    def test_top_degree_twisted_by_the_canonical_bundle(self):
+        # H^n(X(R); Z(omega)) = Z, so CH~^n(X, omega) = GW(R) = Z^2
+        for fan in [toric.hirzebruch(1), toric.hirzebruch(2), toric.del_pezzo_6(),
+                    toric.projective_space(3)]:
+            X = realtoric.RealToricComplex(fan, (3, -7, 11)[:fan.dim], twist=[1] * len(fan.rays))
+            self.assertEqual(chowwitt.chow_witt(X)[-1], (2, []), fan.name)
+
     def test_ranks(self):
         # the rank of CH~^q is rank CH^q plus the rational Betti number b_q(X(R))
         for X in [realcells.real_flag_variety("A3"), realcells.real_flag_variety("B2"),

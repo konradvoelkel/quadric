@@ -53,7 +53,8 @@ First release, to accompany the companion paper (`paper/`).
 - Exact real incidences of toric varieties by discrete Morse theory.
 - Predictions of rational Betti numbers of $X(\mathbb R)$ under hypothesis H1,
   for GKM and graded non-GKM decompositions (experimental).
-- Chow–Witt groups over $\mathbb R$ of flag and toric varieties (untwisted).
+- Chow–Witt groups over $\mathbb R$ of flag and toric varieties; for toric
+  varieties also twisted by a line bundle (`real-toric ... --twist`).
 
 ### Command line
 - `toric`, `flag`, `quadric`, `wonderful`, `example`, `spherical`,

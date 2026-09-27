@@ -329,8 +329,8 @@ Open points:
   $SH(\mathbb{Z})$ themselves, for example via the Thom-space cell structures of
   arXiv:1805.04338 restricted to invariant curves.
 - **Chow–Witt.** Done without twist (`bbcells.chowwitt`, `real … --chow-witt`,
-  `real-toric … --chow-witt`); see §7. Open: twisted coefficients
-  $\widetilde{CH}^q(X,\mathcal L)$, which need $H^q(X(\mathbb R);\mathbb Z(\mathcal L))$
+  `real-toric … --chow-witt`), and with twists for toric varieties
+  (`real-toric … --twist`); see §7. Open: twists for flag varieties
   (incidences twisted along the invariant curves on which $\mathcal L$ has odd
   degree), and the ring structure.
 - **Non-graded decompositions** in dimension $\ge3$ (§§5.2–5.3), in
@@ -366,3 +366,30 @@ $$\widetilde{CH}^q(X) \cong CH^q(X)\times_{H^q(X(\mathbb R);\mathbb Z/2)}H^q(X(\
 - Input: the exact toric Morse complexes (§3.2) and the signed real Schubert
   complexes. Complexes predicted under H1 could be used the same way, and
   would then be conditional on H1.
+
+### 7.1 Twisted coefficients (toric varieties)
+
+For a divisor $D=\sum a_\rho D_\rho$ the orientation local system
+$\mathbb Z(\mathcal L)$ of the real line bundle $\mathcal L=\mathcal O(D)$ is trivialized on each copy
+$P\times\{e\}$ of the Davis–Januszkiewicz model by the section $s_D$, which
+changes sign across the facet of $\rho$ iff $a_\rho$ is odd. So a cell
+$(\tau,e)$ has one generator per representative, with
+$[\tau,e+r_\rho]=(-1)^{a_\rho}[\tau,e]$ for $\rho\in\tau$, and the boundary formula of
+§3.2 holds for every representative; with the reduced representatives each
+incidence gets a sign. The Morse matching is unchanged
+(`RealToricComplex(fan, lam, twist=a)`). The twisted Chow–Witt groups are
+then computed by the fibre product of §7 with $H^q(X(\mathbb R);\mathbb Z(\mathcal L))$; that
+the identifications of §7 hold with twists is assumed, and checked below.
+
+Checks (`tests/test_realtoric.py`, `tests/test_chowwitt.py`):
+- twisted Poincaré duality: with $a_\rho=1$ for all $\rho$ ($\mathcal L=\omega_X$, whose real
+  points have $w_1 = w_1(X(\mathbb R))$), $H_d(X(\mathbb R);\mathbb Z(\omega))\cong H^{n-d}(X(\mathbb R);\mathbb Z)$ for
+  all nine test fans, torsion included;
+- only the class of $D$ modulo $2\,\mathrm{Pic}$ matters: $D+\operatorname{div}\chi^m$ gives the same
+  groups, and $2D$ gives the untwisted ones;
+- $H_*(\mathbb{RP}^n;\mathbb Z(\mathcal O(1)))$ is the homology with the non-trivial local system
+  (e.g. $\mathbb Z/2,0,\mathbb Z$ for $n=2$);
+- $\widetilde{CH}^q(\mathbb P^n,\mathcal O(1))$: $\mathbb Z$ for $q<n$, and the top group is $GW(\mathbb R)$ iff $n$
+  is even, i.e. iff $\mathcal O(1)\equiv\omega$ modulo squares; and
+  $\widetilde{CH}^n(X,\omega_X)=GW(\mathbb R)$ for $F_1$, $F_2$, $dP_6$ and $\mathbb P^3$.
+

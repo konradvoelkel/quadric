@@ -33,6 +33,33 @@ class TestRealToric(unittest.TestCase):
         self.assertEqual(realtoric.RealToricComplex(toric.hirzebruch(1), (3, -7))
                          .integral_homology(), [[0], [0, 2], []])
 
+    def test_twisted_poincare_duality(self):
+        # the orientation sheaf of X(R) is Z(K), K = -sum D_rho: H_d(X(R); Z(K))
+        # is H^{n-d}(X(R); Z), read off the untwisted complex (Ext of H_{n-d-1})
+        for fan in FANS:
+            lam = (3, -7, 11)[:fan.dim]
+            plain = realtoric.RealToricComplex(fan, lam).integral_homology()
+            twisted = realtoric.RealToricComplex(fan, lam, twist=[1] * len(fan.rays))
+            n = fan.dim
+            cohomology = [[0] * plain[n - d].count(0) +
+                          sorted(t for t in (plain[n - d - 1] if n - d - 1 >= 0 else []) if t)
+                          for d in range(n + 1)]
+            self.assertEqual(twisted.integral_homology(), cohomology, fan.name)
+
+    def test_twist_depends_on_the_class_mod_2(self):
+        # D and D + div(chi^m) give the same local system; even twists are trivial
+        for fan in FANS:
+            lam = (3, -7, 11)[:fan.dim]
+            base = [1] + [0] * (len(fan.rays) - 1)
+            m = [1] + [0] * (fan.dim - 1)
+            moved = [a + sum(x * y for x, y in zip(m, r)) for a, r in zip(base, fan.rays)]
+            self.assertEqual(
+                realtoric.RealToricComplex(fan, lam, twist=base).integral_homology(),
+                realtoric.RealToricComplex(fan, lam, twist=moved).integral_homology(), fan.name)
+            self.assertEqual(
+                realtoric.RealToricComplex(fan, lam, twist=[2] * len(fan.rays)).integral_homology(),
+                realtoric.RealToricComplex(fan, lam).integral_homology(), fan.name)
+
     def test_gkm_rule_entrywise_on_graded_decompositions(self):
         # H1': |[x : y]| = 2 iff x, y are joined by a curve with m even (docs/real.md)
         for fan in FANS:
