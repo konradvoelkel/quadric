@@ -71,7 +71,8 @@ def _bonds(letter, n):
 
 
 class RootSystem(object):
-    """an irreducible root system
+    """a root system: irreducible ("B2") or a product ("A1xA1", "A2xG2"),
+    whose simple roots are numbered factor by factor
     >>> R = RootSystem("B2")
     >>> R.cartan
     ((2, -1), (-2, 2))
@@ -81,21 +82,32 @@ class RootSystem(object):
     0
     >>> len(RootSystem("E8").positive_roots)
     120
+    >>> P = RootSystem("A1xB2")
+    >>> P.rank, P.letter, len(P.positive_roots), P.degrees, P.weyl_group_order
+    (3, 'X', 5, [2, 2, 4], 16)
     """
 
     def __init__(self, cartan_type):
-        self.letter, self.rank = parse_cartan_type(cartan_type)
-        self.name = "%s%d" % (self.letter, self.rank)
+        factors = [parse_cartan_type(part) for part in cartan_type.strip().upper().split("X")]
+        if len(factors) == 1:
+            self.letter, self.rank = factors[0]
+        else:
+            self.letter, self.rank = "X", sum(n for _, n in factors)
+        self.factors = tuple(factors)
+        self.name = "x".join("%s%d" % factor for factor in factors)
         n = self.rank
         cartan = [[2 if i == j else 0 for j in range(n)] for i in range(n)]
-        for i, j, m in _bonds(self.letter, n):
-            # i long, j short when m > 1: <a_i^vee, a_j> = -1, <a_j^vee, a_i> = -m
-            cartan[i][j] = -1
-            cartan[j][i] = -m
+        offset = 0
+        for letter, k in factors:
+            for i, j, m in _bonds(letter, k):
+                # i long, j short when m > 1: <a_i^vee, a_j> = -1, <a_j^vee, a_i> = -m
+                cartan[offset + i][offset + j] = -1
+                cartan[offset + j][offset + i] = -m
+            offset += k
         self.cartan = tuple(tuple(row) for row in cartan)
         self._lengths = self._squared_lengths()
         self.positive_roots = self._positive_roots()
-        self.degrees = DEGREES[self.letter](n)
+        self.degrees = sorted(d for letter, k in factors for d in DEGREES[letter](k))
 
     def __repr__(self):
         return "RootSystem(%r)" % self.name
@@ -120,7 +132,11 @@ class RootSystem(object):
                         stack.append(j)
                         component.append(j)
             longest = max(lengths[i] for i in component)
+            single_b1 = len(component) == 1 and any(
+                letter == "B" and k == 1 for letter, k in self.factors)
             scale = (Fraction(1) if self.letter == "B" and n == 1 else 2 / longest)
+            if self.letter == "X" and single_b1:
+                raise ValueError("B1 is not allowed as a factor; use A1")
             for i in component:
                 lengths[i] *= scale
         return tuple(lengths)

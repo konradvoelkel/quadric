@@ -83,5 +83,23 @@ class TestSymplecticPairs(unittest.TestCase):
         self.assertEqual(bb_cells(X).counts, (1, 3, 5, 6, 5, 3, 1))
 
 
+class TestProducts(unittest.TestCase):
+
+    def test_group_case_from_luna_data(self):
+        # G x G > diag G: Sigma = {alpha_i + alpha_i'}, no satellite has fixed
+        # points; this is the De Concini-Procesi compactification of G_ad
+        from bbcells.frontends import wonderful
+        for cartan_type, r in [("A1", 1), ("A2", 2), ("B2", 2), ("G2", 2)]:
+            sigma = [tuple(int(k == i) + int(k == i + r) for k in range(2 * r))
+                     for i in range(r)]
+            X = spherical.wonderful_variety(cartan_type + "x" + cartan_type, sigma,
+                                            lambda I: None)
+            W = wonderful.wonderful_compactification(cartan_type)
+            # the front end lets the first factor act by s x, here by x s^-1
+            flip = lambda w: tuple(-c for c in w[:r]) + tuple(w[r:])
+            self.assertEqual(sorted(tuple(sorted(flip(w) for w in ws)) for ws in X.weights),
+                             sorted(tuple(sorted(ws)) for ws in W.weights), cartan_type)
+
+
 if __name__ == "__main__":
     unittest.main()

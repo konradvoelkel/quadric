@@ -619,6 +619,11 @@ $$E(X)=\sum_{I\subseteq S}|G/P_I|(q)\;e(I),\qquad e(I)=\prod_{\text{factors }F\t
      agrees with this model for $n=2,3,4$, and the Brion–Peyre orbit counts
      agree. Command line: `bbcells spherical symplectic-pairs n` (`-n` for
      the normalizer).
+   - **Products.** `RootSystem` accepts products such as `A2xA2` (simple roots
+     numbered factor by factor). The group case $G\times G\supset G$,
+     $\Sigma=\{\alpha_i+\alpha_i'\}$, whose satellites have no fixed points, reproduces
+     the De Concini–Procesi front end weight by weight for $A_1,A_2,B_2,G_2$;
+     most of Wasserman's and Bravi–Pezzini's lists live on products.
 2. **Certificates beyond the Hermitian case.** The point-count
    certificate of §7 decides one unknown, or two on different orbits, on any
    orbit closure. It remains to:
