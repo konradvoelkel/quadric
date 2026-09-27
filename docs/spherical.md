@@ -491,6 +491,25 @@ Results (dimension, number of fixed points, time):
 For example, EVI has cell counts
 1, 4, 11, 26, 54, 105, 189, 321, 516, 794, 1176, …, 33607, 33805, 33607, …, 1.
 
+**Split forms from the orbit decomposition** (`symmetric.split_cell_counts`,
+PLAN R5). For the split real form of $G$ the spherical roots are the
+$2\alpha_i$ and $S^p=\emptyset$, so the orbits are the $O_I$,
+$I\subseteq S$, with $O_I = G\times^{P_I}(L_I/H_I)$ and $L_I/H_I$ the split
+symmetric space of the Levi. Hence
+$$E(X)=\sum_{I\subseteq S}|G/P_I|(q)\;e(I),\qquad e(I)=\prod_{\text{factors }F\text{ of }L_I}e(F).$$
+- If the split symmetric space of a simple factor $F$ contains a maximal
+  torus, $e(F)$ is its Brion–Peyre count (§9).
+- Otherwise $e(F)$ is the cell count of the complete symmetric variety of $F$
+  (streamed as above), minus $\sum_{J\subsetneq S_F}|F/P_J|\,e(J)$.
+- No fixed point of $X$ itself is visited. The results agree exactly with the
+  streamed counts for $B_2,B_3,B_4,C_3,C_4,D_4,D_6,F_4,G_2$ (tests), whose
+  Levis include factors of both kinds. For $E_7$ (EV) the method gives
+  $\chi=28373976$ in 2 minutes instead of 30, palindromic.
+- EVIII ($E_8/\mathrm{Spin}_{16}$, dimension 128) needs only the complete
+  symmetric varieties of the Levi factors $A_2,\dots,A_7$, $D_5$, $D_7$ and
+  $E_6$ whose split symmetric spaces have smaller rank; its closed orbit alone
+  has $|W(E_8)|=696729600$ fixed points.
+
 ## 11. Open problems
 
 1. **General Luna data (non-symmetric satellites).** Following
@@ -528,6 +547,7 @@ For example, EVI has cell counts
 3. **Toroidal $X$ over $G/H$ with $\Lambda\supsetneq\mathbb Z\Sigma$.** Then
    $O_\tau\to O_J$ is a finite cover times a torus. Needs the lattice
    $\Lambda$ and the component group.
-4. **Large Euler characteristics.** Done for $E_7$ and EIX (§10). EVIII
-   is out of reach in pure Python: its closed orbit alone has
-   $|W(E_8)| = 696729600$ fixed points.
+4. **Large Euler characteristics.** Done for $E_7$ and EIX by streaming, and
+   for all split forms, EVIII included, by the orbit decomposition (§10).
+   Open: the orbit decomposition for non-split forms (black nodes and
+   arrows), which needs the Levi's own Satake subdiagram.

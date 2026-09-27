@@ -330,8 +330,10 @@ Open points:
 
 For a smooth cellular $X$ over $\mathbb R$, the Chow ring has no 2-torsion, so
 $\widetilde{CH}^q(X)=H^q(X,\mathbf I^q)\times_{\mathrm{Ch}^q(X)}CH^q(X)$
-(Hornbostel–Wendt; HWXZ, arXiv:2302.11003, §2). The real cycle class map is
-an isomorphism $H^q(X,\mathbf I^q)\cong H^q(X(\mathbb R);\mathbb Z)$ for cellular $X$, and
+(Hornbostel–Wendt, as stated in Hudson–Matszangosz–Wendt, arXiv:2302.11003,
+§2). The real cycle class map of Hornbostel–Wendt–Xie–Zibrowius
+(arXiv:1911.04150) is an isomorphism
+$H^q(X,\mathbf I^q)\cong H^q(X(\mathbb R);\mathbb Z)$ for cellular $X$, and
 it is compatible with the reduction to $\mathrm{Ch}^q(X)\cong
 H^q(X(\mathbb R);\mathbb Z/2)$ (Borel–Haefliger). Hence
 $$\widetilde{CH}^q(X) \cong CH^q(X)\times_{H^q(X(\mathbb R);\mathbb Z/2)}H^q(X(\mathbb R);\mathbb Z).$$

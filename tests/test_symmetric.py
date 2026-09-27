@@ -171,6 +171,16 @@ class TestNewCases(unittest.TestCase):
             self.assertEqual(spherical.certify_by_symmetry(D.R.name, orbits, D.spherical_roots),
                              spherical.certify_by_closures(D.R.name, orbits))
 
+    def test_split_cell_counts_from_the_orbit_decomposition(self):
+        # sum over I of |G/P_I| times the satellite counts (Brion-Peyre, or the
+        # Levi's own cell counts minus its other orbits) = the BB counts
+        memo = {}
+        for cartan_type, form in [("B2", ("BI", 2, 3)), ("C3", ("CI", 3)), ("B3", ("BI", 3, 4)),
+                                  ("C4", ("CI", 4)), ("D4", ("DI", 4, 4)), ("G2", ("G",)),
+                                  ("F4", ("FI",))]:
+            self.assertEqual(symmetric.split_cell_counts(cartan_type, memo=memo),
+                             symmetric.cell_counts(*form), cartan_type)
+
     def test_certificate_by_orbit_closures(self):
         for case, expected in [(("AIII", 2, 3), {("O2", 0): [0]}), (("EIII",), {("O1", 1): [0]})]:
             D = symmetric.diagram(*case)

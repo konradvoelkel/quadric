@@ -24,7 +24,7 @@ Every recognition is cross-checked: dim K computed from the Satake diagram
 must equal rank + #{roots fixed by t_j}.
 """
 
-from itertools import permutations
+from itertools import combinations, permutations
 
 from bbcells.frontends import spherical
 from bbcells.oracles import _classify_component
@@ -453,6 +453,99 @@ def cell_counts(kind, *parameters, seed=0, processes=1):
     if results[0] != results[1] or results[0] != results[0][::-1]:
         raise ValueError("inconsistent cell counts: %r / %r" % tuple(results))
     return results[0]
+
+
+def _split_form(letter, rank):
+    """the (kind, parameters) of the split real form of a simple type"""
+    if letter == "A":
+        return ("AI", rank + 1)
+    if letter == "B":
+        return ("BI", rank, rank + 1)
+    if letter == "C":
+        return ("CI", rank)
+    if letter == "D":
+        return ("DI", rank, rank)
+    return {("E", 6): ("EI",), ("E", 7): ("EV",), ("E", 8): ("EVIII",), ("F", 4): ("FI",),
+            ("G", 2): ("G",)}[(letter, rank)]
+
+
+def _levi_types(R, nodes):
+    """[(letter, rank)] of the connected components of the sub-diagram on
+    nodes, with B and C told apart by the number of long simple roots"""
+    from bbcells.oracles import _classify_component
+    nodes, result = set(nodes), []
+    while nodes:
+        component, frontier = set(), [min(nodes)]
+        while frontier:
+            i = frontier.pop()
+            if i in component:
+                continue
+            component.add(i)
+            frontier.extend(j for j in nodes if j not in component and R.cartan[i][j])
+        nodes -= component
+        letter, rank = _classify_component(R.cartan, sorted(component))
+        if letter == "B" and rank >= 3:
+            unit = lambda i: tuple(int(k == i) for k in range(R.rank))
+            lengths = [R.inner(unit(i), unit(i)) for i in component]
+            long = sum(1 for x in lengths if x == max(lengths))
+            letter = "B" if long > 1 else "C"
+        result.append((letter, rank))
+    return sorted(result)
+
+
+def split_cell_counts(cartan_type, processes=1, memo=None):
+    """the BB cell counts (Betti numbers) of the complete symmetric variety of
+    the split real form of G, from the orbit decomposition, without its fixed
+    points: E(X) = sum over I c S of |G/P_I|(q) e(I), where e(I) is the point
+    count of the satellite of O_I, the split symmetric space of the Levi L_I,
+    a product over the simple factors of L_I. For a factor whose split
+    symmetric space contains a maximal torus, e is Brion-Peyre's count;
+    otherwise it is the cell count of that factor's complete symmetric
+    variety (cell_counts) minus the counts of its other orbits. PLAN R5.
+    >>> split_cell_counts("A2") == cell_counts("AI", 3)   # complete conics
+    True
+    >>> split_cell_counts("G2") == cell_counts("G")
+    True
+    """
+    from bbcells.algebra import IntPoly
+    from bbcells.oracles import from_degrees, levi_degrees
+    memo = {} if memo is None else memo
+    R = RootSystem(cartan_type)
+
+    def flag(R, nodes):
+        return from_degrees(R.degrees, levi_degrees(R.cartan, set(nodes)))
+
+    def e_of(R, nodes):
+        value = IntPoly((1,))
+        for letter, rank in _levi_types(R, nodes):
+            value = value * e_simple(letter, rank)
+        return value
+
+    def e_simple(letter, rank):
+        key = (letter, rank)
+        if key not in memo:
+            form = _split_form(letter, rank)
+            D = diagram(*form)
+            top = [o for o in D.orbits(strict=False)
+                   if len(o.roots) == len(D.spherical_roots)]
+            if top:
+                memo[key] = spherical.satellite_point_count(D.R.name, top[0])
+            else:
+                total = IntPoly.from_counts(cell_counts(*form, processes=processes))
+                S = range(D.R.rank)
+                for size in range(D.R.rank):
+                    for J in combinations(S, size):
+                        total = total - flag(D.R, J) * e_of(D.R, J)
+                memo[key] = total
+        return memo[key]
+
+    total = IntPoly(())
+    for size in range(R.rank + 1):
+        for I in combinations(range(R.rank), size):
+            total = total + flag(R, I) * e_of(R, I)
+    if any(c < 0 for c in total.coefficients):
+        raise AssertionError("negative cell counts")
+    return tuple(total.coefficients)
 
 
 def complete_symmetric_variety(kind, *parameters, strict=False, certify=True):

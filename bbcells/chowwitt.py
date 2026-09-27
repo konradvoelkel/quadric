@@ -6,10 +6,11 @@ For a smooth cellular X over R the Chow-Witt group is the fibre product
     CH~^q(X) = CH^q(X) x_{Ch^q(X)} H^q(X(R); Z)
 
 (Hornbostel-Wendt, "Chow-Witt rings of classifying spaces...", Prop. 2.11,
-as used in Hornbostel-Wendt-Xie-Zibrowius, arXiv:2302.11003: the Chow ring
-has no 2-torsion, and for cellular X the real cycle class map identifies
-I-cohomology with H^*(X(R); Z) and its reduction with the Borel-Haefliger
-map Ch^q(X) = H^q(X(R); Z/2)). Both sides have bases indexed by the cells,
+as stated in Hudson-Matszangosz-Wendt, arXiv:2302.11003, section 2: the
+Chow ring has no 2-torsion; and for cellular X the real cycle class map of
+Hornbostel-Wendt-Xie-Zibrowius, arXiv:1911.04150, identifies I-cohomology
+with H^*(X(R); Z) and its reduction with the Borel-Haefliger map
+Ch^q(X) = H^q(X(R); Z/2)). Both sides have bases indexed by the cells,
 the cellular cochain complex of X(R) has even coboundaries, and the
 isomorphism type of the fibre product does not depend on how the two bases
 correspond modulo 2 (any matrix in GL(F_2) lifts to GL(Z)). So

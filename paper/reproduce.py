@@ -107,6 +107,45 @@ for _case, _slow in [(("AIII", 2, 3), False), (("AIII", 2, 4), False), (("AIII",
         lambda case=_case: certified(*case))
 
 
+def open_orbits_match(case):
+    """Lemma (open orbits): |O_J| from the fixed points = Brion-Peyre, every orbit"""
+    D = symmetric.diagram(*case)
+    X = D.fixed_point_data()
+    rng = random.Random(1)
+    for o in D.orbits(strict=False):
+        lam = [rng.randrange(1, 10 ** 6) for _ in range(D.R.rank)]
+        got = spherical.open_orbit_count(spherical.orbit_closure(X, o.roots), lam)
+        expected = (oracles.from_degrees(D.R.degrees, oracles.levi_degrees(D.R.cartan, set(o.levi)))
+                    * spherical.satellite_point_count(D.R.name, o))
+        if got != expected:
+            return False
+    return True
+
+
+for _case in [("AI", 3), ("AI", 4), ("AIII", 2, 2), ("AIII", 2, 3), ("CI", 3), ("G",),
+              ("BI", 3, 4), ("DIII", 5), ("EIII",), ("FI",), ("AIII", 3, 4)]:
+    claim("lem:openorbit/" + "".join(map(str, _case)), True,
+          slow=_case in (("EIII",), ("FI",), ("AIII", 3, 4)))(
+        lambda case=_case: open_orbits_match(case))
+
+
+def opposition_decides_all(case):
+    """Theorem (opposition): its hypotheses hold for every unknown"""
+    D = symmetric.diagram(*case)
+    orbits = D.orbits(strict=False)
+    unknowns = {(o.name, g) for o in orbits if o.note == spherical.BEYOND_R for g in o.normal_roots}
+    decided = spherical.certify_by_symmetry(D.R.name, orbits, D.spherical_roots)
+    return bool(unknowns) and set(decided) == unknowns
+
+
+_opposition = [("AIII", p, q) for p in range(2, 7) for q in range(p + 1, 11) if p + q <= 12] + \
+              [("DIII", 5), ("DIII", 7), ("DIII", 9), ("DIII", 11), ("EIII",)]
+for _case in _opposition:
+    claim("comp:opposition/" + "".join(map(str, _case)), True,
+          slow=sum(_case[1:]) > 9 or _case == ("DIII", 11))(
+        lambda case=_case: opposition_decides_all(case))
+
+
 # -- Section 5: cell counts without listing fixed points ---------------------------
 
 LARGE = {"EII": (40, 110916), "EI": (42, 370170), "EVII": (54, 23464),
@@ -209,6 +248,22 @@ def _():
     classes = colours(X, "A5")
     lam = tuple(7 ** k + 3 * k for k in range(5))
     return (tangency(X, classes, lam), [integral(X, [c], [20], lam) for c in classes])
+
+
+@claim("comp:characteristic/sections", (3264, 666841088))
+def _():
+    # the same numbers without fixed points (De Concini-Procesi, Weyl, interpolation)
+    return tuple(oracles.complete_quadrics_degree(n, (2,) * (n - 1)) for n in (3, 4))
+
+
+@claim("comp:characteristic/P4-sections", 48942189946470400, slow=True)
+def _():
+    return oracles.complete_quadrics_degree(5, (2,) * 4)
+
+
+@claim("comp:characteristic/P5-sections", 1810718299257984458113941504, slow=True)
+def _():
+    return oracles.complete_quadrics_degree(6, (2,) * 5)
 
 
 @claim("comp:nocanonical/conics", (12, {2}))
